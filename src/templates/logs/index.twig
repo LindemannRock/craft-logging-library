@@ -1,6 +1,5 @@
-{# Generic log viewer template for any plugin using the logging library #}
 {% extends "_layouts/cp" %}
-{% set title = "Logs"|t('app') %}
+{% set title = (pluginName ~ " Logs")|t('app') %}
 {% set fullPageForm = false %}
 
 {# Set up breadcrumbs - plugin name and logs #}
@@ -17,19 +16,16 @@
 
 {% import "_includes/forms" as forms %}
 
-{% block content %}
-    <div class="flex" style="align-items: center; margin-bottom: 24px;">
-        <h1 style="margin: 0;">{{ (pluginName ~ " Logs")|t('app') }}</h1>
+{% block actionButton %}
+    {% if filters.date and logFiles|length > 0 %}
+        <a href="{{ actionUrl('logging-library/logs/download', { date: filters.date, pluginHandle: pluginHandle }) }}" class="btn" download>
+            <span class="icon" aria-hidden="true">{{ svg('@appicons/download.svg') }}</span>
+            {{ "Download Log"|t('app') }}
+        </a>
+    {% endif %}
+{% endblock %}
 
-        {% if filters.date and logFiles|length > 0 %}
-        <div style="margin-left: auto;">
-            <a href="{{ actionUrl('logging-library/logs/download', { date: filters.date, pluginHandle: pluginHandle }) }}" class="btn" download>
-                <span class="icon" aria-hidden="true">{{ svg('@appicons/download.svg') }}</span>
-                {{ "Download Log"|t('app') }}
-            </a>
-        </div>
-        {% endif %}
-    </div>
+{% block content %}
 
     {# Filters #}
     <div class="pane" style="margin-bottom: 24px;">
@@ -69,6 +65,15 @@
                     placeholder: "Search messages and context (press Enter)..."|t('app'),
                 }) }}
             </div>
+
+            {% if filters.search %}
+            <div class="field" style="flex-shrink: 0;">
+                <label class="invisible">{{ "Clear"|t('app') }}</label>
+                <button type="button" class="btn" onclick="clearSearch()" title="{{ 'Clear search'|t('app') }}">
+                    {{ "Clear"|t('app') }}
+                </button>
+            </div>
+            {% endif %}
         </div>
     </div>
 
@@ -104,7 +109,7 @@
                                 <time datetime="{{ entry.timestamp }}">{{ entry.timestamp|date('H:i:s') }}</time>
                             </td>
                             <td>
-                                <span class="status {{ entry.level }}">{{ entry.level|upper }}</span>
+                                {{ entry.level|upper }}
                             </td>
                             <td class="nowrap">
                                 {% if entry.user matches '/user:(\\d+)/' %}
@@ -307,5 +312,11 @@ document.addEventListener('DOMContentLoaded', function() {
             applyFilters();
         }
     });
+
+    // Global clear search function
+    window.clearSearch = function() {
+        searchFilter.value = '';
+        applyFilters();
+    };
 });
 {% endjs %}

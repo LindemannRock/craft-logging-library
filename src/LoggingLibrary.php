@@ -11,6 +11,7 @@
 namespace lindemannrock\logginglibrary;
 
 use Craft;
+use craft\base\Plugin;
 use craft\events\RegisterUrlRulesEvent;
 use craft\web\UrlManager;
 use yii\base\Event;
@@ -20,10 +21,10 @@ use Monolog\Formatter\LineFormatter;
 use Psr\Log\LogLevel;
 
 /**
- * Logging Module
+ * Logging Library Plugin
  * Provides centralized logging configuration for Craft CMS plugins
  */
-class LoggingModule extends Module
+class LoggingLibrary extends \craft\base\Plugin
 {
     /**
      * @var array Registered plugin configurations
@@ -36,6 +37,25 @@ class LoggingModule extends Module
     private static array $_configuredTargets = [];
 
     /**
+     * @inheritdoc
+     */
+    public function init(): void
+    {
+        parent::init();
+
+
+        // Register CP routes for all plugins using the logging library
+        Event::on(
+            UrlManager::class,
+            UrlManager::EVENT_REGISTER_CP_URL_RULES,
+            function (RegisterUrlRulesEvent $event) {
+                $event->rules['logging-library/logs'] = 'logging-library/logs/index';
+                $event->rules['logging-library/logs/download'] = 'logging-library/logs/download';
+            }
+        );
+    }
+
+    /**
      * Configure logging for a plugin
      */
     public static function configure(array $config): void
@@ -43,6 +63,11 @@ class LoggingModule extends Module
         $handle = $config['pluginHandle'] ?? null;
         if (!$handle) {
             throw new \InvalidArgumentException('Plugin handle is required for logging configuration');
+        }
+
+        // Skip if already configured (lightweight guard)
+        if (isset(self::$_pluginConfigs[$handle])) {
+            return;
         }
 
         // Validate required config
@@ -57,7 +82,7 @@ class LoggingModule extends Module
 
         self::$_pluginConfigs[$handle] = $config;
 
-        // Configure logging immediately
+        // Configure logging immediately (heavy operation, but guarded)
         self::_configureLogging($handle, $config);
 
         // Register routes if log viewer is enabled
@@ -98,23 +123,17 @@ class LoggingModule extends Module
             return;
         }
 
-        // Create a MonologTarget following PutYourLightsOn's approach
+        // Create a MonologTarget following the exact PutYourLightsOn pattern
         $target = new MonologTarget([
             'name' => $handle,
             'categories' => [$handle],
             'level' => self::_mapLogLevel($config['logLevel']),
-            'logContext' => false, // Cleaner output
+            'logContext' => false,
             'allowLineBreaks' => false,
             'formatter' => new LineFormatter(
-                format: "%datetime% [user:%extra.userId%][%level_name%][%channel%] %message% %context%\n",
+                format: "%datetime% [%extra.user%][%level_name%][%channel%] %message% %context%\n",
                 dateFormat: 'Y-m-d H:i:s',
             ),
-            'extractors' => [
-                'userId' => function() {
-                    $user = Craft::$app->has('user', true) ? Craft::$app->getUser() : null;
-                    return $user && !$user->getIsGuest() ? $user->getId() : '-';
-                }
-            ]
         ]);
 
         // Add the target to the log dispatcher (following the exact pattern from the article)
@@ -125,8 +144,6 @@ class LoggingModule extends Module
 
         // Mark as configured
         self::$_configuredTargets[$handle] = true;
-
-        Craft::debug("Configured logging for plugin: {$handle}", $handle);
     }
 
     /**

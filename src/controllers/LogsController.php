@@ -13,7 +13,7 @@ namespace lindemannrock\logginglibrary\controllers;
 use Craft;
 use craft\web\Controller;
 use craft\web\Response;
-use lindemannrock\logginglibrary\LoggingModule;
+use lindemannrock\logginglibrary\LoggingLibrary;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 
@@ -37,7 +37,7 @@ class LogsController extends Controller
 
         // Get plugin handle from the URL segment
         $pluginHandle = $this->_getPluginHandleFromUrl();
-        $config = LoggingModule::getConfig($pluginHandle);
+        $config = LoggingLibrary::getConfig($pluginHandle);
 
         if (!$config) {
             throw new NotFoundHttpException('Plugin logging not configured');
@@ -54,7 +54,7 @@ class LogsController extends Controller
         $limit = 50; // Entries per page
 
         // Get available log files
-        $logFiles = LoggingModule::getLogFiles($pluginHandle);
+        $logFiles = LoggingLibrary::getLogFiles($pluginHandle);
 
         // Read and parse log entries
         $logEntries = $this->_getLogEntries($pluginHandle, $date, $level, $search, $page, $limit);
@@ -65,7 +65,7 @@ class LogsController extends Controller
         // Calculate pagination info
         $totalPages = ceil($totalEntries / $limit);
 
-        return $this->renderTemplate('@lindemannrock-logginglibrary/logs/index', [
+        return $this->renderTemplate('logging-library/logs/index', [
             'pluginHandle' => $pluginHandle,
             'pluginName' => $config['pluginName'],
             'logFiles' => $logFiles,
@@ -100,7 +100,7 @@ class LogsController extends Controller
     {
         $request = Craft::$app->getRequest();
         $pluginHandle = $this->_getPluginHandleFromUrl();
-        $config = LoggingModule::getConfig($pluginHandle);
+        $config = LoggingLibrary::getConfig($pluginHandle);
 
         if (!$config) {
             throw new NotFoundHttpException('Plugin logging not configured');

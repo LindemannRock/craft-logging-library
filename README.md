@@ -42,7 +42,7 @@ namespace yourvendor\yourplugin;
 
 use craft\base\Plugin;
 use lindemannrock\logginglibrary\traits\LoggingTrait;
-use lindemannrock\logginglibrary\LoggingModule;
+use lindemannrock\logginglibrary\LoggingLibrary;
 
 class YourPlugin extends Plugin
 {
@@ -53,7 +53,7 @@ class YourPlugin extends Plugin
         parent::init();
 
         // Configure logging for this plugin
-        LoggingModule::configure([
+        LoggingLibrary::configure([
             'pluginHandle' => $this->handle,           // Required: 'your-plugin'
             'pluginName' => $this->name,               // Optional: 'Your Plugin'
             'logLevel' => 'info',                      // Optional: debug|info|warning|error
@@ -85,7 +85,7 @@ public function getCpNavItem(): ?array
     $item = parent::getCpNavItem();
 
     // Add logs section with permission check
-    return LoggingModule::addLogsNav($item, $this->handle, [
+    return LoggingLibrary::addLogsNav($item, $this->handle, [
         'yourPlugin:viewLogs'
     ]);
 }
@@ -94,7 +94,7 @@ public function getCpNavItem(): ?array
 ## Configuration Options
 
 ```php
-LoggingModule::configure([
+LoggingLibrary::configure([
     'pluginHandle' => 'your-plugin',        // Required: Plugin handle
     'pluginName' => 'Your Plugin',          // Plugin display name
     'logLevel' => 'info',                   // debug|info|warning|error
@@ -151,12 +151,12 @@ $deleted = LoggingService::cleanupOldLogs('your-plugin', 30);
 
 Log files are stored as: `storage/logs/your-plugin-YYYY-MM-DD.log`
 
-Format: `timestamp [user:id][level][plugin-handle] message | context`
+Format: `timestamp [user:id][level][plugin-handle] message context`
 
 Example:
 ```
-2025-01-15 14:30:25 [user:1][INFO][your-plugin] User exported translations | {"count":45,"format":"csv"}
-2025-01-15 14:30:30 [user:1][ERROR][your-plugin] Export failed | {"error":"File not writable"}
+2025-01-15 14:30:25 [user:1][INFO][your-plugin] User exported translations {"count":45,"format":"csv"}
+2025-01-15 14:30:30 [][ERROR][your-plugin] Export failed {"error":"File not writable"}
 ```
 
 ## Log Levels
@@ -229,7 +229,7 @@ use craft\base\Plugin;
 use craft\events\RegisterUserPermissionsEvent;
 use craft\services\UserPermissions;
 use lindemannrock\logginglibrary\traits\LoggingTrait;
-use lindemannrock\logginglibrary\LoggingModule;
+use lindemannrock\logginglibrary\LoggingLibrary;
 use yii\base\Event;
 
 class YourPlugin extends Plugin
@@ -241,7 +241,7 @@ class YourPlugin extends Plugin
         parent::init();
 
         // Configure logging
-        LoggingModule::configure([
+        LoggingLibrary::configure([
             'pluginHandle' => $this->handle,
             'pluginName' => $this->name,
             'logLevel' => 'info',
@@ -267,7 +267,7 @@ class YourPlugin extends Plugin
     public function getCpNavItem(): ?array
     {
         $item = parent::getCpNavItem();
-        return LoggingModule::addLogsNav($item, $this->handle, ['yourPlugin:viewLogs']);
+        return LoggingLibrary::addLogsNav($item, $this->handle, ['yourPlugin:viewLogs']);
     }
 
     // Your plugin methods can now use logging
