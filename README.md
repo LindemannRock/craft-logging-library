@@ -290,8 +290,8 @@ class YourPlugin extends Plugin
 
 ## Requirements
 
-- Craft CMS 5.0+
-- PHP 8.1+
+- Craft CMS 5.0 or greater
+- PHP 8.2 or greater
 
 ## Support
 
