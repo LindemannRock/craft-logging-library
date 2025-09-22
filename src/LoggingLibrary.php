@@ -60,15 +60,18 @@ class LoggingLibrary extends \craft\base\Plugin
      */
     public static function configure(array $config): void
     {
+
         $handle = $config['pluginHandle'] ?? null;
         if (!$handle) {
             throw new \InvalidArgumentException('Plugin handle is required for logging configuration');
         }
 
-        // Skip if already configured (lightweight guard)
-        if (isset(self::$_pluginConfigs[$handle])) {
+        // Allow reconfiguration if log level changed, but skip if exact same config
+        $existingConfig = self::$_pluginConfigs[$handle] ?? null;
+        if ($existingConfig && $existingConfig['logLevel'] === $config['logLevel']) {
             return;
         }
+
 
         // Validate required config
         $config = array_merge([
@@ -112,9 +115,18 @@ class LoggingLibrary extends \craft\base\Plugin
      */
     private static function _configureLogging(string $handle, array $config): void
     {
-        // Skip if already configured
+        // Remove existing target if reconfiguring
         if (isset(self::$_configuredTargets[$handle])) {
-            return;
+            // Remove the old target from dispatcher
+            $dispatcher = Craft::getLogger()->dispatcher;
+            foreach ($dispatcher->targets as $key => $target) {
+                if ($target instanceof MonologTarget &&
+                    !empty($target->categories) &&
+                    $target->categories[0] === $handle) {
+                    unset($dispatcher->targets[$key]);
+                    break;
+                }
+            }
         }
 
         // Skip if target already exists in Craft's log dispatcher
@@ -124,15 +136,19 @@ class LoggingLibrary extends \craft\base\Plugin
         }
 
         // Create a MonologTarget following the exact PutYourLightsOn pattern
+        $mappedLevel = self::_mapLogLevel($config['logLevel']);
+
         $target = new MonologTarget([
             'name' => $handle,
             'categories' => [$handle],
-            'level' => self::_mapLogLevel($config['logLevel']),
+            'level' => $mappedLevel,
             'logContext' => false,
             'allowLineBreaks' => false,
+            'includeUserIp' => true,
             'formatter' => new LineFormatter(
                 format: "%datetime% [%extra.user%][%level_name%][%channel%] %message% %context%\n",
                 dateFormat: 'Y-m-d H:i:s',
+                allowInlineLineBreaks: true,
             ),
         ]);
 
