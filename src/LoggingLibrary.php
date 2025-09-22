@@ -144,7 +144,6 @@ class LoggingLibrary extends \craft\base\Plugin
             'level' => $mappedLevel,
             'logContext' => false,
             'allowLineBreaks' => false,
-            'includeUserIp' => true,
             'formatter' => new LineFormatter(
                 format: "%datetime% [%extra.user%][%level_name%][%channel%] %message% %context%\n",
                 dateFormat: 'Y-m-d H:i:s',
