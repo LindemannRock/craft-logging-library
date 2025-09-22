@@ -1,0 +1,23 @@
+{
+    "name": "lindemannrock/logging-library",
+    "description": "Reusable logging library for Craft CMS plugins",
+    "type": "library",
+    "license": "Proprietary",
+    "authors": [
+        {
+            "name": "LindemannRock",
+            "homepage": "https://lindemannrock.com"
+        }
+    ],
+    "require": {
+        "php": ">=8.1",
+        "craftcms/cms": "^5.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "lindemannrock\\logginglibrary\\": "src/"
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
