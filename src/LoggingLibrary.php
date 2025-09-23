@@ -68,11 +68,8 @@ class LoggingLibrary extends \craft\base\Plugin
         // Allow reconfiguration if log level changed, but skip if exact same config
         $existingConfig = self::$_pluginConfigs[$handle] ?? null;
         if ($existingConfig && $existingConfig['logLevel'] === $config['logLevel']) {
-            Craft::info("LOGGING-LIBRARY: Skipping reconfiguration for {$handle}, same logLevel: {$config['logLevel']}", 'translation-manager');
             return;
         }
-
-        Craft::info("LOGGING-LIBRARY: Configuring {$handle} with logLevel: {$config['logLevel']}", 'translation-manager');
 
 
         // Validate required config
@@ -117,28 +114,24 @@ class LoggingLibrary extends \craft\base\Plugin
      */
     private static function _configureLogging(string $handle, array $config): void
     {
-        // Remove existing target if reconfiguring
-        if (isset(self::$_configuredTargets[$handle])) {
-            // Remove the old target from dispatcher
-            $dispatcher = Craft::getLogger()->dispatcher;
-            foreach ($dispatcher->targets as $key => $target) {
-                if ($target instanceof MonologTarget &&
-                    !empty($target->categories) &&
-                    $target->categories[0] === $handle) {
-                    unset($dispatcher->targets[$key]);
-                    break;
-                }
+        // Remove ALL existing targets for this handle from dispatcher
+        $dispatcher = Craft::getLogger()->dispatcher;
+        $targetsToRemove = [];
+        foreach ($dispatcher->targets as $key => $target) {
+            if ($target instanceof MonologTarget &&
+                !empty($target->categories) &&
+                in_array($handle, $target->categories)) {
+                $targetsToRemove[] = $key;
             }
         }
-
-        // Skip if target already exists in Craft's log dispatcher
-        if (isset(Craft::$app->getLog()->targets[$handle])) {
-            self::$_configuredTargets[$handle] = true;
-            return;
+        foreach ($targetsToRemove as $key) {
+            unset($dispatcher->targets[$key]);
         }
 
+        // Reset the array keys after removal
+        $dispatcher->targets = array_values($dispatcher->targets);
+
         // Create a MonologTarget following the exact PutYourLightsOn pattern
-        Craft::info("LOGGING-LIBRARY: Creating target for {$handle} with level: {$config['logLevel']}", 'translation-manager');
 
         $target = new MonologTarget([
             'name' => $handle,
@@ -153,16 +146,11 @@ class LoggingLibrary extends \craft\base\Plugin
             ),
         ]);
 
-        // Debug: Check what level was actually set
-        Craft::info("LOGGING-LIBRARY: Target level after creation: " . ($target->level ?? 'not set'), 'translation-manager');
-
         // Add the target to the log dispatcher (following the exact pattern from the article)
         Craft::getLogger()->dispatcher->targets[] = $target;
-        Craft::info("LOGGING-LIBRARY: Added target to dispatcher for {$handle}", 'translation-manager');
 
         // Initialize the target immediately
         $target->init();
-        Craft::info("LOGGING-LIBRARY: Initialized target for {$handle}", 'translation-manager');
 
         // Mark as configured
         self::$_configuredTargets[$handle] = true;
