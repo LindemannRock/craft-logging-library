@@ -149,10 +149,11 @@ class LoggingLibrary extends \craft\base\Plugin
             ),
         ]);
 
-        // Add the target to the log dispatcher (following the exact pattern from the article)
+        // Add the target to the log dispatcher AT THE BEGINNING
+        // This ensures our target processes messages before any global filters
         $dispatcher = Craft::getLogger()->dispatcher;
         $beforeCount = count($dispatcher->targets);
-        $dispatcher->targets[] = $target;
+        array_unshift($dispatcher->targets, $target);  // Add at beginning, not end!
         $afterCount = count($dispatcher->targets);
 
         // Initialize the target immediately
@@ -170,7 +171,8 @@ class LoggingLibrary extends \craft\base\Plugin
                 $cats = $t->categories ?? [];
                 if (empty($cats) || in_array($handle, $cats)) {
                     $level = $t->level ?? 'not set';
-                    error_log("LOGGING-LIBRARY: Target $idx has categories: " . json_encode($cats) . ", level: $level");
+                    $name = $t->name ?? 'unnamed';
+                    error_log("LOGGING-LIBRARY: Target $idx name='$name' categories=" . json_encode($cats) . " level=$level");
                 }
             }
         }
