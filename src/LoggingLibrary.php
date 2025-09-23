@@ -131,9 +131,6 @@ class LoggingLibrary extends \craft\base\Plugin
         if (!in_array($handle, $monologConfig['except'])) {
             $monologConfig['except'][] = $handle;
             $logComponent->monologTargetConfig = $monologConfig;
-
-            // DEBUG: Verify the exclusion was set
-            error_log("LOGGING-LIBRARY: Added '$handle' to except list. Full except list: " . json_encode($logComponent->monologTargetConfig['except']));
         }
 
         // Remove ALL existing targets for this handle from dispatcher
@@ -168,9 +165,6 @@ class LoggingLibrary extends \craft\base\Plugin
         ];
 
         $logLevelConstant = $levelMap[$config['logLevel']] ?? LogLevel::INFO;
-
-        // DEBUG: Verify what we're setting
-        error_log("LOGGING-LIBRARY: Setting level for '$handle': input='{$config['logLevel']}' mapped to constant='$logLevelConstant'");
 
         $target = new MonologTarget([
             'name' => $handle,
