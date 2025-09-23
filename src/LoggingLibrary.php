@@ -57,6 +57,10 @@ class LoggingLibrary extends \craft\base\Plugin
 
     /**
      * Configure logging for a plugin
+     *
+     * IMPORTANT: Debug level logging only works when Craft's DEV_MODE is true.
+     * When DEV_MODE=false (production/staging), Craft::debug() calls are ignored
+     * for security reasons. Only INFO, WARNING, and ERROR levels will work.
      */
     public static function configure(array $config): void
     {
@@ -65,9 +69,6 @@ class LoggingLibrary extends \craft\base\Plugin
         if (!$handle) {
             throw new \InvalidArgumentException('Plugin handle is required for logging configuration');
         }
-
-        // EMERGENCY DEBUG: Write to PHP error log to confirm this is being called
-        error_log("LOGGING-LIBRARY: configure() called for $handle with level: " . ($config['logLevel'] ?? 'not set'));
 
         // Allow reconfiguration if log level changed, but skip if exact same config
         $existingConfig = self::$_pluginConfigs[$handle] ?? null;
@@ -130,7 +131,6 @@ class LoggingLibrary extends \craft\base\Plugin
         if (!in_array($handle, $monologConfig['except'])) {
             $monologConfig['except'][] = $handle;
             $logComponent->monologTargetConfig = $monologConfig;
-            error_log("LOGGING-LIBRARY: Added '$handle' to monologTargetConfig except list");
         }
 
         // Remove ALL existing targets for this handle from dispatcher
@@ -166,8 +166,6 @@ class LoggingLibrary extends \craft\base\Plugin
 
         $logLevelConstant = $levelMap[$config['logLevel']] ?? LogLevel::INFO;
 
-        // DEBUG: Log what we're about to create
-        error_log("LOGGING-LIBRARY: Creating MonologTarget with level: '{$config['logLevel']}' mapped to constant: '$logLevelConstant' for handle: $handle");
 
         $target = new MonologTarget([
             'name' => $handle,
@@ -182,16 +180,10 @@ class LoggingLibrary extends \craft\base\Plugin
             ),
         ]);
 
-        // DEBUG: Check what the target actually has after creation
-        error_log("LOGGING-LIBRARY: Target created - level property: " . ($target->level ?? 'NULL'));
-        error_log("LOGGING-LIBRARY: Target created - categories: " . json_encode($target->categories));
 
-        // Add the target to the log dispatcher AT THE BEGINNING
-        // This ensures our target processes messages before any global filters
+        // Add the target to the log dispatcher
         $dispatcher = Craft::getLogger()->dispatcher;
-        $beforeCount = count($dispatcher->targets);
-        array_unshift($dispatcher->targets, $target);  // Add at beginning, not end!
-        $afterCount = count($dispatcher->targets);
+        $dispatcher->targets[] = $target;
 
         // Initialize the target immediately
         $target->init();
@@ -199,26 +191,6 @@ class LoggingLibrary extends \craft\base\Plugin
         // Mark as configured
         self::$_configuredTargets[$handle] = true;
 
-        // DEBUG: Verify target was added and is still there
-        error_log("LOGGING-LIBRARY: Added target for $handle. Targets before: $beforeCount, after: $afterCount");
-
-        // Check what other targets exist and if any are filtering our category
-        foreach ($dispatcher->targets as $idx => $t) {
-            if ($t instanceof MonologTarget) {
-                $cats = $t->categories ?? [];
-                if (empty($cats) || in_array($handle, $cats)) {
-                    $level = $t->level ?? 'not set';
-                    $name = $t->name ?? 'unnamed';
-                    error_log("LOGGING-LIBRARY: Target $idx name='$name' categories=" . json_encode($cats) . " level=$level");
-
-                    // Extra debug to check if our target is really configured with DEBUG
-                    if ($idx === 0 && $name === $handle) {
-                        error_log("LOGGING-LIBRARY: OUR TARGET CHECK - Level is exactly: " . var_export($t->level, true));
-                        error_log("LOGGING-LIBRARY: OUR TARGET CHECK - Is it LogLevel::DEBUG? " . ($t->level === LogLevel::DEBUG ? 'YES' : 'NO'));
-                    }
-                }
-            }
-        }
     }
 
     /**
