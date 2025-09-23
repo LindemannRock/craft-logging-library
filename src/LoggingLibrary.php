@@ -69,8 +69,11 @@ class LoggingLibrary extends \craft\base\Plugin
         // Allow reconfiguration if log level changed, but skip if exact same config
         $existingConfig = self::$_pluginConfigs[$handle] ?? null;
         if ($existingConfig && $existingConfig['logLevel'] === $config['logLevel']) {
+            Craft::info("LOGGING-LIBRARY: Skipping reconfiguration for {$handle}, same logLevel: {$config['logLevel']}", 'translation-manager');
             return;
         }
+
+        Craft::info("LOGGING-LIBRARY: Configuring {$handle} with logLevel: {$config['logLevel']}", 'translation-manager');
 
 
         // Validate required config
@@ -137,6 +140,7 @@ class LoggingLibrary extends \craft\base\Plugin
 
         // Create a MonologTarget following the exact PutYourLightsOn pattern
         $mappedLevel = self::_mapLogLevel($config['logLevel']);
+        Craft::info("LOGGING-LIBRARY: Creating target for {$handle} with mapped level: {$mappedLevel}", 'translation-manager');
 
         $target = new MonologTarget([
             'name' => $handle,
@@ -153,9 +157,11 @@ class LoggingLibrary extends \craft\base\Plugin
 
         // Add the target to the log dispatcher (following the exact pattern from the article)
         Craft::getLogger()->dispatcher->targets[] = $target;
+        Craft::info("LOGGING-LIBRARY: Added target to dispatcher for {$handle}", 'translation-manager');
 
         // Initialize the target immediately
         $target->init();
+        Craft::info("LOGGING-LIBRARY: Initialized target for {$handle}", 'translation-manager');
 
         // Mark as configured
         self::$_configuredTargets[$handle] = true;
