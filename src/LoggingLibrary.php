@@ -18,6 +18,7 @@ use yii\base\Event;
 use yii\base\Module;
 use craft\log\MonologTarget;
 use Monolog\Formatter\LineFormatter;
+use Psr\Log\LogLevel;
 
 /**
  * Logging Library Plugin
@@ -117,6 +118,21 @@ class LoggingLibrary extends \craft\base\Plugin
      */
     private static function _configureLogging(string $handle, array $config): void
     {
+        // CRITICAL: Exclude our category from the global monologTargetConfig
+        // This prevents global targets from filtering our messages
+        $logComponent = Craft::$app->getLog();
+
+        // Get current monolog config or initialize it
+        $monologConfig = $logComponent->monologTargetConfig ?? [];
+        $monologConfig['except'] = $monologConfig['except'] ?? [];
+
+        // Add our handle to the except list if not already there
+        if (!in_array($handle, $monologConfig['except'])) {
+            $monologConfig['except'][] = $handle;
+            $logComponent->monologTargetConfig = $monologConfig;
+            error_log("LOGGING-LIBRARY: Added '$handle' to monologTargetConfig except list");
+        }
+
         // Remove ALL existing targets for this handle from dispatcher
         $dispatcher = Craft::getLogger()->dispatcher;
         $targetsToRemove = [];
@@ -136,10 +152,27 @@ class LoggingLibrary extends \craft\base\Plugin
 
         // Create a MonologTarget following the exact PutYourLightsOn pattern
 
+        // Map string level to LogLevel constant
+        $levelMap = [
+            'debug' => LogLevel::DEBUG,
+            'info' => LogLevel::INFO,
+            'notice' => LogLevel::NOTICE,
+            'warning' => LogLevel::WARNING,
+            'error' => LogLevel::ERROR,
+            'critical' => LogLevel::CRITICAL,
+            'alert' => LogLevel::ALERT,
+            'emergency' => LogLevel::EMERGENCY,
+        ];
+
+        $logLevelConstant = $levelMap[$config['logLevel']] ?? LogLevel::INFO;
+
+        // DEBUG: Log what we're about to create
+        error_log("LOGGING-LIBRARY: Creating MonologTarget with level: '{$config['logLevel']}' mapped to constant: '$logLevelConstant' for handle: $handle");
+
         $target = new MonologTarget([
             'name' => $handle,
             'categories' => [$handle],
-            'level' => $config['logLevel'],  // Use the string directly, Monolog expects PSR-3 strings
+            'level' => $logLevelConstant,  // Use PSR-3 LogLevel constant
             'logContext' => false,
             'allowLineBreaks' => false,
             'formatter' => new LineFormatter(
@@ -148,6 +181,10 @@ class LoggingLibrary extends \craft\base\Plugin
                 allowInlineLineBreaks: true,
             ),
         ]);
+
+        // DEBUG: Check what the target actually has after creation
+        error_log("LOGGING-LIBRARY: Target created - level property: " . ($target->level ?? 'NULL'));
+        error_log("LOGGING-LIBRARY: Target created - categories: " . json_encode($target->categories));
 
         // Add the target to the log dispatcher AT THE BEGINNING
         // This ensures our target processes messages before any global filters
@@ -173,6 +210,12 @@ class LoggingLibrary extends \craft\base\Plugin
                     $level = $t->level ?? 'not set';
                     $name = $t->name ?? 'unnamed';
                     error_log("LOGGING-LIBRARY: Target $idx name='$name' categories=" . json_encode($cats) . " level=$level");
+
+                    // Extra debug to check if our target is really configured with DEBUG
+                    if ($idx === 0 && $name === $handle) {
+                        error_log("LOGGING-LIBRARY: OUR TARGET CHECK - Level is exactly: " . var_export($t->level, true));
+                        error_log("LOGGING-LIBRARY: OUR TARGET CHECK - Is it LogLevel::DEBUG? " . ($t->level === LogLevel::DEBUG ? 'YES' : 'NO'));
+                    }
                 }
             }
         }
