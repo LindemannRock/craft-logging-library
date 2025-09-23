@@ -164,15 +164,16 @@ class LoggingLibrary extends \craft\base\Plugin
         // DEBUG: Verify target was added and is still there
         error_log("LOGGING-LIBRARY: Added target for $handle. Targets before: $beforeCount, after: $afterCount");
 
-        // Check if our target is still in the list
-        $foundOurTarget = false;
-        foreach ($dispatcher->targets as $t) {
-            if ($t instanceof MonologTarget && in_array($handle, $t->categories ?? [])) {
-                $foundOurTarget = true;
-                break;
+        // Check what other targets exist and if any are filtering our category
+        foreach ($dispatcher->targets as $idx => $t) {
+            if ($t instanceof MonologTarget) {
+                $cats = $t->categories ?? [];
+                if (empty($cats) || in_array($handle, $cats)) {
+                    $level = $t->level ?? 'not set';
+                    error_log("LOGGING-LIBRARY: Target $idx has categories: " . json_encode($cats) . ", level: $level");
+                }
             }
         }
-        error_log("LOGGING-LIBRARY: Target for $handle " . ($foundOurTarget ? "IS" : "IS NOT") . " in dispatcher after adding");
     }
 
     /**
