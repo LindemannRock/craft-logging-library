@@ -18,7 +18,6 @@ use yii\base\Event;
 use yii\base\Module;
 use craft\log\MonologTarget;
 use Monolog\Formatter\LineFormatter;
-use Psr\Log\LogLevel;
 
 /**
  * Logging Library Plugin
@@ -139,13 +138,12 @@ class LoggingLibrary extends \craft\base\Plugin
         }
 
         // Create a MonologTarget following the exact PutYourLightsOn pattern
-        $mappedLevel = self::_mapLogLevel($config['logLevel']);
-        Craft::info("LOGGING-LIBRARY: Creating target for {$handle} with mapped level: {$mappedLevel}", 'translation-manager');
+        Craft::info("LOGGING-LIBRARY: Creating target for {$handle} with level: {$config['logLevel']}", 'translation-manager');
 
         $target = new MonologTarget([
             'name' => $handle,
             'categories' => [$handle],
-            'level' => $mappedLevel,
+            'level' => $config['logLevel'],  // Use the string directly, Monolog expects PSR-3 strings
             'logContext' => false,
             'allowLineBreaks' => false,
             'formatter' => new LineFormatter(
@@ -154,6 +152,9 @@ class LoggingLibrary extends \craft\base\Plugin
                 allowInlineLineBreaks: true,
             ),
         ]);
+
+        // Debug: Check what level was actually set
+        Craft::info("LOGGING-LIBRARY: Target level after creation: " . ($target->level ?? 'not set'), 'translation-manager');
 
         // Add the target to the log dispatcher (following the exact pattern from the article)
         Craft::getLogger()->dispatcher->targets[] = $target;
@@ -248,17 +249,4 @@ class LoggingLibrary extends \craft\base\Plugin
         return array_values($files);
     }
 
-    /**
-     * Map string log level to PSR-3 LogLevel constant
-     */
-    private static function _mapLogLevel(string $level): string
-    {
-        return match ($level) {
-            'debug' => LogLevel::DEBUG,
-            'info' => LogLevel::INFO,
-            'warning' => LogLevel::WARNING,
-            'error' => LogLevel::ERROR,
-            default => LogLevel::INFO
-        };
-    }
 }
