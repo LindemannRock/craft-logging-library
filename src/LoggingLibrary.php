@@ -150,13 +150,29 @@ class LoggingLibrary extends \craft\base\Plugin
         ]);
 
         // Add the target to the log dispatcher (following the exact pattern from the article)
-        Craft::getLogger()->dispatcher->targets[] = $target;
+        $dispatcher = Craft::getLogger()->dispatcher;
+        $beforeCount = count($dispatcher->targets);
+        $dispatcher->targets[] = $target;
+        $afterCount = count($dispatcher->targets);
 
         // Initialize the target immediately
         $target->init();
 
         // Mark as configured
         self::$_configuredTargets[$handle] = true;
+
+        // DEBUG: Verify target was added and is still there
+        error_log("LOGGING-LIBRARY: Added target for $handle. Targets before: $beforeCount, after: $afterCount");
+
+        // Check if our target is still in the list
+        $foundOurTarget = false;
+        foreach ($dispatcher->targets as $t) {
+            if ($t instanceof MonologTarget && in_array($handle, $t->categories ?? [])) {
+                $foundOurTarget = true;
+                break;
+            }
+        }
+        error_log("LOGGING-LIBRARY: Target for $handle " . ($foundOurTarget ? "IS" : "IS NOT") . " in dispatcher after adding");
     }
 
     /**
