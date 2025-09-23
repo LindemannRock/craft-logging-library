@@ -6,6 +6,8 @@ A reusable logging library for Craft CMS plugins that provides consistent loggin
 
 - **Dedicated Log Files**: Each plugin gets its own daily log files (`plugin-handle-YYYY-MM-DD.log`)
 - **Built-in Log Viewer**: Web interface for viewing, filtering, and downloading logs
+- **User Context**: Automatically includes user information in log entries (`[user:1]`)
+- **Multi-Plugin Safe**: Proper filtering prevents conflicts between multiple plugins
 - **Monolog Integration**: Uses Craft 5's Monolog system with proper PSR-3 standards
 - **Easy Integration**: Just add trait and configure - no complex setup
 - **Auto Navigation**: Automatically adds "Logs" section to plugin CP nav
@@ -161,10 +163,12 @@ Example:
 
 ## Log Levels
 
-- **debug**: Detailed debugging information
+- **debug**: Detailed debugging information (requires `devMode` to be enabled)
 - **info**: General informational messages
 - **warning**: Warning conditions
 - **error**: Error conditions
+
+**Note**: Debug level logging only works when Craft's `devMode` is enabled. In production environments with `devMode=false`, debug messages are ignored for security reasons. If debug level is set in configuration when `devMode` is false, it will automatically fall back to 'info' level to prevent server errors.
 
 ## Web Log Viewer
 
