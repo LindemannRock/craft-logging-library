@@ -18,6 +18,8 @@ use yii\base\Event;
 use yii\base\Module;
 use craft\log\MonologTarget;
 use Monolog\Formatter\LineFormatter;
+use Monolog\LogRecord;
+use Monolog\Processor\ProcessorInterface;
 use Psr\Log\LogLevel;
 
 /**
@@ -166,12 +168,23 @@ class LoggingLibrary extends \craft\base\Plugin
 
         $logLevelConstant = $levelMap[$config['logLevel']] ?? LogLevel::INFO;
 
+        // Create a custom processor to add user info
+        $userProcessor = new class implements ProcessorInterface {
+            public function __invoke(LogRecord $record): LogRecord
+            {
+                $user = Craft::$app->getUser()->getIdentity();
+                $record->extra['user'] = $user ? 'user:' . $user->id : '';
+                return $record;
+            }
+        };
+
         $target = new MonologTarget([
             'name' => $handle,
             'categories' => [$handle],
             'level' => $logLevelConstant,  // Use PSR-3 LogLevel constant
             'logContext' => false,
             'allowLineBreaks' => false,
+            'processor' => $userProcessor,
             'formatter' => new LineFormatter(
                 format: "%datetime% [%extra.user%][%level_name%][%channel%] %message% %context%\n",
                 dateFormat: 'Y-m-d H:i:s',
