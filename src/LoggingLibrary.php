@@ -65,6 +65,9 @@ class LoggingLibrary extends \craft\base\Plugin
             throw new \InvalidArgumentException('Plugin handle is required for logging configuration');
         }
 
+        // EMERGENCY DEBUG: Write to PHP error log to confirm this is being called
+        error_log("LOGGING-LIBRARY: configure() called for $handle with level: " . ($config['logLevel'] ?? 'not set'));
+
         // Allow reconfiguration if log level changed, but skip if exact same config
         $existingConfig = self::$_pluginConfigs[$handle] ?? null;
         if ($existingConfig && $existingConfig['logLevel'] === $config['logLevel']) {
