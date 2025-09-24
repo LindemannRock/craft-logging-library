@@ -27,8 +27,10 @@
 
 {% block content %}
 
-    {# Filters #}
-    <div class="pane" style="margin-bottom: 24px;">
+    {# Only show filters if we have log files #}
+    {% if logFiles|length > 0 %}
+        {# Filters #}
+        <div class="pane" style="margin-bottom: 24px;">
         <div class="flex flex-wrap" style="gap: 16px; align-items: end;">
             <div class="field" style="flex-shrink: 0;">
                 {{ forms.selectField({
@@ -47,12 +49,18 @@
             </div>
 
             <div class="field" style="flex-shrink: 0;">
+                {% set levelOptions = [] %}
+                {% for value, label in levels %}
+                    {% if value != 'debug' or craft.app.config.general.devMode %}
+                        {% set levelOptions = levelOptions|merge([{ label: label, value: value }]) %}
+                    {% endif %}
+                {% endfor %}
                 {{ forms.selectField({
                     label: "Level"|t('app'),
                     id: 'level-filter',
                     name: 'level',
                     value: filters.level,
-                    options: levels|map((label, value) => { label: label, value: value }),
+                    options: levelOptions,
                 }) }}
             </div>
 
@@ -76,6 +84,7 @@
             {% endif %}
         </div>
     </div>
+    {% endif %}
 
     {% if logFiles|length == 0 %}
         <div class="pane centeralign">
