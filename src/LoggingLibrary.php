@@ -249,6 +249,7 @@ class LoggingLibrary extends \craft\base\Plugin
         $navItem['subnav']['logs'] = [
             'label' => 'Logs',
             'url' => $handle . '/logs',
+            'match' => $handle . '/logs*', // Match all logs pages
         ];
 
         return $navItem;
