@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.6.0](https://github.com/LindemannRock/craft-logging-library/compare/v1.5.0...v1.6.0) (2025-09-24)
+
+
+### Features
+
+* **logs:** enhance log filters display and improve level options logic ([1ffe8bb](https://github.com/LindemannRock/craft-logging-library/commit/1ffe8bb5051ef3303a0b2cd05beda02cd3348b08))
+
+
+### Bug Fixes
+
+* **composer:** update package name and add support information ([d598162](https://github.com/LindemannRock/craft-logging-library/commit/d5981624611483299a2984f67e950b5fce2c7723))
+
 ## [1.5.0](https://github.com/LindemannRock/craft-logging-library/compare/v1.4.10...v1.5.0) (2025-09-23)
 
 
