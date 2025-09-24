@@ -1,5 +1,5 @@
 {
-    "name": "lindemannrock/logging-library",
+    "name": "lindemannrock/craft-logging-library",
     "description": "Reusable logging library for Craft CMS plugins",
     "type": "craft-plugin",
     "version": "1.5.0",
@@ -18,6 +18,12 @@
             "homepage": "https://lindemannrock.com"
         }
     ],
+    "support": {
+        "email": "support@lindemannrock.com",
+        "issues": "https://github.com/LindemannRock/craft-logging-library/issues",
+        "source": "https://github.com/LindemannRock/craft-logging-library",
+        "docs": "https://github.com/LindemannRock/craft-logging-library/blob/main/README.md"
+    },
     "require": {
         "php": ">=8.2",
         "craftcms/cms": "^5.0"
