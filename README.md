@@ -10,7 +10,7 @@ A reusable logging library for Craft CMS plugins that provides consistent loggin
 - **Multi-Plugin Safe**: Proper filtering prevents conflicts between multiple plugins
 - **Monolog Integration**: Uses Craft 5's Monolog system with proper PSR-3 standards
 - **Easy Integration**: Just add trait and configure - no complex setup
-- **Auto Navigation**: Automatically adds "Logs" section to plugin CP nav
+- **Easy Navigation**: Simple method to add "Logs" section to plugin CP nav
 - **Configurable**: Customizable log levels, retention, permissions
 
 ## Installation
@@ -79,17 +79,41 @@ $this->logError('Database connection failed', ['error' => $exception->getMessage
 $this->logDebug('Processing step completed', ['step' => 5, 'data' => $result]);
 ```
 
-### 3. Add Logs to CP Navigation
+### 3. Add Routes for Log Viewer
+
+```php
+// In your plugin's init() method, register CP routes
+// Don't forget these imports at the top of your plugin class:
+// use craft\events\RegisterUrlRulesEvent;
+// use craft\web\UrlManager;
+
+Event::on(
+    UrlManager::class,
+    UrlManager::EVENT_REGISTER_CP_URL_RULES,
+    function (RegisterUrlRulesEvent $event) {
+        // Route logs to logging-library controller
+        $event->rules['your-plugin/logs'] = 'logging-library/logs/index';
+        $event->rules['your-plugin/logs/download'] = 'logging-library/logs/download';
+    }
+);
+```
+
+### 4. Add Logs to CP Navigation
 
 ```php
 public function getCpNavItem(): ?array
 {
     $item = parent::getCpNavItem();
 
-    // Add logs section with permission check
-    return LoggingLibrary::addLogsNav($item, $this->handle, [
-        'yourPlugin:viewLogs'
-    ]);
+    // Add logs section using logging library (only if installed and enabled)
+    if (Craft::$app->getPlugins()->isPluginInstalled('logging-library') &&
+        Craft::$app->getPlugins()->isPluginEnabled('logging-library')) {
+        $item = LoggingLibrary::addLogsNav($item, $this->handle, [
+            'yourPlugin:viewLogs'
+        ]);
+    }
+
+    return $item;
 }
 ```
 
@@ -172,7 +196,7 @@ Example:
 
 ## Web Log Viewer
 
-When `enableLogViewer` is true, logs are available at `your-plugin/logs` with:
+When `enableLogViewer` is true **and** you've configured the routes (step 3 above), logs are available at `your-plugin/logs` with:
 
 - **Date Filter**: Select specific log file by date
 - **Level Filter**: Filter by error, warning, info, debug
@@ -231,7 +255,9 @@ namespace yourvendor\yourplugin;
 
 use craft\base\Plugin;
 use craft\events\RegisterUserPermissionsEvent;
+use craft\events\RegisterUrlRulesEvent;
 use craft\services\UserPermissions;
+use craft\web\UrlManager;
 use lindemannrock\logginglibrary\traits\LoggingTrait;
 use lindemannrock\logginglibrary\LoggingLibrary;
 use yii\base\Event;
@@ -253,6 +279,14 @@ class YourPlugin extends Plugin
             'permissions' => ['yourPlugin:viewLogs'],
         ]);
 
+        // Register CP routes for log viewer
+        Event::on(UrlManager::class, UrlManager::EVENT_REGISTER_CP_URL_RULES,
+            function (RegisterUrlRulesEvent $event) {
+                $event->rules['your-plugin/logs'] = 'logging-library/logs/index';
+                $event->rules['your-plugin/logs/download'] = 'logging-library/logs/download';
+            }
+        );
+
         // Register permissions
         Event::on(UserPermissions::class, UserPermissions::EVENT_REGISTER_PERMISSIONS,
             function (RegisterUserPermissionsEvent $event) {
@@ -271,7 +305,14 @@ class YourPlugin extends Plugin
     public function getCpNavItem(): ?array
     {
         $item = parent::getCpNavItem();
-        return LoggingLibrary::addLogsNav($item, $this->handle, ['yourPlugin:viewLogs']);
+
+        // Add logs section using logging library (only if installed and enabled)
+        if (Craft::$app->getPlugins()->isPluginInstalled('logging-library') &&
+            Craft::$app->getPlugins()->isPluginEnabled('logging-library')) {
+            $item = LoggingLibrary::addLogsNav($item, $this->handle, ['yourPlugin:viewLogs']);
+        }
+
+        return $item;
     }
 
     // Your plugin methods can now use logging
