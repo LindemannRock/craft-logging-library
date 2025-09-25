@@ -2,7 +2,7 @@
     "name": "lindemannrock/craft-logging-library",
     "description": "Reusable logging library for Craft CMS plugins",
     "type": "craft-plugin",
-    "version": "1.7.0",
+    "version": "1.8.0",
     "keywords": [
         "craft",
         "cms",
