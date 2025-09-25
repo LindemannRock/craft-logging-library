@@ -43,6 +43,11 @@ class LogsController extends Controller
             throw new NotFoundHttpException('Plugin logging not configured');
         }
 
+        // Check if log viewer is enabled
+        if (!($config['enableLogViewer'] ?? false)) {
+            throw new NotFoundHttpException('Log viewer is disabled for this plugin');
+        }
+
         // Check permissions if specified
         $this->_checkPermissions($config['permissions'] ?? []);
 
@@ -104,6 +109,11 @@ class LogsController extends Controller
 
         if (!$config) {
             throw new NotFoundHttpException('Plugin logging not configured');
+        }
+
+        // Check if log viewer is enabled
+        if (!($config['enableLogViewer'] ?? false)) {
+            throw new NotFoundHttpException('Log viewer is disabled for this plugin');
         }
 
         // Check permissions

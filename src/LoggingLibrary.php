@@ -79,13 +79,16 @@ class LoggingLibrary extends \craft\base\Plugin
         }
 
 
+        // Detect edge/CDN hosting environments
+        $isEdgeEnvironment = self::_detectEdgeEnvironment();
+
         // Validate required config
         $config = array_merge([
             'pluginName' => ucfirst($handle),
             'logLevel' => 'info', // Options: 'debug', 'info', 'warning', 'error'
             'retention' => 30,
             'maxFileSize' => 10240, // 10MB
-            'enableLogViewer' => true,
+            'enableLogViewer' => !$isEdgeEnvironment, // Auto-disable on edge platforms
             'permissions' => [],
         ], $config);
 
@@ -285,6 +288,18 @@ class LoggingLibrary extends \craft\base\Plugin
         krsort($files);
 
         return array_values($files);
+    }
+
+    /**
+     * Detect edge/CDN hosting environments
+     *
+     * @return bool True if running on an edge platform where file logging may not work
+     */
+    private static function _detectEdgeEnvironment(): bool
+    {
+        return
+            isset($_ENV['SERVD_PROJECT_SLUG']);             // Servd.host - VERIFIED and tested
+            // TODO: Add other platforms after testing actual deployments with Craft CMS
     }
 
 }

@@ -209,16 +209,17 @@ When `enableLogViewer` is true **and** you've configured the routes (step 3 abov
 
 When deploying on edge networks and CDN-based hosting platforms, the logging library can automatically detect these environments and disable the built-in log viewer since edge servers typically don't have persistent local storage.
 
-### Platform Detection
+### Automatic Edge Detection
 
-Individual plugins that use the logging library can implement edge platform detection by checking environment variables in their logging configuration:
+The logging library automatically detects edge/CDN hosting environments and disables file-based logging where it may not work.
 
-**Common Edge Platform Environment Variables**:
-- **Servd.host**: `SERVD_PROJECT_SLUG`
-- **Platform.sh**: `PLATFORM_PROJECT`
-- **Vercel**: `VERCEL`
-- **Netlify**: `NETLIFY`
-- **AWS Lambda/Serverless**: `AWS_LAMBDA_FUNCTION_NAME`
+**Currently Supported Platforms**:
+- **Servd.host**: Detects `SERVD_PROJECT_SLUG` environment variable ✅ *Verified*
+
+**Platform Detection Notes**:
+- Only verified platforms are included to avoid accidentally disabling logging
+- Additional platforms will be added after real-world testing with Craft CMS deployments
+- Manual override is always available if needed
 
 ### Why Edge Detection Matters
 
@@ -254,52 +255,38 @@ LoggingLibrary::configure([
 ]);
 ```
 
-### Implementation Examples
+### Basic Usage (Automatic Detection)
 
-**Simple Servd Detection**:
+**Simple Configuration** (Recommended):
 ```php
 // In your plugin's init() method
 LoggingLibrary::configure([
     'pluginHandle' => $this->handle,
-    'enableLogViewer' => !isset($_ENV['SERVD_PROJECT_SLUG']), // Disable on Servd
+    'pluginName' => $this->name,
+    'logLevel' => 'info',
+    // enableLogViewer automatically disabled on Servd
     // ... other options
 ]);
 ```
 
-**Multi-Platform Detection**:
+**Manual Override** (if needed):
 ```php
-// In your plugin's init() method
-$isEdgeEnvironment =
-    isset($_ENV['SERVD_PROJECT_SLUG']) ||     // Servd.host
-    isset($_ENV['PLATFORM_PROJECT']) ||       // Platform.sh
-    isset($_ENV['VERCEL']) ||                 // Vercel
-    isset($_ENV['NETLIFY']) ||                // Netlify
-    isset($_ENV['AWS_LAMBDA_FUNCTION_NAME']); // AWS Lambda
-
+// Force enable/disable log viewer regardless of environment
 LoggingLibrary::configure([
     'pluginHandle' => $this->handle,
-    'enableLogViewer' => !$isEdgeEnvironment,
+    'enableLogViewer' => false, // Explicitly disable
     // ... other options
 ]);
 ```
 
-**Environment-Specific Configuration**:
+**Custom Edge Detection** (for unsupported platforms):
 ```php
-// More granular control based on environment
-$logViewerEnabled = true;
-
-// Disable for known edge platforms
-if (isset($_ENV['SERVD_PROJECT_SLUG'])) {
-    $logViewerEnabled = false; // Servd has superior dashboard
-} elseif (isset($_ENV['VERCEL'])) {
-    $logViewerEnabled = false; // Vercel has built-in logging
-} elseif (isset($_ENV['CUSTOM_EDGE_FLAG'])) {
-    $logViewerEnabled = false; // Your custom platform
-}
+// Add your own platform detection
+$isCustomEdge = isset($_ENV['YOUR_PLATFORM_VAR']);
 
 LoggingLibrary::configure([
     'pluginHandle' => $this->handle,
-    'enableLogViewer' => $logViewerEnabled,
+    'enableLogViewer' => !$isCustomEdge,
     // ... other options
 ]);
 ```
