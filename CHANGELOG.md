@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.8.0](https://github.com/LindemannRock/craft-logging-library/compare/v1.7.0...v1.8.0) (2025-09-25)
+
+
+### Features
+
+* **docs:** add edge/CDN hosting environment detection and configuration examples ([42d0a2d](https://github.com/LindemannRock/craft-logging-library/commit/42d0a2d25bc7ac3d535c894bf19e01b93c8163bc))
+* **logging:** implement automatic edge/CDN detection and disable log viewer accordingly ([c18a467](https://github.com/LindemannRock/craft-logging-library/commit/c18a4673f8cb95840cec5164031cc197ce038ced))
+
 ## [1.7.0](https://github.com/LindemannRock/craft-logging-library/compare/v1.6.0...v1.7.0) (2025-09-24)
 
 
