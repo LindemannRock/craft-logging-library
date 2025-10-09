@@ -51,9 +51,25 @@
 
             <div class="field" style="flex-shrink: 0;">
                 {% set levelOptions = [] %}
+                {# Define log level severity (higher number = more verbose) #}
+                {% set levelSeverity = {
+                    'error': 1,
+                    'warning': 2,
+                    'info': 3,
+                    'debug': 4
+                } %}
+                {% set configuredLevel = config.logLevel|lower %}
+                {% set configuredSeverity = levelSeverity[configuredLevel] ?? 4 %}
+
+                {# Only include levels at or above the configured severity #}
                 {% for value, label in levels %}
-                    {% if value != 'debug' or craft.app.config.general.devMode %}
+                    {% if value == 'all' %}
                         {% set levelOptions = levelOptions|merge([{ label: label, value: value }]) %}
+                    {% elseif levelSeverity[value] is defined and levelSeverity[value] <= configuredSeverity %}
+                        {# Hide debug unless in dev mode #}
+                        {% if value != 'debug' or craft.app.config.general.devMode %}
+                            {% set levelOptions = levelOptions|merge([{ label: label, value: value }]) %}
+                        {% endif %}
                     {% endif %}
                 {% endfor %}
                 {{ forms.selectField({

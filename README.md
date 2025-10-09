@@ -199,11 +199,13 @@ Example:
 When `enableLogViewer` is true **and** you've configured the routes (step 3 above), logs are available at `your-plugin/logs` with:
 
 - **Date Filter**: Select specific log file by date
-- **Level Filter**: Filter by error, warning, info, debug
+- **Level Filter**: Filter by error, warning, info, debug (automatically filtered based on configured `logLevel`)
 - **Search**: Full-text search across messages and context
 - **Pagination**: Handle large log files efficiently
 - **Download**: Download raw log files
 - **Context Expansion**: Click to view JSON context data
+
+**Note**: The Level Filter dropdown automatically adjusts to only show log levels that are at or above your configured `logLevel`. For example, if `logLevel` is set to 'info', only Error, Warning, and Info options will appear. Debug level is always hidden unless `devMode` is enabled.
 
 ## Edge/CDN Hosting Environments
 
