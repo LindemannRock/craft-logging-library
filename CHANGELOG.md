@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.9.0](https://github.com/LindemannRock/craft-logging-library/compare/v1.8.0...v1.9.0) (2025-10-09)
+
+
+### Features
+
+* filter log level dropdown based on configured logLevel ([28397b6](https://github.com/LindemannRock/craft-logging-library/commit/28397b697c314b3e8ea9b82860f3bee9bb353e95))
+
 ## [1.8.0](https://github.com/LindemannRock/craft-logging-library/compare/v1.7.0...v1.8.0) (2025-09-25)
 
 
