@@ -53,13 +53,24 @@ class LogsController extends Controller
 
         // Get filter parameters
         $level = $request->getParam('level', 'all');
-        $date = $request->getParam('date', (new \DateTime())->format('Y-m-d'));
         $search = $request->getParam('search', '');
         $page = (int) $request->getParam('page', 1);
         $limit = 50; // Entries per page
 
         // Get available log files
         $logFiles = LoggingLibrary::getLogFiles($pluginHandle);
+
+        // Smart date selection: use most recent log file if no date specified or if specified date doesn't exist
+        $requestedDate = $request->getParam('date');
+        if ($requestedDate) {
+            $date = $requestedDate;
+        } elseif (!empty($logFiles)) {
+            // Default to the most recent log file (first in the list)
+            $date = $logFiles[0]['date'];
+        } else {
+            // No log files exist, use today as fallback
+            $date = (new \DateTime())->format('Y-m-d');
+        }
 
         // Read and parse log entries
         $logEntries = $this->_getLogEntries($pluginHandle, $date, $level, $search, $page, $limit);
