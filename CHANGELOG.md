@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.10.0](https://github.com/LindemannRock/craft-logging-library/compare/v1.9.0...v1.10.0) (2025-10-15)
+
+
+### Features
+
+* **license:** add MIT license file to the repository ([83c94e7](https://github.com/LindemannRock/craft-logging-library/commit/83c94e789cab265fd74f35f13cea8564068eb984))
+
+
+### Bug Fixes
+
+* **logs:** Default to most recent log file instead of today ([850022c](https://github.com/LindemannRock/craft-logging-library/commit/850022c53d0def82849815eb96199839e02b5562))
+
 ## [1.9.0](https://github.com/LindemannRock/craft-logging-library/compare/v1.8.0...v1.9.0) (2025-10-09)
 
 
