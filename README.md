@@ -63,8 +63,8 @@ class YourPlugin extends Plugin
             'permissions' => ['yourPlugin:viewLogs'],  // Optional: Required permissions
         ]);
 
-        // Start logging!
-        $this->logInfo('Plugin initialized successfully');
+        // DO NOT log in init() - it's called on every request and floods logs
+        // Only log meaningful events in controllers and services
     }
 }
 ```
@@ -133,6 +133,124 @@ LoggingLibrary::configure([
     ],
 ]);
 ```
+
+## LoggingTrait API Reference
+
+The `LoggingTrait` provides four protected methods for logging. These methods are automatically available in any class that uses the trait.
+
+### Available Methods
+
+```php
+/**
+ * Log an informational message
+ * @param string $message The log message
+ * @param array $params Optional context data (encoded as JSON)
+ */
+protected function logInfo(string $message, array $params = []): void
+
+/**
+ * Log a warning message
+ * @param string $message The log message
+ * @param array $params Optional context data (encoded as JSON)
+ */
+protected function logWarning(string $message, array $params = []): void
+
+/**
+ * Log an error message
+ * @param string $message The log message
+ * @param array $params Optional context data (encoded as JSON)
+ */
+protected function logError(string $message, array $params = []): void
+
+/**
+ * Log a debug message (only works when devMode is enabled)
+ * @param string $message The log message
+ * @param array $params Optional context data (encoded as JSON)
+ */
+protected function logDebug(string $message, array $params = []): void
+```
+
+### Message Formatting
+
+The trait automatically formats messages with JSON context:
+
+```php
+$this->logInfo('User action', ['userId' => 123, 'action' => 'export']);
+// Results in: "User action | {"userId":123,"action":"export"}"
+```
+
+If no context is provided, only the message is logged:
+
+```php
+$this->logError('Database connection failed');
+// Results in: "Database connection failed"
+```
+
+### Plugin Handle Detection
+
+The trait automatically detects your plugin handle from:
+1. `$this->handle` property (automatically available in Plugin classes)
+2. Manual override via `setLoggingHandle()` (for Services and other Components)
+
+**Automatic Detection (Plugin Classes):**
+```php
+class YourPlugin extends Plugin
+{
+    use LoggingTrait;
+
+    public function init(): void
+    {
+        parent::init();
+        // $this->handle is automatically used
+        // DO NOT log here - init() is called on every request
+    }
+
+    public function someAction(): void
+    {
+        // Log meaningful events in your methods
+        $this->logInfo('User performed action', ['action' => 'export']);
+    }
+}
+```
+
+**Manual Handle (Services & Components):**
+```php
+use craft\base\Component;
+use lindemannrock\logginglibrary\traits\LoggingTrait;
+
+class YourService extends Component
+{
+    use LoggingTrait;
+
+    public function init(): void
+    {
+        parent::init();
+        $this->setLoggingHandle('your-plugin');  // Set handle manually
+    }
+
+    public function processData(): void
+    {
+        $this->logInfo('Processing started');
+        // ... your logic
+    }
+}
+```
+
+### Internal Implementation
+
+The trait uses Craft's native PSR-3 logging methods:
+- `logInfo()` → `Craft::info()`
+- `logWarning()` → `Craft::warning()`
+- `logError()` → `Craft::error()`
+- `logDebug()` → `Craft::debug()`
+
+All messages are automatically routed to your plugin's dedicated log file via the Monolog target configured by `LoggingLibrary::configure()`.
+
+**Important Notes:**
+- These are **protected methods** - only available within the class that uses the trait
+- The `logDebug()` method only works when Craft's `devMode` is enabled
+- Context arrays are automatically JSON-encoded with UTF-8 support
+- User information is automatically included in log entries when available
 
 ## Advanced Usage
 
@@ -309,28 +427,74 @@ $event->permissions[] = [
 
 ## Best Practices
 
-1. **Use Appropriate Levels**:
+1. **DO NOT Log in init()** ⚠️:
+   - The `init()` method is called on **every request** (every page load, AJAX call, etc.)
+   - Logging there will **flood your logs** with duplicate entries
+   - Only log meaningful events in controllers, services, and other methods
+
+   ```php
+   // ❌ BAD - Causes log flooding
+   public function init(): void
+   {
+       parent::init();
+       $this->logInfo('Plugin initialized');  // Called on EVERY request!
+   }
+
+   // ✅ GOOD - Log actual user actions
+   public function actionExport(): Response
+   {
+       $this->logInfo('Export started', ['userId' => $userId]);
+       // ... export logic
+       $this->logInfo('Export completed', ['count' => $count]);
+   }
+   ```
+
+2. **Use Appropriate Levels**:
    - `debug`: Internal state, variable dumps
    - `info`: Normal operations, user actions
    - `warning`: Unexpected but handled situations
    - `error`: Actual errors that prevent operation
 
-2. **Include Context**:
+3. **Always Use Context Arrays (Not Inline Concatenation)**:
+
+   Use the second parameter for variable data, not string concatenation:
+
+   ```php
+   // ❌ BAD - Concatenating variables into message
+   $this->logError('Export failed: ' . $e->getMessage());
+   $this->logInfo('Processing ' . $count . ' items');
+   $this->logWarning('Invalid user: ' . $userId);
+
+   // ✅ GOOD - Use context array for variables
+   $this->logError('Export failed', ['error' => $e->getMessage()]);
+   $this->logInfo('Processing items', ['count' => $count]);
+   $this->logWarning('Invalid user', ['userId' => $userId]);
+   ```
+
+   **Why Context Arrays Are Better:**
+   - Structured data for log analysis tools
+   - Easier to search and filter in log viewer
+   - Consistent formatting across all logs
+   - Automatic JSON encoding with UTF-8 support
+   - Better for external logging services (Datadog, etc.)
+
+   **Rich Context Example:**
    ```php
    $this->logInfo('Translation exported', [
        'userId' => Craft::$app->getUser()->getId(),
        'count' => count($translations),
        'format' => $exportFormat,
-       'fileSize' => filesize($exportFile)
+       'fileSize' => filesize($exportFile),
+       'duration' => microtime(true) - $startTime
    ]);
    ```
 
-3. **Performance Considerations**:
+4. **Performance Considerations**:
    - Use `debug` level sparingly in production
    - Avoid logging in tight loops
    - Consider log file size and retention
 
-4. **Security**:
+5. **Security**:
    - Never log passwords or sensitive data
    - Be careful with user input in log messages
    - Use appropriate permissions for log access
@@ -387,7 +551,7 @@ class YourPlugin extends Plugin
             }
         );
 
-        $this->logInfo('Plugin initialized');
+        // DO NOT log in init() - it's called on every request
     }
 
     public function getCpNavItem(): ?array
@@ -402,20 +566,40 @@ class YourPlugin extends Plugin
 
         return $item;
     }
+}
+```
 
-    // Your plugin methods can now use logging
-    public function exportData(): bool
+**Example Controller with Logging:**
+
+```php
+use craft\web\Controller;
+use lindemannrock\logginglibrary\traits\LoggingTrait;
+
+class ExportController extends Controller
+{
+    use LoggingTrait;
+
+    public function init(): void
     {
-        $this->logInfo('Starting data export');
+        parent::init();
+        $this->setLoggingHandle('your-plugin');
+    }
+
+    public function actionExport(): Response
+    {
+        // ✅ Log meaningful user actions
+        $this->logInfo('Export started', ['userId' => Craft::$app->getUser()->getId()]);
 
         try {
             // Your export logic
             $count = $this->performExport();
             $this->logInfo('Export completed successfully', ['count' => $count]);
-            return true;
+
+            return $this->asJson(['success' => true, 'count' => $count]);
         } catch (\Exception $e) {
             $this->logError('Export failed', ['error' => $e->getMessage()]);
-            return false;
+
+            return $this->asJson(['success' => false, 'error' => $e->getMessage()]);
         }
     }
 }
