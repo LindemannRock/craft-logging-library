@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.10.1](https://github.com/LindemannRock/craft-logging-library/compare/v1.10.0...v1.10.1) (2025-10-16)
+
+
+### Bug Fixes
+
+* **composer:** update author details and improve dependency constraints ([1d6ed8e](https://github.com/LindemannRock/craft-logging-library/commit/1d6ed8e5da5e5fe6387090ef54c399f769505181))
+
 ## [1.10.0](https://github.com/LindemannRock/craft-logging-library/compare/v1.9.0...v1.10.0) (2025-10-15)
 
 
