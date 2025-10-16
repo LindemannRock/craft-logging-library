@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.10.2](https://github.com/LindemannRock/craft-logging-library/compare/v1.10.1...v1.10.2) (2025-10-16)
+
+
+### Bug Fixes
+
+* **composer:** change license from Proprietary to MIT ([45b23e7](https://github.com/LindemannRock/craft-logging-library/commit/45b23e75290d5109683b014bd6919b641eb534d8))
+
 ## [1.10.1](https://github.com/LindemannRock/craft-logging-library/compare/v1.10.0...v1.10.1) (2025-10-16)
 
 
