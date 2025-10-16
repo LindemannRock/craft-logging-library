@@ -15,24 +15,23 @@ A reusable logging library for Craft CMS plugins that provides consistent loggin
 
 ## Installation
 
-### Via Composer (Development)
-
-Until published on Packagist, install directly from the repository:
+### Via Composer
 
 ```bash
 cd /path/to/project
-composer config repositories.craft-logging-library vcs https://github.com/LindemannRock/craft-logging-library
-composer require lindemannrock/logging-library:dev-main
+composer require lindemannrock/craft-logging-library
 ```
 
-### Via Composer (Production - Coming Soon)
-
-Once published on Packagist:
+### Using DDEV
 
 ```bash
 cd /path/to/project
-composer require lindemannrock/logging-library
+ddev composer require lindemannrock/craft-logging-library
 ```
+
+### Via Control Panel
+
+In the Control Panel, go to Settings → Plugins and click "Install" for Logging Library.
 
 ## Quick Start
 
