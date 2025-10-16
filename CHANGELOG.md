@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.10.3](https://github.com/LindemannRock/craft-logging-library/compare/v1.10.2...v1.10.3) (2025-10-16)
+
+
+### Bug Fixes
+
+* update installation instructions for Composer and DDEV ([1122f6f](https://github.com/LindemannRock/craft-logging-library/commit/1122f6fca3b2e93b07ef735537191c06a743efe7))
+
 ## [1.10.2](https://github.com/LindemannRock/craft-logging-library/compare/v1.10.1...v1.10.2) (2025-10-16)
 
 
