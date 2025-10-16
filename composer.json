@@ -11,7 +11,7 @@
         "logging",
         "library"
     ],
-    "license": "Proprietary",
+    "license": "MIT",
     "authors": [
         {
             "name": "Bilal Hary Lindemann",
