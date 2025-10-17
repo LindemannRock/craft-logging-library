@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.11.0](https://github.com/LindemannRock/craft-logging-library/compare/v1.10.4...v1.11.0) (2025-10-17)
+
+
+### Features
+
+* **logs:** add sorting and filtering options for log entries ([9c3e904](https://github.com/LindemannRock/craft-logging-library/commit/9c3e9049eb2059fbe609f9f85b08b2d2f7274452))
+
 ## [1.10.4](https://github.com/LindemannRock/craft-logging-library/compare/v1.10.3...v1.10.4) (2025-10-17)
 
 
