@@ -54,6 +54,8 @@ class LogsController extends Controller
         // Get filter parameters
         $level = $request->getParam('level', 'all');
         $search = $request->getParam('search', '');
+        $sort = $request->getParam('sort', 'timestamp');
+        $dir = $request->getParam('dir', 'desc');
         $page = (int) $request->getParam('page', 1);
         $limit = 50; // Entries per page
 
@@ -73,7 +75,7 @@ class LogsController extends Controller
         }
 
         // Read and parse log entries
-        $logEntries = $this->_getLogEntries($pluginHandle, $date, $level, $search, $page, $limit);
+        $logEntries = $this->_getLogEntries($pluginHandle, $date, $level, $search, $sort, $dir, $page, $limit);
 
         // Get total count for pagination
         $totalEntries = $this->_getLogEntriesCount($pluginHandle, $date, $level, $search);
@@ -90,6 +92,8 @@ class LogsController extends Controller
                 'level' => $level,
                 'date' => $date,
                 'search' => $search,
+                'sort' => $sort,
+                'dir' => $dir,
                 'page' => $page,
             ],
             'pagination' => [
@@ -189,9 +193,9 @@ class LogsController extends Controller
     }
 
     /**
-     * Get log entries for a specific date with filtering and pagination
+     * Get log entries for a specific date with filtering, sorting, and pagination
      */
-    private function _getLogEntries(string $pluginHandle, string $date, string $level, string $search, int $page, int $limit): array
+    private function _getLogEntries(string $pluginHandle, string $date, string $level, string $search, string $sort, string $dir, int $page, int $limit): array
     {
         $logPath = Craft::$app->getPath()->getLogPath() . "/{$pluginHandle}-{$date}.log";
 
@@ -228,8 +232,31 @@ class LogsController extends Controller
             fclose($handle);
         }
 
-        // Reverse to show newest first
-        $filteredEntries = array_reverse($filteredEntries);
+        // Sort entries
+        usort($filteredEntries, function($a, $b) use ($sort, $dir) {
+            $result = 0;
+
+            switch ($sort) {
+                case 'timestamp':
+                    $result = strcmp($a['timestamp'], $b['timestamp']);
+                    break;
+                case 'level':
+                    // Sort by level severity: error > warning > info > debug
+                    $levelOrder = ['error' => 1, 'warning' => 2, 'info' => 3, 'debug' => 4, 'unknown' => 5];
+                    $aLevel = $levelOrder[$a['level']] ?? 99;
+                    $bLevel = $levelOrder[$b['level']] ?? 99;
+                    $result = $aLevel - $bLevel;
+                    break;
+                case 'user':
+                    $result = strcmp($a['user'], $b['user']);
+                    break;
+                case 'message':
+                    $result = strcmp($a['message'], $b['message']);
+                    break;
+            }
+
+            return $dir === 'asc' ? $result : -$result;
+        });
 
         // Apply pagination
         $offset = ($page - 1) * $limit;
