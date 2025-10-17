@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.10.4](https://github.com/LindemannRock/craft-logging-library/compare/v1.10.3...v1.10.4) (2025-10-17)
+
+
+### Bug Fixes
+
+* update plugin name configuration to respect custom settings ([a0cdcd2](https://github.com/LindemannRock/craft-logging-library/commit/a0cdcd2a87d07dc605db3d5dffc24a72b115e431))
+
 ## [1.10.3](https://github.com/LindemannRock/craft-logging-library/compare/v1.10.2...v1.10.3) (2025-10-16)
 
 
