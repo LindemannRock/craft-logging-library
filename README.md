@@ -54,12 +54,13 @@ class YourPlugin extends Plugin
         parent::init();
 
         // Configure logging for this plugin
+        $settings = $this->getSettings();
         LoggingLibrary::configure([
-            'pluginHandle' => $this->handle,           // Required: 'your-plugin'
-            'pluginName' => $this->name,               // Optional: 'Your Plugin'
-            'logLevel' => 'info',                      // Optional: debug|info|warning|error
-            'enableLogViewer' => true,                 // Optional: Enable web log viewer
-            'permissions' => ['yourPlugin:viewLogs'],  // Optional: Required permissions
+            'pluginHandle' => $this->handle,                        // Required: 'your-plugin'
+            'pluginName' => $settings->pluginName ?? $this->name,   // Optional: Use config or default name
+            'logLevel' => 'info',                                   // Optional: debug|info|warning|error
+            'enableLogViewer' => true,                              // Optional: Enable web log viewer
+            'permissions' => ['yourPlugin:viewLogs'],               // Optional: Required permissions
         ]);
 
         // DO NOT log in init() - it's called on every request and floods logs
@@ -119,19 +120,22 @@ public function getCpNavItem(): ?array
 ## Configuration Options
 
 ```php
+$settings = $this->getSettings();
 LoggingLibrary::configure([
-    'pluginHandle' => 'your-plugin',        // Required: Plugin handle
-    'pluginName' => 'Your Plugin',          // Plugin display name
-    'logLevel' => 'info',                   // debug|info|warning|error
-    'retention' => 30,                      // Days to keep log files
-    'maxFileSize' => 10240,                 // Max file size in KB (10MB)
-    'enableLogViewer' => true,              // Enable web interface
-    'permissions' => [                      // Required permissions for log access
+    'pluginHandle' => 'your-plugin',                     // Required: Plugin handle
+    'pluginName' => $settings->pluginName ?? 'Default',  // Plugin display name (from config/settings or default)
+    'logLevel' => 'info',                                // debug|info|warning|error
+    'retention' => 30,                                   // Days to keep log files
+    'maxFileSize' => 10240,                              // Max file size in KB (10MB)
+    'enableLogViewer' => true,                           // Enable web interface
+    'permissions' => [                                   // Required permissions for log access
         'yourPlugin:viewLogs',
         'yourPlugin:editSettings'
     ],
 ]);
 ```
+
+**Note**: For `pluginName`, use `$settings->pluginName ?? $this->name` to respect custom plugin names set in your config file (e.g., `config/your-plugin.php`). This allows users to customize the plugin name displayed in the log viewer.
 
 ## LoggingTrait API Reference
 
@@ -379,9 +383,10 @@ LoggingLibrary::configure([
 **Simple Configuration** (Recommended):
 ```php
 // In your plugin's init() method
+$settings = $this->getSettings();
 LoggingLibrary::configure([
     'pluginHandle' => $this->handle,
-    'pluginName' => $this->name,
+    'pluginName' => $settings->pluginName ?? $this->name,
     'logLevel' => 'info',
     // enableLogViewer automatically disabled on Servd
     // ... other options
@@ -522,9 +527,10 @@ class YourPlugin extends Plugin
         parent::init();
 
         // Configure logging
+        $settings = $this->getSettings();
         LoggingLibrary::configure([
             'pluginHandle' => $this->handle,
-            'pluginName' => $this->name,
+            'pluginName' => $settings->pluginName ?? $this->name,
             'logLevel' => 'info',
             'enableLogViewer' => true,
             'permissions' => ['yourPlugin:viewLogs'],
