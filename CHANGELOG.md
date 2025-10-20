@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.0.1](https://github.com/LindemannRock/craft-logging-library/compare/v5.0.0...v5.0.1) (2025-10-20)
+
+
+### Miscellaneous Chores
+
+* enhance README with additional badges ([608d99a](https://github.com/LindemannRock/craft-logging-library/commit/608d99aabffac1d353189a2ede2fa7d41e91b814))
+
 ## [5.0.0](https://github.com/LindemannRock/craft-logging-library/compare/v1.10.4...v5.0.0) (2025-10-20)
 
 
