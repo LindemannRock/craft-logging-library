@@ -1,5 +1,10 @@
 # Craft Logging Library
 
+[![Latest Version](https://img.shields.io/packagist/v/lindemannrock/craft-logging-library.svg)](https://packagist.org/packages/lindemannrock/craft-logging-library)
+[![Craft CMS](https://img.shields.io/badge/Craft%20CMS-5.0+-orange.svg)](https://craftcms.com/)
+[![PHP](https://img.shields.io/badge/PHP-8.2+-blue.svg)](https://php.net/)
+[![License](https://img.shields.io/packagist/l/lindemannrock/craft-logging-library.svg)](LICENSE)
+
 A reusable logging library for Craft CMS plugins that provides consistent logging, dedicated log files, and a built-in log viewer interface.
 
 ## Features
