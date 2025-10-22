@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.1.0](https://github.com/LindemannRock/craft-logging-library/compare/v5.0.1...v5.1.0) (2025-10-22)
+
+
+### Features
+
+* add configurable items per page for log viewer ([29825d4](https://github.com/LindemannRock/craft-logging-library/commit/29825d40191f1e14ceedf8ddd6942142fc2fff20))
+
 ## [5.0.1](https://github.com/LindemannRock/craft-logging-library/compare/v5.0.0...v5.0.1) (2025-10-20)
 
 
