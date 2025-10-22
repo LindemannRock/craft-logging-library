@@ -65,6 +65,7 @@ class YourPlugin extends Plugin
             'pluginName' => $settings->pluginName ?? $this->name,   // Optional: Use config or default name
             'logLevel' => 'info',                                   // Optional: debug|info|warning|error
             'enableLogViewer' => true,                              // Optional: Enable web log viewer
+            'itemsPerPage' => $settings->itemsPerPage ?? 50,        // Optional: Entries per page in log viewer
             'permissions' => ['yourPlugin:viewLogs'],               // Optional: Required permissions
         ]);
 
@@ -133,6 +134,7 @@ LoggingLibrary::configure([
     'retention' => 30,                                   // Days to keep log files
     'maxFileSize' => 10240,                              // Max file size in KB (10MB)
     'enableLogViewer' => true,                           // Enable web interface
+    'itemsPerPage' => $settings->itemsPerPage ?? 50,     // Entries per page in log viewer
     'permissions' => [                                   // Required permissions for log access
         'yourPlugin:viewLogs',
         'yourPlugin:editSettings'
@@ -538,6 +540,7 @@ class YourPlugin extends Plugin
             'pluginName' => $settings->pluginName ?? $this->name,
             'logLevel' => 'info',
             'enableLogViewer' => true,
+            'itemsPerPage' => $settings->itemsPerPage ?? 50,
             'permissions' => ['yourPlugin:viewLogs'],
         ]);
 

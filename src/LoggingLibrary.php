@@ -90,6 +90,7 @@ class LoggingLibrary extends \craft\base\Plugin
             'maxFileSize' => 10240, // 10MB
             'enableLogViewer' => !$isEdgeEnvironment, // Auto-disable on edge platforms
             'permissions' => [],
+            'itemsPerPage' => 50, // Default entries per page in log viewer
         ], $config);
 
         self::$_pluginConfigs[$handle] = $config;

@@ -57,7 +57,7 @@ class LogsController extends Controller
         $sort = $request->getParam('sort', 'timestamp');
         $dir = $request->getParam('dir', 'desc');
         $page = (int) $request->getParam('page', 1);
-        $limit = 50; // Entries per page
+        $limit = $config['itemsPerPage'] ?? 50; // Entries per page from config
 
         // Get available log files
         $logFiles = LoggingLibrary::getLogFiles($pluginHandle);
