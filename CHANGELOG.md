@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.1.1](https://github.com/LindemannRock/craft-logging-library/compare/v5.1.0...v5.1.1) (2025-10-24)
+
+
+### Bug Fixes
+
+* improve log viewer layout and functionality ([a024daf](https://github.com/LindemannRock/craft-logging-library/commit/a024dafc431979348daf3cbb2273d33afcf07988))
+
 ## [5.1.0](https://github.com/LindemannRock/craft-logging-library/compare/v5.0.1...v5.1.0) (2025-10-22)
 
 
