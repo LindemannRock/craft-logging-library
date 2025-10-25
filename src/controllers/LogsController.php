@@ -51,19 +51,19 @@ class LogsController extends Controller
         // Check permissions if specified
         $this->_checkPermissions($config['permissions'] ?? []);
 
-        // Get filter parameters
-        $level = $request->getParam('level', 'all');
-        $search = $request->getParam('search', '');
-        $sort = $request->getParam('sort', 'timestamp');
-        $dir = $request->getParam('dir', 'desc');
-        $page = (int) $request->getParam('page', 1);
+        // Get filter parameters (trim to handle potential whitespace in URLs)
+        $level = trim($request->getParam('level', 'all'));
+        $search = trim($request->getParam('search', ''));
+        $sort = trim($request->getParam('sort', 'timestamp'));
+        $dir = trim($request->getParam('dir', 'desc'));
+        $page = (int) trim($request->getParam('page', 1));
         $limit = $config['itemsPerPage'] ?? 50; // Entries per page from config
 
         // Get available log files
         $logFiles = LoggingLibrary::getLogFiles($pluginHandle);
 
         // Smart date selection: use most recent log file if no date specified or if specified date doesn't exist
-        $requestedDate = $request->getParam('date');
+        $requestedDate = trim($request->getParam('date', ''));
         if ($requestedDate) {
             $date = $requestedDate;
         } elseif (!empty($logFiles)) {
@@ -134,7 +134,7 @@ class LogsController extends Controller
         // Check permissions
         $this->_checkPermissions($config['permissions'] ?? []);
 
-        $date = $request->getRequiredParam('date');
+        $date = trim($request->getRequiredParam('date'));
 
         // Validate date format
         if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {

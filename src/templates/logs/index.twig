@@ -228,7 +228,9 @@
 		<div class="light">
 			<div class="pagination flex">
 				<nav class="flex" aria-label="log pagination">
-					<button{{svg('@appicons/download.svg')}}</span type="button" class="page-link prev-page {{ pagination.currentPage <= 1 ? 'disabled' : '' }}" {{ pagination.currentPage <= 1 ? 'disabled' : '' }} title="Previous Page"></button> <button type="button" class="page-link next-page {{ pagination.currentPage >= totalPages ? 'disabled' : '' }}" {{ pagination.currentPage >= totalPages ? 'disabled' : '' }} title="Next Page"></button> </nav> <div class="page-info"> {% set endRange = min(offset + pagination.perPage, pagination.total) %} {% if pagination.total == 0 %} no log entries {% else %} {{ offset + 1 }} – {{ endRange }} of {{ pagination.total }} {{ pagination.total == 1 ? 'entry' : 'entries' }} {% endif %} </div> </div> </div> <div class="flex flex-nowrap"> {% if filters.date and logFiles|length > 0 %} <a href="{{ actionUrl('logging-library/logs/download', { date: filters.date, pluginHandle: pluginHandle }) }}" class="btn submit" download> <span class="icon" aria-hidden="true">>
+					<button type="button" class="page-link prev-page {{ pagination.currentPage <= 1 ? 'disabled' : '' }}" {{ pagination.currentPage <= 1 ? 'disabled' : '' }} title="Previous Page"></button>
+					<button type="button" class="page-link next-page {{ pagination.currentPage >= totalPages ? 'disabled' : '' }}" {{ pagination.currentPage >= totalPages ? 'disabled' : '' }} title="Next Page"></button>
+				</nav> <div class="page-info"> {% set endRange = min(offset + pagination.perPage, pagination.total) %} {% if pagination.total == 0 %} no log entries {% else %} {{ offset + 1 }} – {{ endRange }} of {{ pagination.total }} {{ pagination.total == 1 ? 'entry' : 'entries' }} {% endif %} </div> </div> </div> <div class="flex flex-nowrap"> {% if filters.date and logFiles|length > 0 %} <a href="{{ actionUrl('logging-library/logs/download', { date: filters.date, pluginHandle: pluginHandle }) }}" class="btn submit" download> <span class="icon" aria-hidden="true">
 						{{ "Download Log"|t('app') }}
 					</a>
 				{% endif %}
@@ -277,17 +279,17 @@ if (sortField === currentSort) {
 newDir = currentDir === 'asc' ? 'desc' : 'asc';
 }
 
-window.location.href = '?date= {{ filters.date }}&level= {{ filters.level }}&search= {{ filters.search }}&sort=' + sortField + '&dir=' + newDir + '&page=1';
+window.location.href = '?date={{ filters.date }}&level={{ filters.level }}&search={{ filters.search }}&sort=' + sortField + '&dir=' + newDir + '&page=1';
 });
 });
 
 // Pagination
 document.querySelector('.prev-page:not(.disabled)') ?. addEventListener('click', function () {
-window.location.href = '?date= {{ filters.date }}&level= {{ filters.level }}&search= {{ filters.search }}&sort= {{ filters.sort }}&dir= {{ filters.dir }}&page= {{ pagination.currentPage - 1 }}';
+window.location.href = '?date={{ filters.date }}&level={{ filters.level }}&search={{ filters.search }}&sort={{ filters.sort }}&dir={{ filters.dir }}&page={{ pagination.currentPage - 1 }}';
 });
 
 document.querySelector('.next-page:not(.disabled)') ?. addEventListener('click', function () {
-window.location.href = '?date= {{ filters.date }}&level= {{ filters.level }}&search= {{ filters.search }}&sort= {{ filters.sort }}&dir= {{ filters.dir }}&page= {{ pagination.currentPage + 1 }}';
+window.location.href = '?date={{ filters.date }}&level={{ filters.level }}&search={{ filters.search }}&sort={{ filters.sort }}&dir={{ filters.dir }}&page={{ pagination.currentPage + 1 }}';
 });
 		</script>
 	{% endblock %}
