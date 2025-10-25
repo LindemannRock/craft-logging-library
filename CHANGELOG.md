@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.1.2](https://github.com/LindemannRock/craft-logging-library/compare/v5.1.1...v5.1.2) (2025-10-25)
+
+
+### Bug Fixes
+
+* trim whitespace from log filter parameters and URLs ([9b37b44](https://github.com/LindemannRock/craft-logging-library/commit/9b37b44810bbd588ed55a13fa616eadabb0f60ca))
+
 ## [5.1.1](https://github.com/LindemannRock/craft-logging-library/compare/v5.1.0...v5.1.1) (2025-10-24)
 
 
