@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.2.0](https://github.com/LindemannRock/craft-logging-library/compare/v5.1.2...v5.2.0) (2025-10-26)
+
+
+### Features
+
+* **logging:** enhance context processing and formatting in logging library ([a4b1442](https://github.com/LindemannRock/craft-logging-library/commit/a4b1442888b5a14ac7b11b03afaab34b04ee7d6f))
+
 ## [5.1.2](https://github.com/LindemannRock/craft-logging-library/compare/v5.1.1...v5.1.2) (2025-10-25)
 
 
