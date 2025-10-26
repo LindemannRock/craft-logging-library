@@ -196,6 +196,8 @@ $this->logError('Database connection failed');
 // Results in: "Database connection failed"
 ```
 
+**Note**: The logging library automatically filters out Yii2's internal context fields (`trace`, `memory`, `category`) to keep logs clean and readable. Only your custom context data will appear in the log output.
+
 ### Plugin Handle Detection
 
 The trait automatically detects your plugin handle from:

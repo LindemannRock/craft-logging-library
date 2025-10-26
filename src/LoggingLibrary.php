@@ -172,13 +172,51 @@ class LoggingLibrary extends \craft\base\Plugin
 
         $logLevelConstant = $levelMap[$config['logLevel']] ?? LogLevel::INFO;
 
-        // Create a custom processor to add user info
-        $userProcessor = new class implements ProcessorInterface {
+        // Create a custom processor to add user info and clean up context
+        $contextProcessor = new class implements ProcessorInterface {
             public function __invoke(LogRecord $record): LogRecord
             {
+                // Add user info
                 $user = Craft::$app->getUser()->getIdentity();
                 $record->extra['user'] = $user ? 'user:' . $user->id : '';
-                return $record;
+
+                // Remove Yii2's automatic context fields (trace, memory, category)
+                // Keep only user-provided context
+                $context = $record->context;
+                unset($context['trace'], $context['memory'], $context['category']);
+
+                return $record->with(context: $context);
+            }
+        };
+
+        // Create a custom formatter that only shows context when not empty
+        $formatter = new class extends LineFormatter {
+            public function __construct()
+            {
+                parent::__construct(
+                    format: null,
+                    dateFormat: 'Y-m-d H:i:s',
+                    allowInlineLineBreaks: true,
+                );
+            }
+
+            public function format(LogRecord $record): string
+            {
+                $output = sprintf(
+                    "%s [%s][%s][%s] %s",
+                    $record->datetime->format($this->dateFormat),
+                    $record->extra['user'] ?? '',
+                    $record->level->getName(),
+                    $record->channel,
+                    $record->message
+                );
+
+                // Only add context if it's not empty
+                if (!empty($record->context)) {
+                    $output .= ' ' . $this->toJson($record->context, true);
+                }
+
+                return $output . "\n";
             }
         };
 
@@ -188,12 +226,8 @@ class LoggingLibrary extends \craft\base\Plugin
             'level' => $logLevelConstant,  // Use PSR-3 LogLevel constant
             'logContext' => false,
             'allowLineBreaks' => false,
-            'processor' => $userProcessor,
-            'formatter' => new LineFormatter(
-                format: "%datetime% [%extra.user%][%level_name%][%channel%] %message% %context%\n",
-                dateFormat: 'Y-m-d H:i:s',
-                allowInlineLineBreaks: true,
-            ),
+            'processor' => $contextProcessor,
+            'formatter' => $formatter,
         ]);
 
 
