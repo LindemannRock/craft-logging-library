@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.2.1](https://github.com/LindemannRock/craft-logging-library/compare/v5.2.0...v5.2.1) (2025-10-27)
+
+
+### Miscellaneous Chores
+
+* update .gitignore ([c28d153](https://github.com/LindemannRock/craft-logging-library/commit/c28d153f484e58a59d7791af8971391afe91b5d9))
+
 ## [5.2.0](https://github.com/LindemannRock/craft-logging-library/compare/v5.1.2...v5.2.0) (2025-10-26)
 
 
