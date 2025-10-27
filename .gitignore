@@ -37,6 +37,7 @@ yarn-error.log*
 TODO.md
 FREEMIUM_PLAN.md
 PluginIntegration.md
+README.md.backup
 
 # Plugin releases
 *.zip
