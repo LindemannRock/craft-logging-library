@@ -19,7 +19,7 @@ use Craft;
 trait LoggingTrait
 {
     /**
-     * The plugin handle for logging (must be set by the using class)
+     * @var string|null Plugin handle for logging (must be set by the using class)
      */
     private ?string $_loggingHandle = null;
 
