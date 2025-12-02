@@ -29,12 +29,21 @@
     },
     "require": {
         "php": "^8.2",
-        "craftcms/cms": "^5.0.0"
+        "craftcms/cms": "^5.0.0",
+        "yii2mod/yii2-array-query": "^1.4"
+    },
+    "require-dev": {
+        "craftcms/phpstan": "dev-main"
     },
     "autoload": {
         "psr-4": {
             "lindemannrock\\logginglibrary\\": "src/"
         }
+    },
+    "scripts": {
+        "phpstan": "phpstan --ansi --memory-limit=1G",
+        "check-cs": "ecs check --ansi",
+        "fix-cs": "ecs check --fix --ansi"
     },
     "extra": {
         "name": "Logging Library",

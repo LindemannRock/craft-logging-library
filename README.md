@@ -9,8 +9,11 @@ A reusable logging library for Craft CMS plugins that provides consistent loggin
 
 ## Features
 
+- **Standalone System Log Viewer**: View all Craft CMS, plugin, and PHP logs from one interface
+- **High Performance Caching**: Handle 40,000+ entries instantly with ArrayQuery and file-based caching
 - **Dedicated Log Files**: Each plugin gets its own daily log files (`plugin-handle-YYYY-MM-DD.log`)
 - **Built-in Log Viewer**: Web interface for viewing, filtering, and downloading logs
+- **Multi-Format Support**: Automatically parses plugin, Craft CMS, and PHP error logs
 - **User Context**: Automatically includes user information in log entries (`[user:1]`)
 - **Multi-Plugin Safe**: Proper filtering prevents conflicts between multiple plugins
 - **Monolog Integration**: Uses Craft 5's Monolog system with proper PSR-3 standards
@@ -24,6 +27,9 @@ A reusable logging library for Craft CMS plugins that provides consistent loggin
 
 ```bash
 cd /path/to/project
+```
+
+```bash
 composer require lindemannrock/craft-logging-library
 ```
 
@@ -31,6 +37,9 @@ composer require lindemannrock/craft-logging-library
 
 ```bash
 cd /path/to/project
+```
+
+```bash
 ddev composer require lindemannrock/craft-logging-library
 ```
 
@@ -122,6 +131,104 @@ public function getCpNavItem(): ?array
     return $item;
 }
 ```
+
+## Standalone Mode: View All System Logs
+
+In addition to plugin-specific log viewing, the Logging Library includes a **standalone mode** that allows you to view **all system logs** from a single interface.
+
+### Features
+
+- **Universal Log Viewer**: Access all logs in `/storage/logs` from one place
+- **Multi-Format Support**: Automatically parses plugin logs, Craft CMS logs (web, console, queue), and PHP error logs
+- **Source Filtering**: Filter by log source (Web, Console, Queue, PHP Errors, or specific plugins)
+- **High Performance Caching**: Handle 40,000+ entries instantly with file-based caching and ArrayQuery
+- **File-Based Navigation**: Select specific log files with size indicators
+- **Smart Detection**: Automatically detects log format and parses accordingly
+
+### Accessing Standalone Mode
+
+Once the Logging Library plugin is installed, navigate to:
+
+1. **Control Panel** → **Logging Library** → **All Logs**
+2. Or directly via URL: `/admin/logging-library/logs`
+
+### Using the Standalone Viewer
+
+**Filter by Source:**
+- **All Sources**: View logs from all sources combined
+- **Web**: Craft CMS web request logs
+- **Console**: Craft CMS console/CLI logs
+- **Queue**: Craft CMS queue job logs
+- **PHP Errors**: PHP error log
+- **[Plugin Name]**: Logs from specific plugins using the logging library
+
+**Filter by Level:**
+- All Levels, Error, Warning, Info, Debug (same as plugin mode)
+
+**Search:**
+- Full-text search across messages and context data
+
+**File Selection:**
+- Select specific log files by name
+- Shows file size for each log
+- Download full file from sidebar
+
+### Log Format Detection
+
+The standalone viewer automatically detects and parses three log formats:
+
+1. **Plugin Logs** (from logging-library):
+   ```
+   2025-11-01 14:30:25 [user:1][INFO][plugin-handle] Message | {"context":"data"}
+   ```
+
+2. **Craft CMS Logs**:
+   ```
+   2025-11-01 14:30:25 [web.INFO] [yii\db\Connection::open] Message {"memory":962008}
+   ```
+
+3. **PHP Error Logs**:
+   ```
+   [01-Nov-2025 14:30:25 UTC] PHP Warning: message in /path/file.php on line 123
+   ```
+
+### How It Works
+
+The standalone viewer:
+1. Scans all files in `/storage/logs/`
+2. Groups them by source (web, console, queue, php-errors, plugins)
+3. Detects the log format of each line automatically
+4. **Parses and caches** structured data in `storage/runtime/logging-library/cache/logs/`
+5. Uses **ArrayQuery** for instant filtering, sorting, and pagination
+
+### Performance & Caching
+
+The logging library uses intelligent caching to handle large log files efficiently:
+
+**First Load:**
+- Parses entire log file once
+- Stores structured data in cache file
+- Cache key: `md5(filepath + filesize)`
+
+**Subsequent Loads:**
+- Reads from cache (instant)
+- ArrayQuery provides SQL-like filtering (WHERE, ORDER BY, LIMIT, OFFSET)
+- No file re-parsing needed
+
+**Cache Invalidation:**
+- Automatic when file size changes (new logs written)
+- Manual via Utilities → Clear Caches → "Logging Library Cache"
+
+**Result:** Handle 40,000+ entries with no performance issues, just like Timber!
+
+### Benefits
+
+- **One Interface**: No need to SSH into server or open multiple plugin log viewers
+- **Centralized Debugging**: See all system activity in one place
+- **High Performance**: File-based caching handles any size log file instantly
+- **Context Aware**: Automatically understands different log formats
+- **Timeline View**: See plugin logs alongside Craft system logs
+- **No Limits**: View all entries from files of any size
 
 ## Configuration Options
 

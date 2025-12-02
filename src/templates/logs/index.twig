@@ -2,6 +2,9 @@
 {% import "_includes/forms" as forms %}
 
 {% set title = "Logs"|t('app') %}
+{% set docTitle = title ~ ' - ' ~ pluginName %}
+
+
 {% set fullPageForm = false %}
 {% set selectedSubnavItem = 'logs' %}
 
@@ -16,25 +19,66 @@
 			<form method="get" action="{{ url(pluginHandle ~ '/logs') }}">
 				<div class="flex">
 					{% if logFiles|length > 0 %}
-						{# Date filter menu button #}
-						<div class="btngroup">
-							<button type="button" class="btn menubtn">
-								<span class="icon" aria-hidden="true">{{ svg('@appicons/calendar.svg') }}</span>
-								{{ filters.date ? filters.date : 'Select Date'|t('app') }}
-							</button>
-							<div class="menu">
-								<ul>
-									{% for file in logFiles %}
-										<li>
-											<a class="{{ filters.date == file.date ? 'sel' : '' }}" href="?date={{ file.date }}&level=all&search=">
-												{{ file.date }}
-												({{ file.formattedSize }})
-											</a>
-										</li>
-									{% endfor %}
-								</ul>
+						{% if isStandalone %}
+							{# Source filter menu button (standalone mode) #}
+							<div class="btngroup">
+								<button type="button" class="btn menubtn">
+									<span class="icon" aria-hidden="true">{{ svg('@appicons/folder.svg') }}</span>
+									{{ sources[filters.source] ?? 'All Sources' }}
+								</button>
+								<div class="menu">
+									<ul>
+										{% for sourceValue, sourceLabel in sources %}
+											<li>
+												<a class="{{ filters.source == sourceValue ? 'sel' : '' }}" href="?source={{ sourceValue }}&level=all&search=">
+													{{ sourceLabel }}
+												</a>
+											</li>
+										{% endfor %}
+									</ul>
+								</div>
 							</div>
-						</div>
+
+							{# File selector menu button (standalone mode) #}
+							<div class="btngroup">
+								<button type="button" class="btn menubtn">
+									<span class="icon" aria-hidden="true">{{ svg('@appicons/file.svg') }}</span>
+									{{ selectedFile ? selectedFile.filename : 'Select File'|t('app') }}
+								</button>
+								<div class="menu" style="max-height: 400px; overflow-y: auto;">
+									<ul>
+										{% for file in logFiles %}
+											<li>
+												<a class="{{ selectedFile and selectedFile.filename == file.filename ? 'sel' : '' }}" href="?source={{ filters.source }}&file={{ file.filename }}&level={{ filters.level }}&search={{ filters.search }}">
+													{{ file.filename }}
+													<span style="color: #999;">({{ file.formattedSize }})</span>
+												</a>
+											</li>
+										{% endfor %}
+									</ul>
+								</div>
+							</div>
+						{% else %}
+							{# Date filter menu button (plugin mode) #}
+							<div class="btngroup">
+								<button type="button" class="btn menubtn">
+									<span class="icon" aria-hidden="true">{{ svg('@appicons/calendar.svg') }}</span>
+									{{ selectedFile ? selectedFile.date : 'Select Date'|t('app') }}
+								</button>
+								<div class="menu">
+									<ul>
+										{% for file in logFiles %}
+											<li>
+												<a class="{{ selectedFile and selectedFile.date == file.date ? 'sel' : '' }}" href="?date={{ file.date }}&level=all&search=">
+													{{ file.date }}
+													({{ file.formattedSize }})
+												</a>
+											</li>
+										{% endfor %}
+									</ul>
+								</div>
+							</div>
+						{% endif %}
 
 						{# Level filter menu button #}
 						<div class="btngroup">
@@ -50,22 +94,22 @@
                                         'info': 3,
                                         'debug': 4
                                     } %}
-									{% set configuredLevel = config.logLevel|lower %}
+									{% set configuredLevel = config ? config.logLevel|lower : 'debug' %}
 									{% set configuredSeverity = levelSeverity[configuredLevel] ?? 4 %}
 
 									{% for value, label in levels %}
 										{% if value == 'all' %}
 											<li>
-												<a class="{{ filters.level == value ? 'sel' : '' }}" href="?date={{ filters.date }}&level={{ value }}&search={{ filters.search }}">
+												<a class="{{ filters.level == value ? 'sel' : '' }}" href="?{{ isStandalone ? 'source=' ~ filters.source ~ '&file=' ~ (selectedFile ? selectedFile.filename : '') : 'date=' ~ (selectedFile ? selectedFile.date : '') }}&level={{ value }}&search={{ filters.search }}">
 													<span class="status all"></span>
 													{{ label }}
 												</a>
 											</li>
 											<li><hr class="padded"></li>
-										{% elseif levelSeverity[value] is defined and levelSeverity[value] <= configuredSeverity %}
+										{% elseif isStandalone or (levelSeverity[value] is defined and levelSeverity[value] <= configuredSeverity) %}
 											{% if value != 'debug' or craft.app.config.general.devMode %}
 												<li>
-													<a class="{{ filters.level == value ? 'sel' : '' }}" href="?date={{ filters.date }}&level={{ value }}&search={{ filters.search }}">
+													<a class="{{ filters.level == value ? 'sel' : '' }}" href="?{{ isStandalone ? 'source=' ~ filters.source ~ '&file=' ~ (selectedFile ? selectedFile.filename : '') : 'date=' ~ (selectedFile ? selectedFile.date : '') }}&level={{ value }}&search={{ filters.search }}">
 														<span class="status {{ value == 'error' ? 'red' : (value == 'warning' ? 'orange' : (value == 'info' ? 'blue' : 'purple')) }}"></span>
 														{{ label }}
 													</a>
@@ -82,7 +126,12 @@
 							<span class="texticon-icon search icon" aria-hidden="true"></span>
 							<input type="text" class="clearable text fullwidth" name="search" value="{{ filters.search }}" placeholder="{{ 'Search messages and context...'|t('app') }}" autocomplete="off" dir="ltr" aria-label="Search" {% if filters.search %} autofocus {% endif %}>
 							<button type="button" class="clear-btn {{ filters.search ? '' : 'hidden' }}" title="Clear search" role="button" aria-label="Clear search"></button>
-							<input type="hidden" name="date" value="{{ filters.date }}">
+							{% if isStandalone %}
+								<input type="hidden" name="source" value="{{ filters.source }}">
+								<input type="hidden" name="file" value="{{ selectedFile ? selectedFile.filename : '' }}">
+							{% else %}
+								<input type="hidden" name="date" value="{{ selectedFile ? selectedFile.date : '' }}">
+							{% endif %}
 							<input type="hidden" name="level" value="{{ filters.level }}">
 						</div>
 					{% endif %}
@@ -137,20 +186,33 @@
 			vertical-align: top;
 			padding: 12px 8px;
 		}
+		/* Clickable row hover effect */
+		.clickable-row:hover {
+			background: #f9fafb !important;
+		}
+		.clickable-row {
+			transition: background 0.1s ease;
+		}
+		/* Context row styling */
+		.context-row td {
+			padding: 0 !important;
+		}
 	</style>
 
 	{% if logFiles|length == 0 %}
 		<div class="pane centeralign">
 			<p class="light">{{ "No log files found. Log files are created when plugin activities occur."|t('app') }}</p>
-			<p class="light">{{ "Current log level"|t('app') }}:
-				<strong>{{ config.logLevel|upper }}</strong>
-			</p>
+			{% if config %}
+				<p class="light">{{ "Current log level"|t('app') }}:
+					<strong>{{ config.logLevel|upper }}</strong>
+				</p>
+			{% endif %}
 		</div>
 	{% elseif logEntries|length == 0 %}
 		<div class="pane centeralign">
 			<p class="light">{{ "No log entries found for the selected filters."|t('app') }}</p>
 			{% if filters.level != 'all' or filters.search %}
-				<p class="light">{{ "Try adjusting your filters or selecting a different date."|t('app') }}</p>
+				<p class="light">{{ "Try adjusting your filters or selecting a different log file."|t('app') }}</p>
 			{% endif %}
 		</div>
 	{% else %}
@@ -169,6 +231,13 @@
 									{{ "Level"|t('app') }}
 								</button>
 							</th>
+							{% if isStandalone %}
+								<th scope="col" data-attribute="category" class="orderable {{ filters.sort == 'category' ? 'ordered ' ~ filters.dir : '' }}" style="width: 120px;">
+									<button type="button" data-sort="category">
+										{{ "Source"|t('app') }}
+									</button>
+								</th>
+							{% endif %}
 							<th scope="col" data-attribute="user" class="orderable {{ filters.sort == 'user' ? 'ordered ' ~ filters.dir : '' }}" style="width: 100px;">
 								<button type="button" data-sort="user">
 									{{ "User"|t('app') }}
@@ -179,18 +248,25 @@
 									{{ "Message"|t('app') }}
 								</button>
 							</th>
-							<th style="width: 60px;">#</th>
 						</tr>
 					</thead>
 					<tbody>
 						{% for entry in logEntries %}
-							<tr class="log-entry" data-level="{{ entry.level }}">
+							{# Main log entry row - clickable #}
+							<tr class="log-entry clickable-row" data-level="{{ entry.level }}" data-entry-id="{{ loop.index }}" style="cursor: pointer;">
 								<td class="nowrap code">
 									<time datetime="{{ entry.timestamp }}">{{ entry.timestamp|date('H:i:s') }}</time>
 								</td>
 								<td>
 									{{ entry.level|upper }}
 								</td>
+								{% if isStandalone %}
+									<td class="nowrap">
+										<span style="font-size: 11px; padding: 2px 6px; background: #f0f0f0; border-radius: 3px;">
+											{{ entry.category|upper }}
+										</span>
+									</td>
+								{% endif %}
 								<td class="nowrap">
 									{% if entry.user matches '/user:(\\d+)/' %}
 										{% set userId = entry.user|replace('user:', '') %}
@@ -201,18 +277,20 @@
 									{% endif %}
 								</td>
 								<td style="word-break: break-word;">
-									<div>{{ entry.message }}</div>
-									{% if entry.context and entry.context != '[]' %}
-										<details style="margin-top: 8px;">
-											<summary style="cursor: pointer; color: #606d7b; font-size: 12px;">{{ "Context"|t('app') }}</summary>
-											<div style="margin-top: 4px; padding: 8px; background: #f8f9fa; border-radius: 3px; font-family: Monaco, 'Courier New', monospace; font-size: 11px; white-space: pre-wrap; border-left: 3px solid #dee2e6;">{{ entry.context }}</div>
-										</details>
-									{% endif %}
-								</td>
-								<td class="light code">
-									{{ entry.lineNumber }}
+									{{ entry.message }}
 								</td>
 							</tr>
+							{# Expandable context row - hidden by default #}
+							{% if entry.context and entry.context != '[]' and entry.context != '' %}
+								<tr class="context-row" data-entry-id="{{ loop.index }}" style="display: none;">
+									<td colspan="10" style="background: #f9fafb; padding: 0;">
+										<div style="padding: 16px; border-left: 3px solid #3498db;">
+											<div style="font-size: 12px; color: #606d7b; margin-bottom: 8px; font-weight: 600;">Context:</div>
+											<pre style="margin: 0; padding: 12px; background: #ffffff; border-radius: 4px; font-family: Monaco, 'Courier New', monospace; font-size: 11px; white-space: pre-wrap; overflow-x: auto; border: 1px solid #e1e8ed;">{{ entry.context }}</pre>
+										</div>
+									</td>
+								</tr>
+							{% endif %}
 						{% endfor %}
 					</tbody>
 				</table>
@@ -230,15 +308,51 @@
 				<nav class="flex" aria-label="log pagination">
 					<button type="button" class="page-link prev-page {{ pagination.currentPage <= 1 ? 'disabled' : '' }}" {{ pagination.currentPage <= 1 ? 'disabled' : '' }} title="Previous Page"></button>
 					<button type="button" class="page-link next-page {{ pagination.currentPage >= totalPages ? 'disabled' : '' }}" {{ pagination.currentPage >= totalPages ? 'disabled' : '' }} title="Next Page"></button>
-				</nav> <div class="page-info"> {% set endRange = min(offset + pagination.perPage, pagination.total) %} {% if pagination.total == 0 %} no log entries {% else %} {{ offset + 1 }} – {{ endRange }} of {{ pagination.total }} {{ pagination.total == 1 ? 'entry' : 'entries' }} {% endif %} </div> </div> </div> <div class="flex flex-nowrap"> {% if filters.date and logFiles|length > 0 %} <a href="{{ actionUrl('logging-library/logs/download', { date: filters.date, pluginHandle: pluginHandle }) }}" class="btn submit" download> <span class="icon" aria-hidden="true">
-						{{ "Download Log"|t('app') }}
-					</a>
-				{% endif %}
+				</nav>
+				<div class="page-info">
+					{% set endRange = min(offset + pagination.perPage, pagination.total) %}
+					{% if pagination.total == 0 %}
+						no log entries
+					{% else %}
+						{{ offset + 1 }} – {{ endRange }} of {{ pagination.total }} {{ pagination.total == 1 ? 'entry' : 'entries' }}
+					{% endif %}
+				</div>
 			</div>
 		</div>
+	</div>
 
 		<script>
-			// Initialize menu buttons
+			// Mode detection
+const isStandalone = {{ isStandalone ? 'true' : 'false' }};
+const currentFile = '{{ isStandalone and selectedFile ? selectedFile.filename : '' }}';
+const currentDate = '{{ not isStandalone and selectedFile ? selectedFile.date : '' }}';
+
+// Clickable rows to toggle context
+document.querySelectorAll('.clickable-row').forEach(row => {
+row.addEventListener('click', function(e) {
+// Don't toggle if clicking on a link or button
+if (e.target.tagName === 'A' || e.target.tagName === 'BUTTON' || e.target.closest('button')) {
+return;
+}
+
+const entryId = this.dataset.entryId;
+const contextRow = document.querySelector('.context-row[data-entry-id="' + entryId + '"]');
+
+if (contextRow) {
+const isVisible = contextRow.style.display !== 'none';
+contextRow.style.display = isVisible ? 'none' : 'table-row';
+
+// Toggle visual indicator on main row
+if (!isVisible) {
+this.style.background = '#f0f4f8';
+} else {
+this.style.background = '';
+}
+}
+});
+});
+
+// Initialize menu buttons
 document.querySelectorAll('.menubtn').forEach(btn => {
 if (typeof Craft !== 'undefined' && Craft.MenuBtn) {
 new Craft.MenuBtn(btn);
@@ -267,6 +381,26 @@ this.form.submit();
 });
 }
 
+// Build URL with proper parameters for current mode
+function buildUrl(params) {
+const urlParams = new URLSearchParams();
+
+if (isStandalone) {
+urlParams.set('source', params.source || '{{ filters.source }}');
+urlParams.set('file', params.file || currentFile);
+} else {
+urlParams.set('date', params.date || currentDate);
+}
+
+urlParams.set('level', params.level || '{{ filters.level }}');
+urlParams.set('search', params.search || '{{ filters.search }}');
+urlParams.set('sort', params.sort || '{{ filters.sort }}');
+urlParams.set('dir', params.dir || '{{ filters.dir }}');
+urlParams.set('page', params.page || '1');
+
+return '?' + urlParams.toString();
+}
+
 // Sort buttons
 document.querySelectorAll('th.orderable button').forEach(button => {
 button.addEventListener('click', function () {
@@ -279,17 +413,17 @@ if (sortField === currentSort) {
 newDir = currentDir === 'asc' ? 'desc' : 'asc';
 }
 
-window.location.href = '?date={{ filters.date }}&level={{ filters.level }}&search={{ filters.search }}&sort=' + sortField + '&dir=' + newDir + '&page=1';
+window.location.href = buildUrl({ sort: sortField, dir: newDir, page: 1 });
 });
 });
 
 // Pagination
-document.querySelector('.prev-page:not(.disabled)') ?. addEventListener('click', function () {
-window.location.href = '?date={{ filters.date }}&level={{ filters.level }}&search={{ filters.search }}&sort={{ filters.sort }}&dir={{ filters.dir }}&page={{ pagination.currentPage - 1 }}';
+document.querySelector('.prev-page:not(.disabled)')?.addEventListener('click', function () {
+window.location.href = buildUrl({ page: {{ pagination.currentPage - 1 }} });
 });
 
-document.querySelector('.next-page:not(.disabled)') ?. addEventListener('click', function () {
-window.location.href = '?date={{ filters.date }}&level={{ filters.level }}&search={{ filters.search }}&sort={{ filters.sort }}&dir={{ filters.dir }}&page={{ pagination.currentPage + 1 }}';
+document.querySelector('.next-page:not(.disabled)')?.addEventListener('click', function () {
+window.location.href = buildUrl({ page: {{ pagination.currentPage + 1 }} });
 });
 		</script>
 	{% endblock %}
@@ -327,19 +461,21 @@ window.location.href = '?date={{ filters.date }}&level={{ filters.level }}&searc
 				}
 			</style>
 
-			<div class="log-config-item">
-				<div class="label">{{ "Current Level"|t('app') }}</div>
-				<div class="value">
-					<span class="status {{ config.logLevel|lower == 'error' ? 'red' : (config.logLevel|lower == 'warning' ? 'orange' : (config.logLevel|lower == 'info' ? 'blue' : 'purple')) }}"></span>
-					<strong>{{ config.logLevel|upper }}</strong>
+			{% if not isStandalone and config %}
+				<div class="log-config-item">
+					<div class="label">{{ "Current Level"|t('app') }}</div>
+					<div class="value">
+						<span class="status {{ config.logLevel|lower == 'error' ? 'red' : (config.logLevel|lower == 'warning' ? 'orange' : (config.logLevel|lower == 'info' ? 'blue' : 'purple')) }}"></span>
+						<strong>{{ config.logLevel|upper }}</strong>
+					</div>
 				</div>
-			</div>
 
-			<div class="log-config-item">
-				<div class="label">{{ "Retention"|t('app') }}</div>
-				<div class="value">{{ config.retention }}
-					{{ "days"|t('app') }}</div>
-			</div>
+				<div class="log-config-item">
+					<div class="label">{{ "Retention"|t('app') }}</div>
+					<div class="value">{{ config.retention }}
+						{{ "days"|t('app') }}</div>
+				</div>
+			{% endif %}
 
 			<div class="log-config-item">
 				<div class="label">{{ "Available Logs"|t('app') }}</div>
@@ -347,10 +483,38 @@ window.location.href = '?date={{ filters.date }}&level={{ filters.level }}&searc
 					{{ logFiles|length == 1 ? 'file' : 'files' }}</div>
 			</div>
 
+			{% if selectedFile %}
+				<div class="log-config-item">
+					<div class="label">{{ "Current File"|t('app') }}</div>
+					<div class="value">
+						{{ selectedFile.formattedSize }}
+					</div>
+				</div>
+
+				<div class="log-config-item">
+					<div class="label">{{ "Entries"|t('app') }}</div>
+					<div class="value">
+						{{ pagination.total }}
+					</div>
+				</div>
+
+				<div class="log-config-item" style="grid-template-columns: 1fr; padding: 8px 0;">
+					<a href="{{ actionUrl('logging-library/logs/download', isStandalone ? { file: selectedFile.filename, pluginHandle: pluginHandle } : { date: selectedFile.date, pluginHandle: pluginHandle }) }}" class="btn submit fullwidth" download>
+						{{ "Download File"|t('app') }}
+					</a>
+				</div>
+			{% endif %}
+
 			<div class="log-config-item location">
 				<div class="label">{{ "Log Location"|t('app') }}</div>
 				<div class="value">
-					<code style="font-size: 10px; line-height: 1.5; color: #606d7b; word-break: break-all; display: block;">storage/logs/{{ pluginHandle }}-{date}.log</code>
+					<code style="font-size: 10px; line-height: 1.5; color: #606d7b; word-break: break-all; display: block;">
+						{% if isStandalone %}
+							storage/logs/
+						{% else %}
+							storage/logs/{{ pluginHandle }}-{date}.log
+						{% endif %}
+					</code>
 				</div>
 			</div>
 		</div>

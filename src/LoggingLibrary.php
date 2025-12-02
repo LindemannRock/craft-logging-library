@@ -12,19 +12,26 @@ namespace lindemannrock\logginglibrary;
 
 use Craft;
 use craft\base\Plugin;
+use craft\events\RegisterCacheOptionsEvent;
+use craft\events\RegisterComponentTypesEvent;
 use craft\events\RegisterUrlRulesEvent;
-use craft\web\UrlManager;
-use yii\base\Event;
-use yii\base\Module;
 use craft\log\MonologTarget;
+use craft\services\Utilities;
+use craft\utilities\ClearCaches;
+use craft\web\UrlManager;
+use lindemannrock\logginglibrary\services\LogCacheService;
+use lindemannrock\logginglibrary\utilities\LogsUtility;
 use Monolog\Formatter\LineFormatter;
 use Monolog\LogRecord;
 use Monolog\Processor\ProcessorInterface;
 use Psr\Log\LogLevel;
+use yii\base\Event;
 
 /**
  * Logging Library Plugin
  * Provides centralized logging configuration for Craft CMS plugins
+ *
+ * @property-read LogCacheService $logCache
  */
 class LoggingLibrary extends \craft\base\Plugin
 {
@@ -45,16 +52,60 @@ class LoggingLibrary extends \craft\base\Plugin
     {
         parent::init();
 
+        // Register services
+        $this->setComponents([
+            'logCache' => LogCacheService::class,
+        ]);
 
         // Register CP routes for all plugins using the logging library
         Event::on(
             UrlManager::class,
             UrlManager::EVENT_REGISTER_CP_URL_RULES,
-            function (RegisterUrlRulesEvent $event) {
+            function(RegisterUrlRulesEvent $event) {
                 $event->rules['logging-library/logs'] = 'logging-library/logs/index';
                 $event->rules['logging-library/logs/download'] = 'logging-library/logs/download';
             }
         );
+
+        // Register cache clearing options
+        Event::on(
+            ClearCaches::class,
+            ClearCaches::EVENT_REGISTER_CACHE_OPTIONS,
+            function(RegisterCacheOptionsEvent $event) {
+                $event->options[] = [
+                    'key' => 'logging-library-cache',
+                    'label' => Craft::t('app', 'Logging Library Cache'),
+                    'action' => [$this->logCache, 'invalidateCaches'],
+                ];
+            }
+        );
+
+        // Register utility (Tools → Utilities → Logs)
+        Event::on(
+            Utilities::class,
+            Utilities::EVENT_REGISTER_UTILITIES,
+            function(RegisterComponentTypesEvent $event) {
+                $event->types[] = LogsUtility::class;
+            }
+        );
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getCpNavItem(): ?array
+    {
+        $item = parent::getCpNavItem();
+
+        // Add "All Logs" subnav for standalone viewer
+        $item['subnav'] = [
+            'all-logs' => [
+                'label' => 'All Logs',
+                'url' => 'logging-library/logs',
+            ],
+        ];
+
+        return $item;
     }
 
     /**
@@ -66,7 +117,6 @@ class LoggingLibrary extends \craft\base\Plugin
      */
     public static function configure(array $config): void
     {
-
         $handle = $config['pluginHandle'] ?? null;
         if (!$handle) {
             throw new \InvalidArgumentException('Plugin handle is required for logging configuration');
@@ -173,7 +223,7 @@ class LoggingLibrary extends \craft\base\Plugin
         $logLevelConstant = $levelMap[$config['logLevel']] ?? LogLevel::INFO;
 
         // Create a custom processor to add user info and clean up context
-        $contextProcessor = new class implements ProcessorInterface {
+        $contextProcessor = new class() implements ProcessorInterface {
             public function __invoke(LogRecord $record): LogRecord
             {
                 // Add user info
@@ -190,7 +240,7 @@ class LoggingLibrary extends \craft\base\Plugin
         };
 
         // Create a custom formatter that only shows context when not empty
-        $formatter = new class extends LineFormatter {
+        $formatter = new class() extends LineFormatter {
             public function __construct()
             {
                 parent::__construct(
@@ -240,7 +290,6 @@ class LoggingLibrary extends \craft\base\Plugin
 
         // Mark as configured
         self::$_configuredTargets[$handle] = true;
-
     }
 
     /**
@@ -251,7 +300,7 @@ class LoggingLibrary extends \craft\base\Plugin
         Event::on(
             UrlManager::class,
             UrlManager::EVENT_REGISTER_CP_URL_RULES,
-            function (RegisterUrlRulesEvent $event) use ($handle) {
+            function(RegisterUrlRulesEvent $event) use ($handle) {
                 // Logs routes
                 $event->rules[$handle . '/logs'] = 'logging-library/logs/index';
                 $event->rules[$handle . '/logs/download'] = 'logging-library/logs/download';
@@ -326,6 +375,133 @@ class LoggingLibrary extends \craft\base\Plugin
     }
 
     /**
+     * Get all log files from storage/logs directory (for standalone viewer)
+     *
+     * @return array Array of log file information grouped by source
+     */
+    public static function getAllLogFiles(): array
+    {
+        $logPath = Craft::$app->getPath()->getLogPath();
+        $files = [];
+
+        if (!is_dir($logPath)) {
+            return [];
+        }
+
+        $allLogFiles = glob($logPath . '/*.log*');
+
+        foreach ($allLogFiles as $file) {
+            $basename = basename($file);
+            $size = filesize($file);
+            $lastModified = filemtime($file);
+
+            // Skip empty or very small files
+            if ($size < 10) {
+                continue;
+            }
+
+            $fileInfo = [
+                'filename' => $basename,
+                'size' => $size,
+                'formattedSize' => Craft::$app->getFormatter()->asShortSize($size),
+                'lastModified' => $lastModified,
+                'path' => $file,
+            ];
+
+            // Plugin logs: {plugin-handle}-{YYYY-MM-DD}.log
+            if (preg_match('/^([a-z0-9\-]+)-(\d{4}-\d{2}-\d{2})\.log$/', $basename, $matches)) {
+                $pluginHandle = $matches[1];
+                $date = $matches[2];
+                $fileInfo['source'] = $pluginHandle;
+                $fileInfo['type'] = 'plugin';
+                $fileInfo['date'] = $date;
+                $fileInfo['category'] = $pluginHandle;
+            }
+            // Craft web logs: web-{YYYY-MM-DD}.log or web.log
+            elseif (preg_match('/^web(-(\d{4}-\d{2}-\d{2}))?\.log(\.\d+)?$/', $basename, $matches)) {
+                $date = $matches[2] ?? null;
+                $rotation = $matches[3] ?? null;
+                $fileInfo['source'] = 'web';
+                $fileInfo['type'] = 'craft';
+                $fileInfo['date'] = $date ?: 'current';
+                $fileInfo['category'] = 'web';
+                if ($rotation) {
+                    $fileInfo['rotation'] = ltrim($rotation, '.');
+                }
+            }
+            // Console logs: console-{YYYY-MM-DD}.log
+            elseif (preg_match('/^console(-(\d{4}-\d{2}-\d{2}))?\.log$/', $basename, $matches)) {
+                $date = $matches[2] ?? null;
+                $fileInfo['source'] = 'console';
+                $fileInfo['type'] = 'craft';
+                $fileInfo['date'] = $date ?: 'current';
+                $fileInfo['category'] = 'console';
+            }
+            // Queue logs: queue-{YYYY-MM-DD}.log
+            elseif (preg_match('/^queue(-(\d{4}-\d{2}-\d{2}))?\.log$/', $basename, $matches)) {
+                $date = $matches[2] ?? null;
+                $fileInfo['source'] = 'queue';
+                $fileInfo['type'] = 'craft';
+                $fileInfo['date'] = $date ?: 'current';
+                $fileInfo['category'] = 'queue';
+            }
+            // PHP errors: phperrors.log
+            elseif ($basename === 'phperrors.log') {
+                $fileInfo['source'] = 'php-errors';
+                $fileInfo['type'] = 'php';
+                $fileInfo['date'] = 'current';
+                $fileInfo['category'] = 'php-errors';
+            }
+            // Other/unknown logs
+            else {
+                $fileInfo['source'] = 'other';
+                $fileInfo['type'] = 'unknown';
+                $fileInfo['date'] = 'unknown';
+                $fileInfo['category'] = 'other';
+            }
+
+            $files[] = $fileInfo;
+        }
+
+        // Sort by last modified date descending (newest first)
+        usort($files, function($a, $b) {
+            return $b['lastModified'] - $a['lastModified'];
+        });
+
+        return $files;
+    }
+
+    /**
+     * Detect log format from a log line
+     *
+     * @param string $line A line from the log file
+     * @return string Format type: 'plugin', 'craft', 'php', or 'unknown'
+     */
+    public static function detectLogFormat(string $line): string
+    {
+        if (empty($line)) {
+            return 'unknown';
+        }
+
+        // Plugin format: YYYY-MM-DD HH:MM:SS [user][LEVEL][category] message
+        if (preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\s+\[.*?\]\[.*?\]\[.*?\]/', $line)) {
+            return 'plugin';
+        }
+
+        // Craft format: YYYY-MM-DD HH:MM:SS [category.LEVEL] [class.name] message
+        if (preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\s+\[[a-z]+\.[A-Z]+\]/', $line)) {
+            return 'craft';
+        }
+
+        // PHP error format: [DD-MMM-YYYY HH:MM:SS Timezone] PHP Error Type:
+        if (preg_match('/^\[\d{2}-[A-Za-z]{3}-\d{4} \d{2}:\d{2}:\d{2}/', $line)) {
+            return 'php';
+        }
+
+        return 'unknown';
+    }
+
+    /**
      * Detect edge/CDN hosting environments
      *
      * @return bool True if running on an edge platform where file logging may not work
@@ -336,5 +512,4 @@ class LoggingLibrary extends \craft\base\Plugin
             isset($_ENV['SERVD_PROJECT_SLUG']);             // Servd.host - VERIFIED and tested
             // TODO: Add other platforms after testing actual deployments with Craft CMS
     }
-
 }
