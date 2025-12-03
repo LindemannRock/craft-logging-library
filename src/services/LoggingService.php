@@ -12,7 +12,7 @@ namespace lindemannrock\logginglibrary\services;
 
 use Craft;
 use craft\base\Component;
-use lindemannrock\logginglibrary\LoggingModule;
+use lindemannrock\logginglibrary\LoggingLibrary;
 
 /**
  * Logging Service
@@ -50,7 +50,7 @@ class LoggingService extends Component
      */
     public static function getLogStats(string $pluginHandle): array
     {
-        $logFiles = LoggingModule::getLogFiles($pluginHandle);
+        $logFiles = LoggingLibrary::getLogFiles($pluginHandle);
         $stats = [
             'totalFiles' => count($logFiles),
             'totalSize' => 0,
@@ -119,7 +119,7 @@ class LoggingService extends Component
      */
     public static function getRecentEntries(string $pluginHandle, int $limit = 10, string $level = 'all'): array
     {
-        $logFiles = LoggingModule::getLogFiles($pluginHandle);
+        $logFiles = LoggingLibrary::getLogFiles($pluginHandle);
         if (empty($logFiles)) {
             return [];
         }
@@ -159,7 +159,7 @@ class LoggingService extends Component
      */
     public static function isConfigured(string $pluginHandle): bool
     {
-        return LoggingModule::getConfig($pluginHandle) !== null;
+        return LoggingLibrary::getConfig($pluginHandle) !== null;
     }
 
     /**
@@ -167,7 +167,7 @@ class LoggingService extends Component
      */
     public static function getLogLevel(string $pluginHandle): ?string
     {
-        $config = LoggingModule::getConfig($pluginHandle);
+        $config = LoggingLibrary::getConfig($pluginHandle);
         return $config['logLevel'] ?? null;
     }
 

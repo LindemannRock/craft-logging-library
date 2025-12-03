@@ -12,10 +12,10 @@ namespace lindemannrock\logginglibrary\controllers;
 
 use Craft;
 use craft\web\Controller;
-use craft\web\Response;
 use lindemannrock\logginglibrary\LoggingLibrary;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
+use yii\web\Response;
 
 /**
  * Generic Logs Controller
@@ -358,45 +358,51 @@ class LogsController extends Controller
         // Get cached parsed logs as ArrayQuery
         $logQuery = LoggingLibrary::getInstance()->logCache->getLogs($filePath);
 
-        // Apply filters
+        // Apply level filter
         if ($level !== 'all') {
             $logQuery->andFilterWhere(['level' => $level]);
         }
 
+        // Get all results first (we'll filter search manually)
+        $logs = $logQuery->all();
+
+        // Apply search filter manually since ArrayQuery doesn't support LIKE
         if ($search) {
-            // ArrayQuery doesn't support LIKE, so we'll filter manually
-            $logQuery->andFilterWhere(function($log) use ($search) {
+            $logs = array_values(array_filter($logs, function($log) use ($search) {
                 return stripos($log['message'] ?? '', $search) !== false ||
                        stripos($log['context'] ?? '', $search) !== false;
-            });
+            }));
         }
+
+        // Count total before pagination
+        $totalCount = count($logs);
 
         // Apply sorting
         $orderDirection = $dir === 'asc' ? SORT_ASC : SORT_DESC;
 
         if ($sort === 'level') {
-            // Custom level sorting
             $levelOrder = ['error' => 1, 'warning' => 2, 'info' => 3, 'debug' => 4, 'unknown' => 5];
-            $logQuery->addOrderBy(function($a, $b) use ($levelOrder, $orderDirection) {
+            usort($logs, function($a, $b) use ($levelOrder, $orderDirection) {
                 $aLevel = $levelOrder[$a['level'] ?? 'unknown'] ?? 99;
                 $bLevel = $levelOrder[$b['level'] ?? 'unknown'] ?? 99;
                 $result = $aLevel - $bLevel;
                 return $orderDirection === SORT_ASC ? $result : -$result;
             });
         } else {
-            $logQuery->orderBy([$sort => $orderDirection]);
+            // Sort by the requested column
+            usort($logs, function($a, $b) use ($sort, $orderDirection) {
+                $aVal = $a[$sort] ?? '';
+                $bVal = $b[$sort] ?? '';
+                $result = $aVal <=> $bVal;
+                return $orderDirection === SORT_ASC ? $result : -$result;
+            });
         }
-
-        // Save total before pagination
-        $totalCount = $logQuery->count();
 
         // Apply pagination
         $offset = ($page - 1) * $limit;
-        $logQuery->limit($limit)->offset($offset);
+        $logs = array_slice($logs, $offset, $limit);
 
-        // Get results and add line numbers
-        $logs = $logQuery->all();
-
+        // Add line numbers
         foreach ($logs as $index => &$log) {
             $log['lineNumber'] = $offset + $index + 1;
         }
@@ -416,167 +422,22 @@ class LogsController extends Controller
         // Get cached parsed logs as ArrayQuery
         $logQuery = LoggingLibrary::getInstance()->logCache->getLogs($filePath);
 
-        // Apply filters
+        // Apply level filter
         if ($level !== 'all') {
             $logQuery->andFilterWhere(['level' => $level]);
         }
 
+        // Get all results
+        $logs = $logQuery->all();
+
+        // Apply search filter manually since ArrayQuery doesn't support LIKE
         if ($search) {
-            $logQuery->andFilterWhere(function($log) use ($search) {
+            $logs = array_filter($logs, function($log) use ($search) {
                 return stripos($log['message'] ?? '', $search) !== false ||
                        stripos($log['context'] ?? '', $search) !== false;
             });
         }
 
-        return $logQuery->count();
-    }
-
-
-    /**
-     * Get log entries for a specific date with filtering, sorting, and pagination
-     * @deprecated Use _getLogEntriesFromFile() instead
-     */
-    private function _getLogEntries(string $pluginHandle, string $date, string $level, string $search, string $sort, string $dir, int $page, int $limit): array
-    {
-        $logPath = Craft::$app->getPath()->getLogPath() . "/{$pluginHandle}-{$date}.log";
-        return $this->_getLogEntriesFromFile($logPath, $level, $search, $sort, $dir, $page, $limit);
-    }
-
-    /**
-     * Get total count of log entries for pagination
-     * @deprecated Use _getLogEntriesCountFromFile() instead
-     */
-    private function _getLogEntriesCount(string $pluginHandle, string $date, string $level, string $search): int
-    {
-        $logPath = Craft::$app->getPath()->getLogPath() . "/{$pluginHandle}-{$date}.log";
-        return $this->_getLogEntriesCountFromFile($logPath, $level, $search);
-    }
-
-    /**
-     * Detect format and parse log entry line
-     */
-    private function _parseLogEntry(string $line, int $lineNumber = 0): ?array
-    {
-        if (empty($line)) {
-            return null;
-        }
-
-        // Detect format and route to appropriate parser
-        $format = LoggingLibrary::detectLogFormat($line);
-
-        return match ($format) {
-            'plugin' => $this->_parsePluginLogEntry($line, $lineNumber),
-            'craft' => $this->_parseCraftLogEntry($line, $lineNumber),
-            'php' => $this->_parsePhpErrorEntry($line, $lineNumber),
-            default => $this->_parseUnknownLogEntry($line, $lineNumber),
-        };
-    }
-
-    /**
-     * Parse plugin log format: timestamp [user][LEVEL][category] message | context
-     */
-    private function _parsePluginLogEntry(string $line, int $lineNumber = 0): ?array
-    {
-        // Parse log format: timestamp [user:id][level][category] message | context
-        if (preg_match('/^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\s+\[(.*?)\]\[(.*?)\]\[(.*?)\]\s+(.*?)(?:\s+\|\s+(.*))?$/', $line, $matches)) {
-            return [
-                'timestamp' => $matches[1],
-                'user' => $matches[2],
-                'level' => strtolower(str_replace('.', '', $matches[3])),
-                'category' => $matches[4],
-                'message' => $matches[5],
-                'context' => isset($matches[6]) ? $matches[6] : '',
-                'lineNumber' => $lineNumber,
-                'raw' => $line,
-                'format' => 'plugin',
-            ];
-        }
-
-        return null;
-    }
-
-    /**
-     * Parse Craft log format: timestamp [category.LEVEL] [class.name] message {"memory":...}
-     */
-    private function _parseCraftLogEntry(string $line, int $lineNumber = 0): ?array
-    {
-        // Parse Craft format: YYYY-MM-DD HH:MM:SS [category.LEVEL] [class.name] message
-        if (preg_match('/^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\s+\[([a-z]+)\.([A-Z]+)\]\s+\[(.*?)\]\s+(.*?)(?:\s+(\{.*\}))?$/', $line, $matches)) {
-            return [
-                'timestamp' => $matches[1],
-                'user' => 'System', // Craft logs don't have user field
-                'level' => strtolower($matches[3]),
-                'category' => $matches[2], // web, console, queue, etc.
-                'class' => $matches[4], // Fully qualified class name
-                'message' => $matches[5],
-                'context' => isset($matches[6]) ? $matches[6] : '',
-                'lineNumber' => $lineNumber,
-                'raw' => $line,
-                'format' => 'craft',
-            ];
-        }
-
-        return null;
-    }
-
-    /**
-     * Parse PHP error log format: [DD-MMM-YYYY HH:MM:SS Timezone] PHP Error Type: message
-     */
-    private function _parsePhpErrorEntry(string $line, int $lineNumber = 0): ?array
-    {
-        // Parse PHP error format: [01-Nov-2025 12:34:56 UTC] PHP Warning: message in /path/to/file.php on line 123
-        if (preg_match('/^\[(\d{2}-[A-Za-z]{3}-\d{4} \d{2}:\d{2}:\d{2}[^\]]*)\]\s+PHP\s+([^:]+):\s+(.*)$/', $line, $matches)) {
-            $phpTimestamp = $matches[1];
-            $errorType = trim($matches[2]);
-            $message = $matches[3];
-
-            // Convert PHP timestamp to standard format
-            try {
-                $date = \DateTime::createFromFormat('d-M-Y H:i:s T', $phpTimestamp);
-                $timestamp = $date ? $date->format('Y-m-d H:i:s') : $phpTimestamp;
-            } catch (\Exception $e) {
-                $timestamp = $phpTimestamp;
-            }
-
-            // Map PHP error types to log levels
-            $level = match (true) {
-                str_contains($errorType, 'Fatal') || str_contains($errorType, 'Error') => 'error',
-                str_contains($errorType, 'Warning') => 'warning',
-                str_contains($errorType, 'Notice') || str_contains($errorType, 'Deprecated') => 'info',
-                default => 'error',
-            };
-
-            return [
-                'timestamp' => $timestamp,
-                'user' => 'System',
-                'level' => $level,
-                'category' => 'php-errors',
-                'message' => $errorType . ': ' . $message,
-                'context' => '',
-                'lineNumber' => $lineNumber,
-                'raw' => $line,
-                'format' => 'php',
-            ];
-        }
-
-        return null;
-    }
-
-    /**
-     * Parse unknown/fallback log format
-     */
-    private function _parseUnknownLogEntry(string $line, int $lineNumber = 0): array
-    {
-        return [
-            'timestamp' => '',
-            'user' => '',
-            'level' => 'unknown',
-            'category' => '',
-            'message' => $line,
-            'context' => '',
-            'lineNumber' => $lineNumber,
-            'raw' => $line,
-            'format' => 'unknown',
-        ];
+        return count($logs);
     }
 }

@@ -41,11 +41,6 @@ class LoggingLibrary extends \craft\base\Plugin
     private static array $_pluginConfigs = [];
 
     /**
-     * @var array Already configured log targets to prevent duplicates
-     */
-    private static array $_configuredTargets = [];
-
-    /**
      * @inheritdoc
      */
     public function init(): void
@@ -287,9 +282,6 @@ class LoggingLibrary extends \craft\base\Plugin
 
         // Initialize the target immediately
         $target->init();
-
-        // Mark as configured
-        self::$_configuredTargets[$handle] = true;
     }
 
     /**
