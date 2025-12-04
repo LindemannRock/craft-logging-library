@@ -32,6 +32,7 @@ use yii\base\Event;
  * Provides centralized logging configuration for Craft CMS plugins
  *
  * @property-read LogCacheService $logCache
+ * @since 1.0.0
  */
 class LoggingLibrary extends \craft\base\Plugin
 {

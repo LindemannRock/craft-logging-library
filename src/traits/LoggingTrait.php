@@ -15,6 +15,8 @@ use Craft;
 /**
  * Logging trait for Craft CMS plugins
  * Provides consistent logging to dedicated plugin log files
+ *
+ * @since 1.0.0
  */
 trait LoggingTrait
 {

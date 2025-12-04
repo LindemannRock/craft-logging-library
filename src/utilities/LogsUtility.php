@@ -16,6 +16,8 @@ use craft\base\Utility;
 /**
  * Logs Utility
  * Provides access to system-wide log viewer from Utilities menu
+ *
+ * @since 1.0.0
  */
 class LogsUtility extends Utility
 {

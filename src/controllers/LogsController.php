@@ -20,6 +20,8 @@ use yii\web\Response;
 /**
  * Generic Logs Controller
  * Provides log viewing functionality for any plugin using the logging library
+ *
+ * @since 1.0.0
  */
 class LogsController extends Controller
 {

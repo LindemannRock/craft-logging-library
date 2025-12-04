@@ -17,6 +17,8 @@ use lindemannrock\logginglibrary\LoggingLibrary;
 /**
  * Logging Service
  * Provides utilities for managing plugin logs
+ *
+ * @since 1.0.0
  */
 class LoggingService extends Component
 {
