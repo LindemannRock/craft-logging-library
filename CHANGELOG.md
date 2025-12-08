@@ -1,5 +1,13 @@
 # Changelog
 
+## [5.2.2](https://github.com/LindemannRock/craft-logging-library/compare/v5.2.1...v5.2.2) (2025-12-04)
+
+
+### Miscellaneous Chores
+
+* add [@since](https://github.com/since) 1.0.0 annotation to multiple classes and traits ([a0b5dc5](https://github.com/LindemannRock/craft-logging-library/commit/a0b5dc51654ec5fed29e465b39a088af7759fcf9))
+* add MIT License file ([a3403a4](https://github.com/LindemannRock/craft-logging-library/commit/a3403a4bb2eece363939556666dfe7b02ed99fb6))
+
 ## [5.2.1](https://github.com/LindemannRock/craft-logging-library/compare/v5.2.0...v5.2.1) (2025-10-27)
 
 
