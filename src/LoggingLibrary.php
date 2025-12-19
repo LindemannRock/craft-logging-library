@@ -70,7 +70,7 @@ class LoggingLibrary extends \craft\base\Plugin
             function(RegisterCacheOptionsEvent $event) {
                 $event->options[] = [
                     'key' => 'logging-library-cache',
-                    'label' => Craft::t('app', 'Logging Library Cache'),
+                    'label' => Craft::t('app', 'Logging Library caches'),
                     'action' => [$this->logCache, 'invalidateCaches'],
                 ];
             }
