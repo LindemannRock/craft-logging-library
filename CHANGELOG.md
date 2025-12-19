@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.2.3](https://github.com/LindemannRock/craft-logging-library/compare/v5.2.2...v5.2.3) (2025-12-19)
+
+
+### Bug Fixes
+
+* correct label for logging library cache option ([179b53e](https://github.com/LindemannRock/craft-logging-library/commit/179b53e279d9c5e6b52af8974d3ad935e29c38a5))
+
 ## [5.2.2](https://github.com/LindemannRock/craft-logging-library/compare/v5.2.1...v5.2.2) (2025-12-04)
 
 
