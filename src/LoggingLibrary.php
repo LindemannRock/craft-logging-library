@@ -19,6 +19,7 @@ use craft\log\MonologTarget;
 use craft\services\Utilities;
 use craft\utilities\ClearCaches;
 use craft\web\UrlManager;
+use lindemannrock\base\helpers\PluginHelper;
 use lindemannrock\logginglibrary\services\LogCacheService;
 use lindemannrock\logginglibrary\utilities\LogsUtility;
 use Monolog\Formatter\LineFormatter;
@@ -47,6 +48,9 @@ class LoggingLibrary extends \craft\base\Plugin
     public function init(): void
     {
         parent::init();
+
+        // Bootstrap the base plugin helper
+        PluginHelper::bootstrap($this, 'loggingLibraryHelper');
 
         // Register services
         $this->setComponents([
