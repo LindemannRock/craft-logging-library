@@ -83,7 +83,8 @@ class YourPlugin extends Plugin
             'logLevel' => 'info',                                   // Optional: debug|info|warning|error
             'enableLogViewer' => true,                              // Optional: Enable web log viewer
             'itemsPerPage' => $settings->itemsPerPage ?? 50,        // Optional: Entries per page in log viewer
-            'permissions' => ['yourPlugin:viewLogs'],               // Optional: Required permissions
+            'viewPermissions' => ['yourPlugin:viewLogs'],           // Optional: Permissions to view logs
+            'downloadPermissions' => ['yourPlugin:downloadLogs'],   // Optional: Permissions to download logs
         ]);
 
         // DO NOT log in init() - it's called on every request and floods logs
@@ -250,10 +251,8 @@ LoggingLibrary::configure([
     'maxFileSize' => 10240,                              // Max file size in KB (10MB)
     'enableLogViewer' => true,                           // Enable web interface
     'itemsPerPage' => $settings->itemsPerPage ?? 50,     // Entries per page in log viewer
-    'permissions' => [                                   // Required permissions for log access
-        'yourPlugin:viewLogs',
-        'yourPlugin:editSettings'
-    ],
+    'viewPermissions' => ['yourPlugin:viewLogs'],        // Permissions required to view logs
+    'downloadPermissions' => ['yourPlugin:downloadLogs'], // Permissions required to download logs
 ]);
 ```
 
@@ -548,6 +547,11 @@ $event->permissions[] = [
     'permissions' => [
         'yourPlugin:viewLogs' => [
             'label' => 'View logs',
+            'nested' => [
+                'yourPlugin:downloadLogs' => [
+                    'label' => 'Download logs',
+                ],
+            ],
         ],
     ],
 ];
@@ -658,7 +662,8 @@ class YourPlugin extends Plugin
             'logLevel' => 'info',
             'enableLogViewer' => true,
             'itemsPerPage' => $settings->itemsPerPage ?? 50,
-            'permissions' => ['yourPlugin:viewLogs'],
+            'viewPermissions' => ['yourPlugin:viewLogs'],
+            'downloadPermissions' => ['yourPlugin:downloadLogs'],
         ]);
 
         // Register CP routes for log viewer
@@ -675,7 +680,14 @@ class YourPlugin extends Plugin
                 $event->permissions[] = [
                     'heading' => $this->name,
                     'permissions' => [
-                        'yourPlugin:viewLogs' => ['label' => 'View logs'],
+                        'yourPlugin:viewLogs' => [
+                            'label' => 'View logs',
+                            'nested' => [
+                                'yourPlugin:downloadLogs' => [
+                                    'label' => 'Download logs',
+                                ],
+                            ],
+                        ],
                     ],
                 ];
             }

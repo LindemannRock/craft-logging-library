@@ -498,11 +498,13 @@ window.location.href = buildUrl({ page: {{ pagination.currentPage + 1 }} });
 					</div>
 				</div>
 
+				{% if canDownload %}
 				<div class="log-config-item" style="grid-template-columns: 1fr; padding: 8px 0;">
 					<a href="{{ actionUrl('logging-library/logs/download', isStandalone ? { file: selectedFile.filename, pluginHandle: pluginHandle } : { date: selectedFile.date, pluginHandle: pluginHandle }) }}" class="btn submit fullwidth" download>
 						{{ "Download File"|t('app') }}
 					</a>
 				</div>
+				{% endif %}
 			{% endif %}
 
 			<div class="log-config-item location">

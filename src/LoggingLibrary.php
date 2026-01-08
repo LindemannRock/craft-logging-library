@@ -122,12 +122,9 @@ class LoggingLibrary extends \craft\base\Plugin
             throw new \InvalidArgumentException('Plugin handle is required for logging configuration');
         }
 
-        // Allow reconfiguration if log level changed, but skip if exact same config
+        // Check if we need to reconfigure logging (expensive operation)
         $existingConfig = self::$_pluginConfigs[$handle] ?? null;
-        if ($existingConfig && $existingConfig['logLevel'] === $config['logLevel']) {
-            return;
-        }
-
+        $needsLoggingSetup = !$existingConfig || $existingConfig['logLevel'] !== ($config['logLevel'] ?? 'info');
 
         // Detect edge/CDN hosting environments
         $isEdgeEnvironment = self::_detectEdgeEnvironment();
@@ -139,16 +136,20 @@ class LoggingLibrary extends \craft\base\Plugin
             'retention' => 30,
             'maxFileSize' => 10240, // 10MB
             'enableLogViewer' => !$isEdgeEnvironment, // Auto-disable on edge platforms
-            'permissions' => [],
+            'viewPermissions' => [], // Permissions required to view logs
+            'downloadPermissions' => [], // Permissions required to download logs
             'itemsPerPage' => 50, // Default entries per page in log viewer
         ], $config);
 
+        // Always store the latest config (permissions may have changed)
         self::$_pluginConfigs[$handle] = $config;
 
-        // Configure logging immediately (heavy operation, but guarded)
-        self::_configureLogging($handle, $config);
+        // Only configure logging if needed (expensive operation)
+        if ($needsLoggingSetup) {
+            self::_configureLogging($handle, $config);
+        }
 
-        // Register routes if log viewer is enabled
+        // Register routes if log viewer is enabled (idempotent)
         if ($config['enableLogViewer']) {
             self::_registerRoutes($handle);
         }

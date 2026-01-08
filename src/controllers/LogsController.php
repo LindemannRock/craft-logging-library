@@ -56,8 +56,11 @@ class LogsController extends Controller
                 throw new NotFoundHttpException('Log viewer is disabled for this plugin');
             }
 
-            // Check permissions if specified
-            $this->_checkPermissions($config['permissions'] ?? []);
+            // Check view permissions if specified
+            $this->_checkPermissions($config['viewPermissions'] ?? []);
+
+            // Check if user can download
+            $canDownload = $this->_hasPermission($config['downloadPermissions'] ?? []);
 
             $limit = $config['itemsPerPage'] ?? 50;
             $pluginName = $config['pluginName'];
@@ -66,8 +69,7 @@ class LogsController extends Controller
             $config = null;
             $limit = 50; // Default for standalone
             $pluginName = 'All Logs';
-
-            // TODO: Add admin permission check for standalone mode
+            $canDownload = Craft::$app->getUser()->getIsAdmin(); // Only admins can download in standalone mode
         }
 
         // Get filter parameters
@@ -141,6 +143,7 @@ class LogsController extends Controller
             'sources' => $sources,
             'logEntries' => $logEntries,
             'columnVariance' => $columnVariance,
+            'canDownload' => $canDownload,
             'filters' => [
                 'level' => $level,
                 'source' => $source,
@@ -218,8 +221,8 @@ class LogsController extends Controller
             throw new NotFoundHttpException('Log viewer is disabled for this plugin');
         }
 
-        // Check permissions
-        $this->_checkPermissions($config['permissions'] ?? []);
+        // Check download permissions
+        $this->_checkPermissions($config['downloadPermissions'] ?? []);
 
         $date = trim($request->getRequiredParam('date'));
 
@@ -258,7 +261,7 @@ class LogsController extends Controller
     }
 
     /**
-     * Check permissions for accessing logs
+     * Check permissions for accessing logs (throws exception if not allowed)
      */
     private function _checkPermissions(array $permissions): void
     {
@@ -266,17 +269,27 @@ class LogsController extends Controller
             return; // No permissions required
         }
 
-        $hasPermission = false;
+        if (!$this->_hasPermission($permissions)) {
+            throw new ForbiddenHttpException('User does not have permission to view logs');
+        }
+    }
+
+    /**
+     * Check if user has any of the specified permissions
+     */
+    private function _hasPermission(array $permissions): bool
+    {
+        if (empty($permissions)) {
+            return true; // No permissions required
+        }
+
         foreach ($permissions as $permission) {
             if (Craft::$app->getUser()->checkPermission($permission)) {
-                $hasPermission = true;
-                break;
+                return true;
             }
         }
 
-        if (!$hasPermission) {
-            throw new ForbiddenHttpException('User does not have permission to view logs');
-        }
+        return false;
     }
 
     /**
