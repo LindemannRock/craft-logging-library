@@ -1,5 +1,13 @@
 # Changelog
 
+## [5.3.0](https://github.com/LindemannRock/craft-logging-library/compare/v5.2.3...v5.3.0) (2026-01-08)
+
+
+### Features
+
+* enhance logging permissions and download functionality ([a381730](https://github.com/LindemannRock/craft-logging-library/commit/a381730d69f42bf3095b5ffd8e50662fc61ecb3e))
+* Migrate to shared base plugin (lindemannrock/craft-plugin-base) ([ce6e4e1](https://github.com/LindemannRock/craft-logging-library/commit/ce6e4e156923521ae5346a6effe65f8911ce814d))
+
 ## [5.2.3](https://github.com/LindemannRock/craft-logging-library/compare/v5.2.2...v5.2.3) (2025-12-19)
 
 
