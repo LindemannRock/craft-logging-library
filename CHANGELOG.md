@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.3.1](https://github.com/LindemannRock/craft-logging-library/compare/v5.3.0...v5.3.1) (2026-01-11)
+
+
+### Bug Fixes
+
+* correct search input reference in clear button event listener ([a03be9d](https://github.com/LindemannRock/craft-logging-library/commit/a03be9db2a4a54445978107063d31bedeca55dfa))
+
 ## [5.3.0](https://github.com/LindemannRock/craft-logging-library/compare/v5.2.3...v5.3.0) (2026-01-08)
 
 
