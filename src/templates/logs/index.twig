@@ -365,7 +365,7 @@ new Garnish.MenuBtn(btn);
 const clearBtn = document.querySelector('.clear-btn');
 if (clearBtn) {
 clearBtn.addEventListener('click', function () {
-const searchInput = this.previousElementSibling.previousElementSibling;
+const searchInput = this.previousElementSibling;
 searchInput.value = '';
 searchInput.form.submit();
 });
