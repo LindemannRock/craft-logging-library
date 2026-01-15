@@ -209,7 +209,50 @@ class LogsController extends Controller
     public function actionDownload(): Response
     {
         $request = Craft::$app->getRequest();
-        $pluginHandle = $this->_getPluginHandleFromUrl();
+
+        // Get plugin handle from query param (passed by template)
+        $pluginHandle = trim($request->getRequiredParam('pluginHandle'));
+
+        // Validate plugin handle (only allow alphanumeric and dash)
+        if (!preg_match('/^[a-zA-Z0-9\-]+$/', $pluginHandle)) {
+            throw new \InvalidArgumentException('Invalid plugin handle');
+        }
+
+        // Detect standalone mode (viewing all logs)
+        $isStandalone = ($pluginHandle === 'logging-library');
+
+        if ($isStandalone) {
+            // Standalone mode - only admins can download
+            if (!Craft::$app->getUser()->getIsAdmin()) {
+                throw new ForbiddenHttpException('User does not have permission to download logs');
+            }
+
+            // Get filename from query param
+            $filename = trim($request->getRequiredParam('file'));
+
+            // Validate filename (only allow alphanumeric, dash, underscore, dot)
+            if (!preg_match('/^[a-zA-Z0-9_\-\.]+$/', $filename)) {
+                throw new \InvalidArgumentException('Invalid filename');
+            }
+
+            // Ensure it's a .log file
+            if (!str_ends_with(strtolower($filename), '.log')) {
+                throw new \InvalidArgumentException('Invalid file type');
+            }
+
+            $logPath = Craft::$app->getPath()->getLogPath() . '/' . $filename;
+
+            if (!file_exists($logPath)) {
+                throw new NotFoundHttpException('Log file not found');
+            }
+
+            return Craft::$app->getResponse()->sendFile($logPath, $filename, [
+                'mimeType' => 'text/plain',
+                'inline' => false,
+            ]);
+        }
+
+        // Plugin-specific mode
         $config = LoggingLibrary::getConfig($pluginHandle);
 
         if (!$config) {
@@ -234,7 +277,7 @@ class LogsController extends Controller
         $logPath = Craft::$app->getPath()->getLogPath() . "/{$pluginHandle}-{$date}.log";
 
         if (!file_exists($logPath)) {
-            throw new \Exception('Log file not found');
+            throw new NotFoundHttpException('Log file not found');
         }
 
         return Craft::$app->getResponse()->sendFile($logPath, "{$pluginHandle}-{$date}.log", [
