@@ -1,5 +1,18 @@
 # Changelog
 
+## [5.4.0](https://github.com/LindemannRock/craft-logging-library/compare/v5.3.1...v5.4.0) (2026-01-16)
+
+
+### Features
+
+* enhance log download functionality with validation and permissions ([b2b8e32](https://github.com/LindemannRock/craft-logging-library/commit/b2b8e324acb848cf364be6a2d4a3699b353f7c94))
+
+
+### Bug Fixes
+
+* ensure download permission check only occurs if downloadPermissions are configured ([588a19b](https://github.com/LindemannRock/craft-logging-library/commit/588a19baae1ce1c240f8a8d8dcabc880920488a1))
+* update hardcoded cache paths with PluginHelper for consistency ([146f207](https://github.com/LindemannRock/craft-logging-library/commit/146f20780226ef56b1c0e6dfba410378cb29152e))
+
 ## [5.3.1](https://github.com/LindemannRock/craft-logging-library/compare/v5.3.0...v5.3.1) (2026-01-11)
 
 
