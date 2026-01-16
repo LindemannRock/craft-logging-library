@@ -13,6 +13,7 @@ namespace lindemannrock\logginglibrary\services;
 use Craft;
 use craft\base\Component;
 use craft\helpers\FileHelper;
+use lindemannrock\base\helpers\PluginHelper;
 use lindemannrock\logginglibrary\LoggingLibrary;
 use yii2mod\query\ArrayQuery;
 
@@ -272,7 +273,7 @@ class LogCacheService extends Component
      */
     private function _getCachePath(): string
     {
-        return Craft::$app->getPath()->getRuntimePath() . '/logging-library/cache/logs/';
+        return PluginHelper::getCachePath(LoggingLibrary::getInstance(), 'logs');
     }
 
     /**
