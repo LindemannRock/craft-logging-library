@@ -59,8 +59,9 @@ class LogsController extends Controller
             // Check view permissions if specified
             $this->_checkPermissions($config['viewPermissions'] ?? []);
 
-            // Check if user can download
-            $canDownload = $this->_hasPermission($config['downloadPermissions'] ?? []);
+            // Check if user can download (only if downloadPermissions is configured)
+            $downloadPermissions = $config['downloadPermissions'] ?? [];
+            $canDownload = !empty($downloadPermissions) && $this->_hasPermission($downloadPermissions);
 
             $limit = $config['itemsPerPage'] ?? 50;
             $pluginName = $config['pluginName'];
