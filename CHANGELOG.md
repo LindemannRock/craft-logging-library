@@ -1,5 +1,17 @@
 # Changelog
 
+## [5.5.0](https://github.com/LindemannRock/craft-logging-library/compare/v5.4.0...v5.5.0) (2026-01-24)
+
+
+### Features
+
+* migrate logs index template to cp-table layout from base plugin ([dce3709](https://github.com/LindemannRock/craft-logging-library/commit/dce3709feff30ea49bb98a0b8b1c1e3ae9c488e8))
+
+
+### Bug Fixes
+
+* rename sidebar block to sidebarContent for consistency ([e6ce37d](https://github.com/LindemannRock/craft-logging-library/commit/e6ce37d3e25b5fe6454a50e5bd7de58ae056b0c7))
+
 ## [5.4.0](https://github.com/LindemannRock/craft-logging-library/compare/v5.3.1...v5.4.0) (2026-01-16)
 
 
