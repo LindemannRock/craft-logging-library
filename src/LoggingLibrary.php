@@ -114,6 +114,9 @@ class LoggingLibrary extends \craft\base\Plugin
      * IMPORTANT: Debug level logging only works when Craft's DEV_MODE is true.
      * When DEV_MODE=false (production/staging), Craft::debug() calls are ignored
      * for security reasons. Only INFO, WARNING, and ERROR levels will work.
+     *
+     * @param array $config Plugin configuration array
+     * @since 1.0.0
      */
     public static function configure(array $config): void
     {
@@ -157,6 +160,10 @@ class LoggingLibrary extends \craft\base\Plugin
 
     /**
      * Get configuration for a plugin
+     *
+     * @param string $handle Plugin handle
+     * @return array|null Plugin configuration or null if not found
+     * @since 1.0.0
      */
     public static function getConfig(string $handle): ?array
     {
@@ -165,6 +172,9 @@ class LoggingLibrary extends \craft\base\Plugin
 
     /**
      * Get all registered plugin configurations
+     *
+     * @return array All plugin configurations
+     * @since 1.0.0
      */
     public static function getAllConfigs(): array
     {
@@ -308,6 +318,12 @@ class LoggingLibrary extends \craft\base\Plugin
 
     /**
      * Add logs section to plugin's CP nav item
+     *
+     * @param array $navItem The plugin's CP nav item
+     * @param string $handle Plugin handle
+     * @param array $permissions Permissions required to view logs
+     * @return array Modified nav item with logs subnav
+     * @since 1.7.0
      */
     public static function addLogsNav(array $navItem, string $handle, array $permissions = []): array
     {
@@ -342,6 +358,10 @@ class LoggingLibrary extends \craft\base\Plugin
 
     /**
      * Get available log files for a plugin
+     *
+     * @param string $handle Plugin handle
+     * @return array Array of log file information
+     * @since 1.0.0
      */
     public static function getLogFiles(string $handle): array
     {
@@ -376,6 +396,7 @@ class LoggingLibrary extends \craft\base\Plugin
      * Get all log files from storage/logs directory (for standalone viewer)
      *
      * @return array Array of log file information grouped by source
+     * @since 5.0.0
      */
     public static function getAllLogFiles(): array
     {
@@ -474,6 +495,7 @@ class LoggingLibrary extends \craft\base\Plugin
      *
      * @param string $line A line from the log file
      * @return string Format type: 'plugin', 'craft', 'php', or 'unknown'
+     * @since 5.0.0
      */
     public static function detectLogFormat(string $line): string
     {

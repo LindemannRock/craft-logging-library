@@ -32,6 +32,9 @@ class LogsController extends Controller
 
     /**
      * Display logs with pagination
+     *
+     * @return Response
+     * @since 1.0.0
      */
     public function actionIndex(): Response
     {
@@ -166,7 +169,7 @@ class LogsController extends Controller
                 'info' => 'Info',
                 'debug' => 'Debug',
             ],
-            'config' => $config,
+            'logConfig' => $config,
         ]);
     }
 
@@ -206,6 +209,9 @@ class LogsController extends Controller
 
     /**
      * Download a log file
+     *
+     * @return Response
+     * @since 1.0.0
      */
     public function actionDownload(): Response
     {

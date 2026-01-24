@@ -1,523 +1,390 @@
-{% extends "_layouts/cp" %}
-{% import "_includes/forms" as forms %}
+{#
+ # System Logs Index - Using cp-table layout
+ #
+ # This template extends the base plugin's cp-table layout to provide
+ # a consistent interface for viewing system logs with filters, sorting,
+ # expandable row details, and a sidebar with log configuration info.
+ #
+ # Supports two modes:
+ # - Plugin mode: Shows logs for a specific plugin (date-based files)
+ # - Standalone mode: Shows all system logs (source/file-based)
+ #}
 
-{% set title = "Logs"|t('app') %}
-{% set docTitle = title ~ ' - ' ~ pluginName %}
+{% extends 'lindemannrock-base/_layouts/cp-table' %}
+
+{# ============================================================================
+   BUILD FILTER OPTIONS
+   ============================================================================ #}
+
+{# Build level options #}
+{% set levelOptions = [
+    {value: 'all', label: 'All Levels'|t('app'), status: 'all'},
+] %}
+
+{% set levelSeverity = {
+    'error': 1,
+    'warning': 2,
+    'info': 3,
+    'debug': 4
+} %}
+{% set configuredLevel = logConfig ? logConfig.logLevel|lower : 'debug' %}
+{% set configuredSeverity = levelSeverity[configuredLevel] ?? 4 %}
+
+{% for value, label in levels %}
+    {% if value != 'all' %}
+        {% if isStandalone or (levelSeverity[value] is defined and levelSeverity[value] <= configuredSeverity) %}
+            {% if value != 'debug' or craft.app.config.general.devMode %}
+                {% set levelOptions = levelOptions|merge([{
+                    value: value,
+                    label: label,
+                    colorKey: value,
+                }]) %}
+            {% endif %}
+        {% endif %}
+    {% endif %}
+{% endfor %}
+
+{# Build file/date options #}
+{% set fileOptions = [{value: '', label: isStandalone ? 'Select File'|t('app') : 'Select Date'|t('app')}] %}
+{% for file in logFiles %}
+    {% set fileOptions = fileOptions|merge([{
+        value: isStandalone ? file.filename : file.date,
+        label: (isStandalone ? file.filename : file.date) ~ ' (' ~ file.formattedSize ~ ')',
+    }]) %}
+{% endfor %}
+
+{# Build source options (standalone mode only) #}
+{% set sourceOptions = [] %}
+{% if isStandalone %}
+    {% for sourceValue, sourceLabel in sources %}
+        {% set sourceOptions = sourceOptions|merge([{
+            value: sourceValue,
+            label: sourceLabel,
+        }]) %}
+    {% endfor %}
+{% endif %}
 
 
-{% set fullPageForm = false %}
-{% set selectedSubnavItem = 'logs' %}
+{# ============================================================================
+   TABLE CONFIGURATION
+   ============================================================================ #}
 
-{% set crumbs = [
-      { label: pluginName, url: url(pluginHandle) },
-      { label: 'Logs'|t('redirect-manager'), url: url(pluginHandle ~ '/logs') },
-  ] %}
+{% set tableConfig = {
+    plugin: {
+        handle: pluginHandle,
+        name: pluginName,
+    },
+    page: {
+        title: 'Logs'|t('app'),
+        subnav: 'logs',
+        crumbs: [
+            { label: pluginName, url: url(pluginHandle) },
+            { label: 'Logs'|t('app'), url: url(pluginHandle ~ '/logs') }
+        ],
+    },
+    filters: isStandalone ? [
+        {
+            type: 'dropdown',
+            param: 'source',
+            current: filters.source,
+            label: sources[filters.source] ?? 'All Sources'|t('app'),
+            options: sourceOptions,
+        },
+        {
+            type: 'dropdown',
+            param: 'file',
+            current: selectedFile ? selectedFile.filename : '',
+            label: selectedFile ? selectedFile.filename : 'Select File'|t('app'),
+            options: fileOptions,
+        },
+        {
+            type: 'status',
+            param: 'level',
+            current: filters.level,
+            label: levels[filters.level] ?? 'All Levels'|t('app'),
+            colorSet: 'logLevel',
+            options: levelOptions,
+        },
+    ] : [
+        {
+            type: 'dropdown',
+            param: 'date',
+            current: selectedFile ? selectedFile.date : '',
+            label: selectedFile ? selectedFile.date : 'Select Date'|t('app'),
+            options: fileOptions,
+        },
+        {
+            type: 'status',
+            param: 'level',
+            current: filters.level,
+            label: levels[filters.level] ?? 'All Levels'|t('app'),
+            colorSet: 'logLevel',
+            options: levelOptions,
+        },
+    ],
+    search: {
+        placeholder: 'Search messages and context...'|t('app'),
+        value: filters.search,
+    },
+    sort: {
+        field: filters.sort,
+        direction: filters.dir,
+    },
+    table: {
+        columns: isStandalone ? [
+            {key: 'timestamp', label: 'Time'|t('app'), sortable: true, width: '140px'},
+            {key: 'level', label: 'Level'|t('app'), sortable: true, width: '80px'},
+            {key: 'category', label: 'Source'|t('app'), sortable: true, width: '120px'},
+            {key: 'user', label: 'User'|t('app'), sortable: true, width: '100px'},
+            {key: 'message', label: 'Message'|t('app'), sortable: true},
+        ] : [
+            {key: 'timestamp', label: 'Time'|t('app'), sortable: true, width: '140px'},
+            {key: 'level', label: 'Level'|t('app'), sortable: true, width: '80px'},
+            {key: 'user', label: 'User'|t('app'), sortable: true, width: '100px'},
+            {key: 'message', label: 'Message'|t('app'), sortable: true},
+        ],
+        items: logEntries,
+        emptyMessage: logFiles|length == 0
+            ? 'No log files found. Log files are created when plugin activities occur.'|t('app')
+            : 'No log entries found for the selected filters.'|t('app'),
+        expandable: true,
+    },
+    pagination: {
+        page: pagination.currentPage,
+        limit: pagination.perPage,
+        totalCount: pagination.total,
+        itemLabel: {singular: 'entry'|t('app'), plural: 'entries'|t('app')},
+    },
+    checkboxes: false,
+    rowActions: false,
+} %}
 
-{% block toolbar %}
-	<div id="toolbar" class="flex">
-		<div class="flex-grow">
-			<form method="get" action="{{ url(pluginHandle ~ '/logs') }}">
-				<div class="flex">
-					{% if logFiles|length > 0 %}
-						{% if isStandalone %}
-							{# Source filter menu button (standalone mode) #}
-							<div class="btngroup">
-								<button type="button" class="btn menubtn">
-									<span class="icon" aria-hidden="true">{{ svg('@appicons/folder.svg') }}</span>
-									{{ sources[filters.source] ?? 'All Sources' }}
-								</button>
-								<div class="menu">
-									<ul>
-										{% for sourceValue, sourceLabel in sources %}
-											<li>
-												<a class="{{ filters.source == sourceValue ? 'sel' : '' }}" href="?source={{ sourceValue }}&level=all&search=">
-													{{ sourceLabel }}
-												</a>
-											</li>
-										{% endfor %}
-									</ul>
-								</div>
-							</div>
 
-							{# File selector menu button (standalone mode) #}
-							<div class="btngroup">
-								<button type="button" class="btn menubtn">
-									<span class="icon" aria-hidden="true">{{ svg('@appicons/file.svg') }}</span>
-									{{ selectedFile ? selectedFile.filename : 'Select File'|t('app') }}
-								</button>
-								<div class="menu" style="max-height: 400px; overflow-y: auto;">
-									<ul>
-										{% for file in logFiles %}
-											<li>
-												<a class="{{ selectedFile and selectedFile.filename == file.filename ? 'sel' : '' }}" href="?source={{ filters.source }}&file={{ file.filename }}&level={{ filters.level }}&search={{ filters.search }}">
-													{{ file.filename }}
-													<span style="color: #999;">({{ file.formattedSize }})</span>
-												</a>
-											</li>
-										{% endfor %}
-									</ul>
-								</div>
-							</div>
-						{% else %}
-							{# Date filter menu button (plugin mode) #}
-							<div class="btngroup">
-								<button type="button" class="btn menubtn">
-									<span class="icon" aria-hidden="true">{{ svg('@appicons/calendar.svg') }}</span>
-									{{ selectedFile ? selectedFile.date : 'Select Date'|t('app') }}
-								</button>
-								<div class="menu">
-									<ul>
-										{% for file in logFiles %}
-											<li>
-												<a class="{{ selectedFile and selectedFile.date == file.date ? 'sel' : '' }}" href="?date={{ file.date }}&level=all&search=">
-													{{ file.date }}
-													({{ file.formattedSize }})
-												</a>
-											</li>
-										{% endfor %}
-									</ul>
-								</div>
-							</div>
-						{% endif %}
+{# ============================================================================
+   BEFORE TABLE - Empty state info
+   ============================================================================ #}
 
-						{# Level filter menu button #}
-						<div class="btngroup">
-							<button type="button" class="btn menubtn">
-								<span class="status {{ filters.level == 'error' ? 'red' : (filters.level == 'warning' ? 'orange' : (filters.level == 'info' ? 'blue' : (filters.level == 'debug' ? 'purple' : 'all'))) }}"></span>
-								{{ levels[filters.level] ?? 'All Levels'|t('app') }}
-							</button>
-							<div class="menu">
-								<ul>
-									{% set levelSeverity = {
-                                        'error': 1,
-                                        'warning': 2,
-                                        'info': 3,
-                                        'debug': 4
-                                    } %}
-									{% set configuredLevel = config ? config.logLevel|lower : 'debug' %}
-									{% set configuredSeverity = levelSeverity[configuredLevel] ?? 4 %}
+{% block beforeTable %}
+    <style>
+        /* Log level colors in table rows */
+        .lr-data-row[data-level="error"] {
+            background: rgba(231, 76, 60, 0.05);
+            border-left: 3px solid rgba(231, 76, 60, 0.3);
+        }
+        .lr-data-row[data-level="warning"] {
+            background: rgba(243, 156, 18, 0.05);
+            border-left: 3px solid rgba(243, 156, 18, 0.3);
+        }
+        .lr-data-row[data-level="info"] {
+            background: rgba(52, 152, 219, 0.05);
+            border-left: 3px solid rgba(52, 152, 219, 0.3);
+        }
+        .lr-data-row[data-level="debug"] {
+            background: rgba(155, 89, 182, 0.08);
+            border-left: 3px solid rgba(155, 89, 182, 0.4);
+        }
+        .lr-data-row td {
+            vertical-align: top;
+        }
 
-									{% for value, label in levels %}
-										{% if value == 'all' %}
-											<li>
-												<a class="{{ filters.level == value ? 'sel' : '' }}" href="?{{ isStandalone ? 'source=' ~ filters.source ~ '&file=' ~ (selectedFile ? selectedFile.filename : '') : 'date=' ~ (selectedFile ? selectedFile.date : '') }}&level={{ value }}&search={{ filters.search }}">
-													<span class="status all"></span>
-													{{ label }}
-												</a>
-											</li>
-											<li><hr class="padded"></li>
-										{% elseif isStandalone or (levelSeverity[value] is defined and levelSeverity[value] <= configuredSeverity) %}
-											{% if value != 'debug' or craft.app.config.general.devMode %}
-												<li>
-													<a class="{{ filters.level == value ? 'sel' : '' }}" href="?{{ isStandalone ? 'source=' ~ filters.source ~ '&file=' ~ (selectedFile ? selectedFile.filename : '') : 'date=' ~ (selectedFile ? selectedFile.date : '') }}&level={{ value }}&search={{ filters.search }}">
-														<span class="status {{ value == 'error' ? 'red' : (value == 'warning' ? 'orange' : (value == 'info' ? 'blue' : 'purple')) }}"></span>
-														{{ label }}
-													</a>
-												</li>
-											{% endif %}
-										{% endif %}
-									{% endfor %}
-								</ul>
-							</div>
-						</div>
+        /* Context row styling */
+        .lr-context-row.error .lr-context-content {
+            border-left-color: #ef4444;
+        }
+    </style>
 
-						{# Search input #}
-						<div class="search-container texticon flex-grow">
-							<span class="texticon-icon search icon" aria-hidden="true"></span>
-							<input type="text" class="clearable text fullwidth" name="search" value="{{ filters.search }}" placeholder="{{ 'Search messages and context...'|t('app') }}" autocomplete="off" dir="ltr" aria-label="Search" {% if filters.search %} autofocus {% endif %}>
-							<button type="button" class="clear-btn {{ filters.search ? '' : 'hidden' }}" title="Clear search" role="button" aria-label="Clear search"></button>
-							{% if isStandalone %}
-								<input type="hidden" name="source" value="{{ filters.source }}">
-								<input type="hidden" name="file" value="{{ selectedFile ? selectedFile.filename : '' }}">
-							{% else %}
-								<input type="hidden" name="date" value="{{ selectedFile ? selectedFile.date : '' }}">
-							{% endif %}
-							<input type="hidden" name="level" value="{{ filters.level }}">
-						</div>
-					{% endif %}
-				</div>
-			</form>
-		</div>
-	</div>
+    {% if logFiles|length == 0 and logConfig %}
+        <div class="info-box-table-wrapper">
+            {% include 'lindemannrock-base/_components/info-box' with {
+                message: 'Current log level'|t('app') ~ ': <strong>' ~ logConfig.logLevel|upper ~ '</strong>',
+                type: 'tip',
+                margin: 'none',
+                stretch: true,
+            } %}
+        </div>
+    {% endif %}
 {% endblock %}
 
-{% block content %}
 
-	<style>
-		.page-info {
-			margin: 0 12px;
-			color: #596673;
-		}
-		.pagination {
-			gap: 4px;
-			align-items: center;
-		}
-		/* Keep toolbar on one row even on smaller screens */
-		#toolbar.flex {
-			flex-wrap: nowrap;
-			gap: 8px;
-		}
-		#toolbar .flex-grow {
-			min-width: 0;
-			flex-shrink: 1;
-		}
-		/* Enhance context display */
-		details[open] summary {
-			margin-bottom: 4px;
-		}
-		/* Log level colors in table rows */
-		.log-entry[data-level="error"] {
-			background: rgba(231, 76, 60, 0.05);
-			border-left: 3px solid rgba(231, 76, 60, 0.3);
-		}
-		.log-entry[data-level="warning"] {
-			background: rgba(243, 156, 18, 0.05);
-			border-left: 3px solid rgba(243, 156, 18, 0.3);
-		}
-		.log-entry[data-level="info"] {
-			background: rgba(52, 152, 219, 0.05);
-			border-left: 3px solid rgba(52, 152, 219, 0.3);
-		}
-		.log-entry[data-level="debug"] {
-			background: rgba(155, 89, 182, 0.08);
-			border-left: 3px solid rgba(155, 89, 182, 0.4);
-		}
-		.log-entry td {
-			vertical-align: top;
-			padding: 12px 8px;
-		}
-		/* Clickable row hover effect */
-		.clickable-row:hover {
-			background: #f9fafb !important;
-		}
-		.clickable-row {
-			transition: background 0.1s ease;
-		}
-		/* Context row styling */
-		.context-row td {
-			padding: 0 !important;
-		}
-	</style>
+{# ============================================================================
+   CUSTOM TABLE ROW RENDERING
+   ============================================================================ #}
 
-	{% if logFiles|length == 0 %}
-		<div class="pane centeralign">
-			<p class="light">{{ "No log files found. Log files are created when plugin activities occur."|t('app') }}</p>
-			{% if config %}
-				<p class="light">{{ "Current log level"|t('app') }}:
-					<strong>{{ config.logLevel|upper }}</strong>
-				</p>
-			{% endif %}
-		</div>
-	{% elseif logEntries|length == 0 %}
-		<div class="pane centeralign">
-			<p class="light">{{ "No log entries found for the selected filters."|t('app') }}</p>
-			{% if filters.level != 'all' or filters.search %}
-				<p class="light">{{ "Try adjusting your filters or selecting a different log file."|t('app') }}</p>
-			{% endif %}
-		</div>
-	{% else %}
-		<div id="elements" class="elements">
-			<div class="tableview tablepane">
-				<table class="data fullwidth">
-					<thead>
-						<tr>
-							<th scope="col" data-attribute="timestamp" class="orderable {{ filters.sort == 'timestamp' ? 'ordered ' ~ filters.dir : '' }}" style="width: 140px;">
-								<button type="button" data-sort="timestamp">
-									{{ "Time"|t('app') }}
-								</button>
-							</th>
-							<th scope="col" data-attribute="level" class="orderable {{ filters.sort == 'level' ? 'ordered ' ~ filters.dir : '' }}" style="width: 80px;">
-								<button type="button" data-sort="level">
-									{{ "Level"|t('app') }}
-								</button>
-							</th>
-							{% if isStandalone %}
-								<th scope="col" data-attribute="category" class="orderable {{ filters.sort == 'category' ? 'ordered ' ~ filters.dir : '' }}" style="width: 120px;">
-									<button type="button" data-sort="category">
-										{{ "Source"|t('app') }}
-									</button>
-								</th>
-							{% endif %}
-							<th scope="col" data-attribute="user" class="orderable {{ filters.sort == 'user' ? 'ordered ' ~ filters.dir : '' }}" style="width: 100px;">
-								<button type="button" data-sort="user">
-									{{ "User"|t('app') }}
-								</button>
-							</th>
-							<th scope="col" data-attribute="message" class="orderable {{ filters.sort == 'message' ? 'ordered ' ~ filters.dir : '' }}">
-								<button type="button" data-sort="message">
-									{{ "Message"|t('app') }}
-								</button>
-							</th>
-						</tr>
-					</thead>
-					<tbody>
-						{% for entry in logEntries %}
-							{# Main log entry row - clickable #}
-							<tr class="log-entry clickable-row" data-level="{{ entry.level }}" data-entry-id="{{ loop.index }}" style="cursor: pointer;">
-								<td class="nowrap code">
-									<time datetime="{{ entry.timestamp }}">{{ entry.timestamp|date('H:i:s') }}</time>
-								</td>
-								<td>
-									{{ entry.level|upper }}
-								</td>
-								{% if isStandalone %}
-									<td class="nowrap">
-										<span style="font-size: 11px; padding: 2px 6px; background: #f0f0f0; border-radius: 3px;">
-											{{ entry.category|upper }}
-										</span>
-									</td>
-								{% endif %}
-								<td class="nowrap">
-									{% if entry.user matches '/user:(\\d+)/' %}
-										{% set userId = entry.user|replace('user:', '') %}
-										{% set user = craft.users.id(userId).one() %}
-										{{ user ? user.username : 'User #' ~ userId }}
-									{% else %}
-										{{ entry.user ?: 'System' }}
-									{% endif %}
-								</td>
-								<td style="word-break: break-word;">
-									{{ entry.message }}
-								</td>
-							</tr>
-							{# Expandable context row - hidden by default #}
-							{% if entry.context and entry.context != '[]' and entry.context != '' %}
-								<tr class="context-row" data-entry-id="{{ loop.index }}" style="display: none;">
-									<td colspan="10" style="background: #f9fafb; padding: 0;">
-										<div style="padding: 16px; border-left: 3px solid #3498db;">
-											<div style="font-size: 12px; color: #606d7b; margin-bottom: 8px; font-weight: 600;">Context:</div>
-											<pre style="margin: 0; padding: 12px; background: #ffffff; border-radius: 4px; font-family: Monaco, 'Courier New', monospace; font-size: 11px; white-space: pre-wrap; overflow-x: auto; border: 1px solid #e1e8ed;">{{ entry.context }}</pre>
-										</div>
-									</td>
-								</tr>
-							{% endif %}
-						{% endfor %}
-					</tbody>
-				</table>
-			</div>
-		</div>
+{% block tableRow %}
+    {# Timestamp #}
+    <td class="nowrap code">
+        <time datetime="{{ item.timestamp|lrForApi }}">{{ item.timestamp|lrTime('short', true) }}</time>
+    </td>
 
-	{% endif %}
+    {# Level #}
+    <td>
+        {% include 'lindemannrock-base/_components/badge' with {
+            label: item.level|upper,
+            value: item.level,
+            colorSet: 'logLevel',
+        } only %}
+    </td>
 
-	{% set totalPages = (pagination.total / pagination.perPage)|round(0, 'ceil') %}
-	{% set offset = (pagination.currentPage - 1) * pagination.perPage %}
+    {# Category/Source (standalone mode only) #}
+    {% if isStandalone %}
+        <td class="nowrap">
+            <span style="font-size: 11px; padding: 2px 6px; background: #f0f0f0; border-radius: 3px;">
+                {{ item.category|upper }}
+            </span>
+        </td>
+    {% endif %}
 
-	<div id="footer" class="flex-justify flex">
-		<div class="light">
-			<div class="pagination flex">
-				<nav class="flex" aria-label="log pagination">
-					<button type="button" class="page-link prev-page {{ pagination.currentPage <= 1 ? 'disabled' : '' }}" {{ pagination.currentPage <= 1 ? 'disabled' : '' }} title="Previous Page"></button>
-					<button type="button" class="page-link next-page {{ pagination.currentPage >= totalPages ? 'disabled' : '' }}" {{ pagination.currentPage >= totalPages ? 'disabled' : '' }} title="Next Page"></button>
-				</nav>
-				<div class="page-info">
-					{% set endRange = min(offset + pagination.perPage, pagination.total) %}
-					{% if pagination.total == 0 %}
-						no log entries
-					{% else %}
-						{{ offset + 1 }} – {{ endRange }} of {{ pagination.total }} {{ pagination.total == 1 ? 'entry' : 'entries' }}
-					{% endif %}
-				</div>
-			</div>
-		</div>
-	</div>
+    {# User #}
+    <td class="nowrap">
+        {% if item.user matches '/user:(\\d+)/' %}
+            {% set userId = item.user|replace('user:', '') %}
+            {% set user = craft.users.id(userId).one() %}
+            {{ user ? user.username : 'User #' ~ userId }}
+        {% else %}
+            {{ item.user ?: 'System' }}
+        {% endif %}
+    </td>
 
-		<script>
-			// Mode detection
-const isStandalone = {{ isStandalone ? 'true' : 'false' }};
-const currentFile = '{{ isStandalone and selectedFile ? selectedFile.filename : '' }}';
-const currentDate = '{{ not isStandalone and selectedFile ? selectedFile.date : '' }}';
+    {# Message #}
+    <td style="word-break: break-word;">
+        {{ item.message }}
+    </td>
+{% endblock %}
 
-// Clickable rows to toggle context
-document.querySelectorAll('.clickable-row').forEach(row => {
-row.addEventListener('click', function(e) {
-// Don't toggle if clicking on a link or button
-if (e.target.tagName === 'A' || e.target.tagName === 'BUTTON' || e.target.closest('button')) {
-return;
-}
 
-const entryId = this.dataset.entryId;
-const contextRow = document.querySelector('.context-row[data-entry-id="' + entryId + '"]');
+{# ============================================================================
+   EXPANDABLE ROW DETAILS
+   ============================================================================ #}
 
-if (contextRow) {
-const isVisible = contextRow.style.display !== 'none';
-contextRow.style.display = isVisible ? 'none' : 'table-row';
+{% block expandableRow %}
+    {% if item.context and item.context != '[]' and item.context != '' %}
+        <div style="font-size: 12px; color: #606d7b; margin-bottom: 8px; font-weight: 600;">{{ 'Context'|t('app') }}:</div>
+        <pre style="margin: 0; padding: 12px; background: #ffffff; border-radius: 4px; font-family: Monaco, 'Courier New', monospace; font-size: 11px; white-space: pre-wrap; overflow-x: auto; border: 1px solid #e1e8ed;">{{ item.context }}</pre>
+    {% else %}
+        <span class="light">{{ 'No context data available.'|t('app') }}</span>
+    {% endif %}
+{% endblock %}
 
-// Toggle visual indicator on main row
-if (!isVisible) {
-this.style.background = '#f0f4f8';
-} else {
-this.style.background = '';
-}
-}
-});
-});
 
-// Initialize menu buttons
-document.querySelectorAll('.menubtn').forEach(btn => {
-if (typeof Craft !== 'undefined' && Craft.MenuBtn) {
-new Craft.MenuBtn(btn);
-} else if (typeof Garnish !== 'undefined' && Garnish.MenuBtn) {
-new Garnish.MenuBtn(btn);
-}
-});
+{# ============================================================================
+   SIDEBAR - Log Configuration Info
+   ============================================================================ #}
 
-// Clear search
-const clearBtn = document.querySelector('.clear-btn');
-if (clearBtn) {
-clearBtn.addEventListener('click', function () {
-const searchInput = this.previousElementSibling;
-searchInput.value = '';
-searchInput.form.submit();
-});
-}
+{% block sidebar %}
+    <style>
+        .log-config-item {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 8px;
+            align-items: center;
+            padding: 6px 0;
+        }
+        .log-config-item:not(:last-child) {
+            border-bottom: 1px solid rgba(51, 64, 77, 0.1);
+        }
+        .log-config-item .label {
+            color: #596673;
+            font-weight: normal;
+            white-space: nowrap;
+        }
+        .log-config-item .value {
+            text-align: right;
+            word-break: break-word;
+        }
+        .log-config-item.location {
+            grid-template-columns: 1fr;
+            align-items: start;
+        }
+        .log-config-item.location .value {
+            text-align: left;
+            margin-top: 4px;
+        }
+    </style>
 
-// Search on Enter
-const searchInput = document.querySelector('input[name="search"]');
-if (searchInput) {
-searchInput.addEventListener('keyup', function (e) {
-if (e.key === 'Enter') {
-this.form.submit();
-}
-});
-}
+    <div class="meta" style="padding: 12px;">
+        {% if not isStandalone and logConfig %}
+            <div class="log-config-item">
+                <div class="label">{{ "Current Level"|t('app') }}</div>
+                <div class="value">
+                    {% include 'lindemannrock-base/_components/badge' with {
+                        label: logConfig.logLevel|upper,
+                        value: logConfig.logLevel|lower,
+                        colorSet: 'logLevel',
+                    } only %}
+                </div>
+            </div>
 
-// Build URL with proper parameters for current mode
-function buildUrl(params) {
-const urlParams = new URLSearchParams();
+            <div class="log-config-item">
+                <div class="label">{{ "Retention"|t('app') }}</div>
+                <div class="value">{{ logConfig.retention }} {{ "days"|t('app') }}</div>
+            </div>
+        {% endif %}
 
-if (isStandalone) {
-urlParams.set('source', params.source || '{{ filters.source }}');
-urlParams.set('file', params.file || currentFile);
-} else {
-urlParams.set('date', params.date || currentDate);
-}
+        <div class="log-config-item">
+            <div class="label">{{ "Available Logs"|t('app') }}</div>
+            <div class="value">{{ logFiles|length|number_format }} {{ logFiles|length == 1 ? 'file' : 'files' }}</div>
+        </div>
 
-urlParams.set('level', params.level || '{{ filters.level }}');
-urlParams.set('search', params.search || '{{ filters.search }}');
-urlParams.set('sort', params.sort || '{{ filters.sort }}');
-urlParams.set('dir', params.dir || '{{ filters.dir }}');
-urlParams.set('page', params.page || '1');
+        {% if selectedFile %}
+            <div class="log-config-item">
+                <div class="label">{{ "Current File"|t('app') }}</div>
+                <div class="value">{{ selectedFile.formattedSize }}</div>
+            </div>
 
-return '?' + urlParams.toString();
-}
+            <div class="log-config-item">
+                <div class="label">{{ "Entries"|t('app') }}</div>
+                <div class="value">{{ pagination.total|number_format }}</div>
+            </div>
 
-// Sort buttons
-document.querySelectorAll('th.orderable button').forEach(button => {
-button.addEventListener('click', function () {
-const sortField = this.dataset.sort;
-const currentSort = '{{ filters.sort }}';
-const currentDir = '{{ filters.dir }}';
-let newDir = 'asc';
+            {% if canDownload %}
+                <div class="log-config-item" style="grid-template-columns: 1fr; padding: 8px 0;">
+                    <a href="{{ actionUrl('logging-library/logs/download', isStandalone ? { file: selectedFile.filename, pluginHandle: pluginHandle } : { date: selectedFile.date, pluginHandle: pluginHandle }) }}" class="btn submit fullwidth" download>
+                        {{ "Download File"|t('app') }}
+                    </a>
+                </div>
+            {% endif %}
+        {% endif %}
 
-if (sortField === currentSort) {
-newDir = currentDir === 'asc' ? 'desc' : 'asc';
-}
+        <div class="log-config-item location">
+            <div class="label">{{ "Log Location"|t('app') }}</div>
+            <div class="value">
+                <code style="font-size: 10px; line-height: 1.5; color: #606d7b; word-break: break-all; display: block;">
+                    {% if isStandalone %}
+                        storage/logs/
+                    {% else %}
+                        storage/logs/{{ pluginHandle }}-{date}.log
+                    {% endif %}
+                </code>
+            </div>
+        </div>
+    </div>
+{% endblock %}
 
-window.location.href = buildUrl({ sort: sortField, dir: newDir, page: 1 });
-});
-});
 
-// Pagination
-document.querySelector('.prev-page:not(.disabled)')?.addEventListener('click', function () {
-window.location.href = buildUrl({ page: {{ pagination.currentPage - 1 }} });
-});
+{# ============================================================================
+   CUSTOM SCRIPTS
+   ============================================================================ #}
 
-document.querySelector('.next-page:not(.disabled)')?.addEventListener('click', function () {
-window.location.href = buildUrl({ page: {{ pagination.currentPage + 1 }} });
-});
-		</script>
-	{% endblock %}
+{% block scripts %}
+    <script>
+    (function() {
+        // Add level data attribute to rows for styling
+        document.querySelectorAll('.lr-data-row').forEach((row, index) => {
+            const levelCell = row.querySelector('td:nth-child(2)');
+            if (levelCell) {
+                const level = levelCell.textContent.trim().toLowerCase();
+                row.setAttribute('data-level', level);
 
-	{% block details %}
-		{# Log Configuration Info - In details/sidebar area #}
-		<div class="meta" style="padding: 12px;">
-			<style>
-				.log-config-item {
-					display: grid;
-					grid-template-columns: auto 1fr;
-					gap: 8px;
-					align-items: center;
-					padding: 6px 0;
-				}
-				.log-config-item:not(:last-child) {
-					border-bottom: 1px solid rgba(51, 64, 77, 0.1);
-				}
-				.log-config-item .label {
-					color: #596673;
-					font-weight: normal;
-					white-space: nowrap;
-				}
-				.log-config-item .value {
-					text-align: right;
-					word-break: break-word;
-				}
-				.log-config-item.location {
-					grid-template-columns: 1fr;
-					align-items: start;
-				}
-				.log-config-item.location .value {
-					text-align: left;
-					margin-top: 4px;
-				}
-			</style>
-
-			{% if not isStandalone and config %}
-				<div class="log-config-item">
-					<div class="label">{{ "Current Level"|t('app') }}</div>
-					<div class="value">
-						<span class="status {{ config.logLevel|lower == 'error' ? 'red' : (config.logLevel|lower == 'warning' ? 'orange' : (config.logLevel|lower == 'info' ? 'blue' : 'purple')) }}"></span>
-						<strong>{{ config.logLevel|upper }}</strong>
-					</div>
-				</div>
-
-				<div class="log-config-item">
-					<div class="label">{{ "Retention"|t('app') }}</div>
-					<div class="value">{{ config.retention }}
-						{{ "days"|t('app') }}</div>
-				</div>
-			{% endif %}
-
-			<div class="log-config-item">
-				<div class="label">{{ "Available Logs"|t('app') }}</div>
-				<div class="value">{{ logFiles|length }}
-					{{ logFiles|length == 1 ? 'file' : 'files' }}</div>
-			</div>
-
-			{% if selectedFile %}
-				<div class="log-config-item">
-					<div class="label">{{ "Current File"|t('app') }}</div>
-					<div class="value">
-						{{ selectedFile.formattedSize }}
-					</div>
-				</div>
-
-				<div class="log-config-item">
-					<div class="label">{{ "Entries"|t('app') }}</div>
-					<div class="value">
-						{{ pagination.total }}
-					</div>
-				</div>
-
-				{% if canDownload %}
-				<div class="log-config-item" style="grid-template-columns: 1fr; padding: 8px 0;">
-					<a href="{{ actionUrl('logging-library/logs/download', isStandalone ? { file: selectedFile.filename, pluginHandle: pluginHandle } : { date: selectedFile.date, pluginHandle: pluginHandle }) }}" class="btn submit fullwidth" download>
-						{{ "Download File"|t('app') }}
-					</a>
-				</div>
-				{% endif %}
-			{% endif %}
-
-			<div class="log-config-item location">
-				<div class="label">{{ "Log Location"|t('app') }}</div>
-				<div class="value">
-					<code style="font-size: 10px; line-height: 1.5; color: #606d7b; word-break: break-all; display: block;">
-						{% if isStandalone %}
-							storage/logs/
-						{% else %}
-							storage/logs/{{ pluginHandle }}-{date}.log
-						{% endif %}
-					</code>
-				</div>
-			</div>
-		</div>
-	{% endblock %}
+                // Also mark context row if error
+                if (level === 'error') {
+                    const entryId = row.dataset.entryId;
+                    const contextRow = document.querySelector('.lr-context-row[data-entry-id="' + entryId + '"]');
+                    if (contextRow) {
+                        contextRow.classList.add('error');
+                    }
+                }
+            }
+        });
+    })();
+    </script>
+{% endblock %}
