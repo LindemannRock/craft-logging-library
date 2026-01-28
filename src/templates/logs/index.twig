@@ -213,7 +213,7 @@
 {% block tableRow %}
     {# Timestamp #}
     <td class="nowrap code">
-        <time datetime="{{ item.timestamp|lrForApi }}">{{ item.timestamp|lrTime('short', true) }}</time>
+        <time datetime="{{ item.timestamp|lrForApi }}">{{ item.timestamp|lrTime('short', true, false) }}</time>
     </td>
 
     {# Level #}
