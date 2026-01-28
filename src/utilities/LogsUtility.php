@@ -12,6 +12,8 @@ namespace lindemannrock\logginglibrary\utilities;
 
 use Craft;
 use craft\base\Utility;
+use lindemannrock\logginglibrary\LoggingLibrary;
+use yii\web\ForbiddenHttpException;
 
 /**
  * Logs Utility
@@ -50,8 +52,23 @@ class LogsUtility extends Utility
      */
     public static function contentHtml(): string
     {
-        // Redirect to the standalone logs viewer
-        Craft::$app->getResponse()->redirect('logging-library/logs')->send();
-        Craft::$app->end();
+        $user = Craft::$app->getUser();
+        if (!$user->getIsAdmin() && !$user->checkPermission(LoggingLibrary::PERMISSION_VIEW_ALL_LOGS)) {
+            throw new ForbiddenHttpException('User does not have permission to view logs');
+        }
+
+        $canDownload = $user->getIsAdmin() || $user->checkPermission(LoggingLibrary::PERMISSION_DOWNLOAD_ALL_LOGS);
+
+        $viewModel = LoggingLibrary::getInstance()->logsView->buildViewModel(
+            Craft::$app->getRequest(),
+            'logging-library',
+            'All Logs',
+            true,
+            50,
+            $canDownload,
+            null
+        );
+
+        return Craft::$app->getView()->renderTemplate('logging-library/logs/utility', $viewModel);
     }
 }

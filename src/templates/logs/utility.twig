@@ -1,0 +1,390 @@
+{#
+ # System Logs Index - Using cp-table layout
+ #
+ # This template extends the base plugin's cp-table layout to provide
+ # a consistent interface for viewing system logs with filters, sorting,
+ # expandable row details, and a sidebar with log configuration info.
+ #
+ # Supports two modes:
+ # - Plugin mode: Shows logs for a specific plugin (date-based files)
+ # - Standalone mode: Shows all system logs (source/file-based)
+ #}
+
+{% extends 'lindemannrock-base/_layouts/cp-table-utility' %}
+
+{# ============================================================================
+   BUILD FILTER OPTIONS
+   ============================================================================ #}
+
+{# Build level options #}
+{% set levelOptions = [
+    {value: 'all', label: 'All Levels'|t('app'), status: 'all'},
+] %}
+
+{% set levelSeverity = {
+    'error': 1,
+    'warning': 2,
+    'info': 3,
+    'debug': 4
+} %}
+{% set configuredLevel = logConfig ? logConfig.logLevel|lower : 'debug' %}
+{% set configuredSeverity = levelSeverity[configuredLevel] ?? 4 %}
+
+{% for value, label in levels %}
+    {% if value != 'all' %}
+        {% if isStandalone or (levelSeverity[value] is defined and levelSeverity[value] <= configuredSeverity) %}
+            {% if value != 'debug' or craft.app.config.general.devMode %}
+                {% set levelOptions = levelOptions|merge([{
+                    value: value,
+                    label: label,
+                    colorKey: value,
+                }]) %}
+            {% endif %}
+        {% endif %}
+    {% endif %}
+{% endfor %}
+
+{# Build file/date options #}
+{% set fileOptions = [{value: '', label: isStandalone ? 'Select File'|t('app') : 'Select Date'|t('app')}] %}
+{% for file in logFiles %}
+    {% set fileOptions = fileOptions|merge([{
+        value: isStandalone ? file.filename : file.date,
+        label: (isStandalone ? file.filename : file.date) ~ ' (' ~ file.formattedSize ~ ')',
+    }]) %}
+{% endfor %}
+
+{# Build source options (standalone mode only) #}
+{% set sourceOptions = [] %}
+{% if isStandalone %}
+    {% for sourceValue, sourceLabel in sources %}
+        {% set sourceOptions = sourceOptions|merge([{
+            value: sourceValue,
+            label: sourceLabel,
+        }]) %}
+    {% endfor %}
+{% endif %}
+
+
+{# ============================================================================
+   TABLE CONFIGURATION
+   ============================================================================ #}
+
+{% set tableConfig = {
+    plugin: {
+        handle: pluginHandle,
+        name: pluginName,
+    },
+    page: {
+        title: 'Logs'|t('app'),
+        subnav: 'logs',
+        crumbs: [
+            { label: pluginName, url: url(pluginHandle) },
+            { label: 'Logs'|t('app'), url: url(pluginHandle ~ '/logs') }
+        ],
+    },
+    filters: isStandalone ? [
+        {
+            type: 'dropdown',
+            param: 'source',
+            current: filters.source,
+            label: sources[filters.source] ?? 'All Sources'|t('app'),
+            options: sourceOptions,
+        },
+        {
+            type: 'dropdown',
+            param: 'file',
+            current: selectedFile ? selectedFile.filename : '',
+            label: selectedFile ? selectedFile.filename : 'Select File'|t('app'),
+            options: fileOptions,
+        },
+        {
+            type: 'status',
+            param: 'level',
+            current: filters.level,
+            label: levels[filters.level] ?? 'All Levels'|t('app'),
+            colorSet: 'logLevel',
+            options: levelOptions,
+        },
+    ] : [
+        {
+            type: 'dropdown',
+            param: 'date',
+            current: selectedFile ? selectedFile.date : '',
+            label: selectedFile ? selectedFile.date : 'Select Date'|t('app'),
+            options: fileOptions,
+        },
+        {
+            type: 'status',
+            param: 'level',
+            current: filters.level,
+            label: levels[filters.level] ?? 'All Levels'|t('app'),
+            colorSet: 'logLevel',
+            options: levelOptions,
+        },
+    ],
+    search: {
+        placeholder: 'Search messages and context...'|t('app'),
+        value: filters.search,
+    },
+    sort: {
+        field: filters.sort,
+        direction: filters.dir,
+    },
+    table: {
+        columns: isStandalone ? [
+            {key: 'timestamp', label: 'Time'|t('app'), sortable: true, width: '140px'},
+            {key: 'level', label: 'Level'|t('app'), sortable: true, width: '80px'},
+            {key: 'category', label: 'Source'|t('app'), sortable: true, width: '120px'},
+            {key: 'user', label: 'User'|t('app'), sortable: true, width: '100px'},
+            {key: 'message', label: 'Message'|t('app'), sortable: true},
+        ] : [
+            {key: 'timestamp', label: 'Time'|t('app'), sortable: true, width: '140px'},
+            {key: 'level', label: 'Level'|t('app'), sortable: true, width: '80px'},
+            {key: 'user', label: 'User'|t('app'), sortable: true, width: '100px'},
+            {key: 'message', label: 'Message'|t('app'), sortable: true},
+        ],
+        items: logEntries,
+        emptyMessage: logFiles|length == 0
+            ? 'No log files found. Log files are created when plugin activities occur.'|t('app')
+            : 'No log entries found for the selected filters.'|t('app'),
+        expandable: true,
+    },
+    pagination: {
+        page: pagination.currentPage,
+        limit: pagination.perPage,
+        totalCount: pagination.total,
+        itemLabel: {singular: 'entry'|t('app'), plural: 'entries'|t('app')},
+    },
+    checkboxes: false,
+    rowActions: false,
+} %}
+
+
+{# ============================================================================
+   BEFORE TABLE - Empty state info
+   ============================================================================ #}
+
+{% block beforeTable %}
+    <style>
+        /* Log level colors in table rows */
+        .lr-data-row[data-level="error"] {
+            background: rgba(231, 76, 60, 0.05);
+            border-left: 3px solid rgba(231, 76, 60, 0.3);
+        }
+        .lr-data-row[data-level="warning"] {
+            background: rgba(243, 156, 18, 0.05);
+            border-left: 3px solid rgba(243, 156, 18, 0.3);
+        }
+        .lr-data-row[data-level="info"] {
+            background: rgba(52, 152, 219, 0.05);
+            border-left: 3px solid rgba(52, 152, 219, 0.3);
+        }
+        .lr-data-row[data-level="debug"] {
+            background: rgba(155, 89, 182, 0.08);
+            border-left: 3px solid rgba(155, 89, 182, 0.4);
+        }
+        .lr-data-row td {
+            vertical-align: top;
+        }
+
+        /* Context row styling */
+        .lr-context-row.error .lr-context-content {
+            border-left-color: #ef4444;
+        }
+    </style>
+
+    {% if logFiles|length == 0 and logConfig %}
+        <div class="info-box-table-wrapper">
+            {% include 'lindemannrock-base/_components/info-box' with {
+                message: 'Current log level'|t('app') ~ ': <strong>' ~ logConfig.logLevel|upper ~ '</strong>',
+                type: 'tip',
+                margin: 'none',
+                stretch: true,
+            } %}
+        </div>
+    {% endif %}
+{% endblock %}
+
+
+{# ============================================================================
+   CUSTOM TABLE ROW RENDERING
+   ============================================================================ #}
+
+{% block tableRow %}
+    {# Timestamp #}
+    <td class="nowrap code">
+        <time datetime="{{ item.timestamp|lrForApi }}">{{ item.timestamp|lrTime('short', true, false) }}</time>
+    </td>
+
+    {# Level #}
+    <td>
+        {% include 'lindemannrock-base/_components/badge' with {
+            label: item.level|upper,
+            value: item.level,
+            colorSet: 'logLevel',
+        } only %}
+    </td>
+
+    {# Category/Source (standalone mode only) #}
+    {% if isStandalone %}
+        <td class="nowrap">
+            <span style="font-size: 11px; padding: 2px 6px; background: #f0f0f0; border-radius: 3px;">
+                {{ item.category|upper }}
+            </span>
+        </td>
+    {% endif %}
+
+    {# User #}
+    <td class="nowrap">
+        {% if item.user matches '/user:(\\d+)/' %}
+            {% set userId = item.user|replace('user:', '') %}
+            {% set user = craft.users.id(userId).one() %}
+            {{ user ? user.username : 'User #' ~ userId }}
+        {% else %}
+            {{ item.user ?: 'System' }}
+        {% endif %}
+    </td>
+
+    {# Message #}
+    <td style="word-break: break-word;">
+        {{ item.message }}
+    </td>
+{% endblock %}
+
+
+{# ============================================================================
+   EXPANDABLE ROW DETAILS
+   ============================================================================ #}
+
+{% block expandableRow %}
+    {% if item.context and item.context != '[]' and item.context != '' %}
+        <div style="font-size: 12px; color: #606d7b; margin-bottom: 8px; font-weight: 600;">{{ 'Context'|t('app') }}:</div>
+        <pre style="margin: 0; padding: 12px; background: #ffffff; border-radius: 4px; font-family: Monaco, 'Courier New', monospace; font-size: 11px; white-space: pre-wrap; overflow-x: auto; border: 1px solid #e1e8ed;">{{ item.context }}</pre>
+    {% else %}
+        <span class="light">{{ 'No context data available.'|t('app') }}</span>
+    {% endif %}
+{% endblock %}
+
+
+{# ============================================================================
+   SIDEBAR - Log Configuration Info
+   ============================================================================ #}
+
+{% block sidebarContent %}
+    <style>
+        .log-config-item {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 8px;
+            align-items: center;
+            padding: 6px 0;
+        }
+        .log-config-item:not(:last-child) {
+            border-bottom: 1px solid rgba(51, 64, 77, 0.1);
+        }
+        .log-config-item .label {
+            color: #596673;
+            font-weight: normal;
+            white-space: nowrap;
+        }
+        .log-config-item .value {
+            text-align: right;
+            word-break: break-word;
+        }
+        .log-config-item.location {
+            grid-template-columns: 1fr;
+            align-items: start;
+        }
+        .log-config-item.location .value {
+            text-align: left;
+            margin-top: 4px;
+        }
+    </style>
+
+    <div class="meta" style="padding: 12px;">
+        {% if not isStandalone and logConfig %}
+            <div class="log-config-item">
+                <div class="label">{{ "Current Level"|t('app') }}</div>
+                <div class="value">
+                    {% include 'lindemannrock-base/_components/badge' with {
+                        label: logConfig.logLevel|upper,
+                        value: logConfig.logLevel|lower,
+                        colorSet: 'logLevel',
+                    } only %}
+                </div>
+            </div>
+
+            <div class="log-config-item">
+                <div class="label">{{ "Retention"|t('app') }}</div>
+                <div class="value">{{ logConfig.retention }} {{ "days"|t('app') }}</div>
+            </div>
+        {% endif %}
+
+        <div class="log-config-item">
+            <div class="label">{{ "Available Logs"|t('app') }}</div>
+            <div class="value">{{ logFiles|length|number_format }} {{ logFiles|length == 1 ? 'file' : 'files' }}</div>
+        </div>
+
+        {% if selectedFile %}
+            <div class="log-config-item">
+                <div class="label">{{ "Current File"|t('app') }}</div>
+                <div class="value">{{ selectedFile.formattedSize }}</div>
+            </div>
+
+            <div class="log-config-item">
+                <div class="label">{{ "Entries"|t('app') }}</div>
+                <div class="value">{{ pagination.total|number_format }}</div>
+            </div>
+
+            {% if canDownload %}
+                <div class="log-config-item" style="grid-template-columns: 1fr; padding: 8px 0;">
+                    <a href="{{ actionUrl('logging-library/logs/download', isStandalone ? { file: selectedFile.filename, pluginHandle: pluginHandle } : { date: selectedFile.date, pluginHandle: pluginHandle }) }}" class="btn submit fullwidth" download>
+                        {{ "Download File"|t('app') }}
+                    </a>
+                </div>
+            {% endif %}
+        {% endif %}
+
+        <div class="log-config-item location">
+            <div class="label">{{ "Log Location"|t('app') }}</div>
+            <div class="value">
+                <code style="font-size: 10px; line-height: 1.5; color: #606d7b; word-break: break-all; display: block;">
+                    {% if isStandalone %}
+                        storage/logs/
+                    {% else %}
+                        storage/logs/{{ pluginHandle }}-{date}.log
+                    {% endif %}
+                </code>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+
+{# ============================================================================
+   CUSTOM SCRIPTS
+   ============================================================================ #}
+
+{% block scripts %}
+    <script>
+    (function() {
+        // Add level data attribute to rows for styling
+        document.querySelectorAll('.lr-data-row').forEach((row, index) => {
+            const levelCell = row.querySelector('td:nth-child(2)');
+            if (levelCell) {
+                const level = levelCell.textContent.trim().toLowerCase();
+                row.setAttribute('data-level', level);
+
+                // Also mark context row if error
+                if (level === 'error') {
+                    const entryId = row.dataset.entryId;
+                    const contextRow = document.querySelector('.lr-context-row[data-entry-id="' + entryId + '"]');
+                    if (contextRow) {
+                        contextRow.classList.add('error');
+                    }
+                }
+            }
+        });
+    })();
+    </script>
+{% endblock %}

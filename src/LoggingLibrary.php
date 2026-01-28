@@ -23,6 +23,7 @@ use craft\utilities\ClearCaches;
 use craft\web\UrlManager;
 use lindemannrock\base\helpers\PluginHelper;
 use lindemannrock\logginglibrary\services\LogCacheService;
+use lindemannrock\logginglibrary\services\LogsViewService;
 use lindemannrock\logginglibrary\utilities\LogsUtility;
 use Monolog\Formatter\LineFormatter;
 use Monolog\LogRecord;
@@ -35,6 +36,7 @@ use yii\base\Event;
  * Provides centralized logging configuration for Craft CMS plugins
  *
  * @property-read LogCacheService $logCache
+ * @property-read LogsViewService $logsView
  * @since 1.0.0
  */
 class LoggingLibrary extends \craft\base\Plugin
@@ -60,6 +62,7 @@ class LoggingLibrary extends \craft\base\Plugin
         // Register services
         $this->setComponents([
             'logCache' => LogCacheService::class,
+            'logsView' => LogsViewService::class,
         ]);
 
         // Register CP routes for all plugins using the logging library

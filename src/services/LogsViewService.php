@@ -2,84 +2,40 @@
 /**
  * Logging Library for Craft CMS
  *
- * Generic controller for viewing plugin logs
+ * Service for building log viewer view models
  *
  * @link      https://lindemannrock.com
  * @copyright Copyright (c) 2025 LindemannRock
  */
 
-namespace lindemannrock\logginglibrary\controllers;
+namespace lindemannrock\logginglibrary\services;
 
-use Craft;
-use craft\web\Controller;
+use craft\base\Component;
+use craft\web\Request;
 use lindemannrock\logginglibrary\LoggingLibrary;
-use yii\web\ForbiddenHttpException;
-use yii\web\NotFoundHttpException;
-use yii\web\Response;
 
 /**
- * Generic Logs Controller
- * Provides log viewing functionality for any plugin using the logging library
+ * Logs View Service
  *
- * @since 1.0.0
+ * @since 5.6.0
  */
-class LogsController extends Controller
+class LogsViewService extends Component
 {
     /**
-     * @inheritdoc
+     * Build view data for the logs viewer
      */
-    protected array|int|bool $allowAnonymous = false;
-
-    /**
-     * Display logs with pagination
-     *
-     * @return Response
-     * @since 1.0.0
-     */
-    public function actionIndex(): Response
-    {
-        $request = Craft::$app->getRequest();
-
-        // Get plugin handle from the URL segment
-        $pluginHandle = $this->_getPluginHandleFromUrl();
-
-        // Detect standalone mode (viewing all logs)
-        $isStandalone = ($pluginHandle === 'logging-library');
-
-        if (!$isStandalone) {
-            // Plugin-specific mode - use existing config
-            $config = LoggingLibrary::getConfig($pluginHandle);
-
-            if (!$config) {
-                throw new NotFoundHttpException('Plugin logging not configured');
-            }
-
-            // Check if log viewer is enabled
-            if (!($config['enableLogViewer'] ?? false)) {
-                throw new NotFoundHttpException('Log viewer is disabled for this plugin');
-            }
-
-            // Check view permissions if specified
-            $this->_checkPermissions($config['viewPermissions'] ?? []);
-
-            // Check if user can download (only if downloadPermissions is configured)
-            $downloadPermissions = $config['downloadPermissions'] ?? [];
-            $canDownload = !empty($downloadPermissions) && $this->_hasPermission($downloadPermissions);
-
-            $limit = $config['itemsPerPage'] ?? 50;
-            $pluginName = $config['pluginName'];
-        } else {
-            // Standalone mode - no specific config needed
-            $this->_checkPermissions([LoggingLibrary::PERMISSION_VIEW_ALL_LOGS]);
-            $config = null;
-            $limit = 50; // Default for standalone
-            $pluginName = 'All Logs';
-            $canDownload = $this->_hasPermission([LoggingLibrary::PERMISSION_DOWNLOAD_ALL_LOGS]);
-        }
-
+    public function buildViewModel(
+        Request $request,
+        string $pluginHandle,
+        string $pluginName,
+        bool $isStandalone,
+        int $limit,
+        bool $canDownload,
+        ?array $config,
+    ): array {
         // Get filter parameters
         $level = trim($request->getParam('level', 'all'));
-        $source = trim($request->getParam('source', 'all')); // New: source/category filter
+        $source = trim($request->getParam('source', 'all'));
         $search = trim($request->getParam('search', ''));
         $sort = trim($request->getParam('sort', 'timestamp'));
         $dir = trim($request->getParam('dir', 'desc'));
@@ -139,7 +95,7 @@ class LogsController extends Controller
         // Calculate pagination info
         $totalPages = $totalEntries > 0 ? ceil($totalEntries / $limit) : 0;
 
-        return $this->renderTemplate('logging-library/logs/index', [
+        return [
             'pluginHandle' => $pluginHandle,
             'pluginName' => $pluginName,
             'isStandalone' => $isStandalone,
@@ -171,7 +127,7 @@ class LogsController extends Controller
                 'debug' => 'Debug',
             ],
             'logConfig' => $config,
-        ]);
+        ];
     }
 
     /**
@@ -209,144 +165,6 @@ class LogsController extends Controller
     }
 
     /**
-     * Download a log file
-     *
-     * @return Response
-     * @since 1.0.0
-     */
-    public function actionDownload(): Response
-    {
-        $request = Craft::$app->getRequest();
-
-        // Get plugin handle from query param (passed by template)
-        $pluginHandle = trim($request->getRequiredParam('pluginHandle'));
-
-        // Validate plugin handle (only allow alphanumeric and dash)
-        if (!preg_match('/^[a-zA-Z0-9\-]+$/', $pluginHandle)) {
-            throw new \InvalidArgumentException('Invalid plugin handle');
-        }
-
-        // Detect standalone mode (viewing all logs)
-        $isStandalone = ($pluginHandle === 'logging-library');
-
-        if ($isStandalone) {
-            // Standalone mode - permission-gated
-            $this->_checkPermissions([LoggingLibrary::PERMISSION_VIEW_ALL_LOGS]);
-            $this->_checkPermissions([LoggingLibrary::PERMISSION_DOWNLOAD_ALL_LOGS]);
-
-            // Get filename from query param
-            $filename = trim($request->getRequiredParam('file'));
-
-            // Validate filename (only allow alphanumeric, dash, underscore, dot)
-            if (!preg_match('/^[a-zA-Z0-9_\-\.]+$/', $filename)) {
-                throw new \InvalidArgumentException('Invalid filename');
-            }
-
-            // Ensure it's a .log file
-            if (!str_ends_with(strtolower($filename), '.log')) {
-                throw new \InvalidArgumentException('Invalid file type');
-            }
-
-            $logPath = Craft::$app->getPath()->getLogPath() . '/' . $filename;
-
-            if (!file_exists($logPath)) {
-                throw new NotFoundHttpException('Log file not found');
-            }
-
-            return Craft::$app->getResponse()->sendFile($logPath, $filename, [
-                'mimeType' => 'text/plain',
-                'inline' => false,
-            ]);
-        }
-
-        // Plugin-specific mode
-        $config = LoggingLibrary::getConfig($pluginHandle);
-
-        if (!$config) {
-            throw new NotFoundHttpException('Plugin logging not configured');
-        }
-
-        // Check if log viewer is enabled
-        if (!($config['enableLogViewer'] ?? false)) {
-            throw new NotFoundHttpException('Log viewer is disabled for this plugin');
-        }
-
-        // Check download permissions
-        $this->_checkPermissions($config['downloadPermissions'] ?? []);
-
-        $date = trim($request->getRequiredParam('date'));
-
-        // Validate date format
-        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
-            throw new \InvalidArgumentException('Invalid date format');
-        }
-
-        $logPath = Craft::$app->getPath()->getLogPath() . "/{$pluginHandle}-{$date}.log";
-
-        if (!file_exists($logPath)) {
-            throw new NotFoundHttpException('Log file not found');
-        }
-
-        return Craft::$app->getResponse()->sendFile($logPath, "{$pluginHandle}-{$date}.log", [
-            'mimeType' => 'text/plain',
-            'inline' => false,
-        ]);
-    }
-
-    /**
-     * Get plugin handle from the current URL
-     */
-    private function _getPluginHandleFromUrl(): string
-    {
-        $segments = Craft::$app->getRequest()->getSegments();
-
-        // The plugin handle should be the first segment before '/logs'
-        foreach ($segments as $index => $segment) {
-            if ($segment === 'logs' && $index > 0) {
-                return $segments[$index - 1];
-            }
-        }
-
-        throw new NotFoundHttpException('Unable to determine plugin handle from URL');
-    }
-
-    /**
-     * Check permissions for accessing logs (throws exception if not allowed)
-     */
-    private function _checkPermissions(array $permissions): void
-    {
-        if (empty($permissions)) {
-            return; // No permissions required
-        }
-
-        if (!$this->_hasPermission($permissions)) {
-            throw new ForbiddenHttpException('User does not have permission to view logs');
-        }
-    }
-
-    /**
-     * Check if user has any of the specified permissions
-     */
-    private function _hasPermission(array $permissions): bool
-    {
-        if (Craft::$app->getUser()->getIsAdmin()) {
-            return true;
-        }
-
-        if (empty($permissions)) {
-            return true; // No permissions required
-        }
-
-        foreach ($permissions as $permission) {
-            if (Craft::$app->getUser()->checkPermission($permission)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
      * Extract unique sources from log files for filter dropdown
      */
     private function _extractSources(array $logFiles): array
@@ -377,7 +195,7 @@ class LogsController extends Controller
     /**
      * Get the selected log file from request parameters
      */
-    private function _getSelectedLogFile($request, array $logFiles, bool $isStandalone): ?array
+    private function _getSelectedLogFile(Request $request, array $logFiles, bool $isStandalone): ?array
     {
         if (empty($logFiles)) {
             return null;
@@ -395,31 +213,36 @@ class LogsController extends Controller
                 }
             }
 
-            // No selection yet
             return null;
-        } else {
-            // Plugin mode: select by date
-            $requestedDate = trim($request->getParam('date', ''));
+        }
 
-            if ($requestedDate) {
-                foreach ($logFiles as $file) {
-                    if (($file['date'] ?? '') === $requestedDate) {
-                        return $file;
-                    }
+        // Plugin mode: select by date
+        $requestedDate = trim($request->getParam('date', ''));
+
+        if ($requestedDate) {
+            foreach ($logFiles as $file) {
+                if (($file['date'] ?? '') === $requestedDate) {
+                    return $file;
                 }
             }
-
-            // Default to most recent file (use reset since array keys might not start at 0)
-            return reset($logFiles) ?: null;
         }
+
+        return null;
     }
 
     /**
      * Get log entries from a file with filtering, sorting, and pagination
      * Uses cached ArrayQuery for high performance
      */
-    private function _getLogEntriesFromFile(string $filePath, string $level, string $search, string $sort, string $dir, int $page, int $limit): array
-    {
+    private function _getLogEntriesFromFile(
+        string $filePath,
+        string $level,
+        string $search,
+        string $sort,
+        string $dir,
+        int $page,
+        int $limit,
+    ): array {
         if (!file_exists($filePath)) {
             return [];
         }
@@ -439,12 +262,9 @@ class LogsController extends Controller
         if ($search) {
             $logs = array_values(array_filter($logs, function($log) use ($search) {
                 return stripos($log['message'] ?? '', $search) !== false ||
-                       stripos($log['context'] ?? '', $search) !== false;
+                    stripos($log['context'] ?? '', $search) !== false;
             }));
         }
-
-        // Count total before pagination
-        $totalCount = count($logs);
 
         // Apply sorting
         $orderDirection = $dir === 'asc' ? SORT_ASC : SORT_DESC;
@@ -503,7 +323,7 @@ class LogsController extends Controller
         if ($search) {
             $logs = array_filter($logs, function($log) use ($search) {
                 return stripos($log['message'] ?? '', $search) !== false ||
-                       stripos($log['context'] ?? '', $search) !== false;
+                    stripos($log['context'] ?? '', $search) !== false;
             });
         }
 
