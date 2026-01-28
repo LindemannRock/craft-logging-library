@@ -1,5 +1,18 @@
 # Changelog
 
+## [5.6.0](https://github.com/LindemannRock/craft-logging-library/compare/v5.5.0...v5.6.0) (2026-01-28)
+
+
+### Features
+
+* add LogsViewService and update LogsController for log viewing ([769b278](https://github.com/LindemannRock/craft-logging-library/commit/769b278accd774fd9d8c128771bc93acdc2f1c07))
+* add permission system for standalone log viewer ([5b8c249](https://github.com/LindemannRock/craft-logging-library/commit/5b8c2490bc2f8c38d70d41b6cd414857e79e1016))
+
+
+### Bug Fixes
+
+* update timestamp formatting in tableRow block ([eec55b4](https://github.com/LindemannRock/craft-logging-library/commit/eec55b4ff0012d94d67ad77f73da8c75745c30f4))
+
 ## [5.5.0](https://github.com/LindemannRock/craft-logging-library/compare/v5.4.0...v5.5.0) (2026-01-24)
 
 
