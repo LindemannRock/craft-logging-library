@@ -151,27 +151,34 @@ class LoggingService extends Component
         $latestFile = $logFiles[0];
         $entries = [];
 
-        if (($handle = fopen($latestFile['path'], 'r')) !== false) {
-            $lines = [];
-            while (($line = fgets($handle)) !== false) {
-                $lines[] = trim($line);
+        $logQuery = LoggingLibrary::getInstance()->logCache->getLogs($latestFile['path']);
+        $logs = $logQuery->all();
+
+        // Process entries in reverse order (newest first)
+        $logs = array_reverse($logs);
+        $lineNumber = count($logs);
+
+        foreach ($logs as $log) {
+            if (count($entries) >= $limit) {
+                break;
             }
-            fclose($handle);
 
-            // Process lines in reverse order (newest first)
-            $lines = array_reverse($lines);
-            $lineNumber = count($lines);
-
-            foreach ($lines as $line) {
-                if (count($entries) >= $limit) {
-                    break;
-                }
-
-                $entry = self::_parseLogEntry($line, $lineNumber--);
-                if ($entry && ($level === 'all' || $entry['level'] === $level)) {
-                    $entries[] = $entry;
-                }
+            $logLevel = $log['level'] ?? 'unknown';
+            if ($level !== 'all' && $logLevel !== $level) {
+                $lineNumber--;
+                continue;
             }
+
+            $entries[] = [
+                'timestamp' => $log['timestamp'] ?? '',
+                'user' => $log['user'] ?? '',
+                'level' => $logLevel,
+                'category' => $log['category'] ?? '',
+                'message' => $log['message'] ?? '',
+                'context' => $log['context'] ?? '',
+                'lineNumber' => $lineNumber--,
+                'raw' => $log['raw'] ?? '',
+            ];
         }
 
         return $entries;
@@ -214,55 +221,18 @@ class LoggingService extends Component
             'debug' => 0,
         ];
 
-        if (!file_exists($filePath) || !($handle = fopen($filePath, 'r'))) {
+        if (!file_exists($filePath)) {
             return $counts;
         }
 
-        while (($line = fgets($handle)) !== false) {
-            $entry = self::_parseLogEntry(trim($line));
-            if ($entry && isset($counts[$entry['level']])) {
-                $counts[$entry['level']]++;
+        $logQuery = LoggingLibrary::getInstance()->logCache->getLogs($filePath);
+        $logs = $logQuery->all();
+        foreach ($logs as $log) {
+            $level = $log['level'] ?? 'unknown';
+            if (isset($counts[$level])) {
+                $counts[$level]++;
             }
         }
-
-        fclose($handle);
         return $counts;
-    }
-
-    /**
-     * Parse a log entry line (shared with LogsController)
-     */
-    private static function _parseLogEntry(string $line, int $lineNumber = 0): ?array
-    {
-        // Skip empty lines
-        if (empty($line)) {
-            return null;
-        }
-
-        // Parse log format: timestamp [user:id][level][category] message | context
-        if (preg_match('/^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\s+\[(.*?)\]\[(.*?)\]\[(.*?)\]\s+(.*?)(?:\s+\|\s+(.*))?$/', $line, $matches)) {
-            return [
-                'timestamp' => $matches[1],
-                'user' => $matches[2],
-                'level' => strtolower(str_replace('.', '', $matches[3])),
-                'category' => $matches[4],
-                'message' => $matches[5],
-                'context' => isset($matches[6]) ? $matches[6] : '',
-                'lineNumber' => $lineNumber,
-                'raw' => $line,
-            ];
-        }
-
-        // Fallback for non-standard format
-        return [
-            'timestamp' => '',
-            'user' => '',
-            'level' => 'unknown',
-            'category' => '',
-            'message' => $line,
-            'context' => '',
-            'lineNumber' => $lineNumber,
-            'raw' => $line,
-        ];
     }
 }

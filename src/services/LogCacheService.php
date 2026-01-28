@@ -40,9 +40,9 @@ class LogCacheService extends Component
         // Check if cache exists and is valid
         if (file_exists($cacheFile)) {
             $data = @file_get_contents($cacheFile);
-            if ($data) {
-                $cache = @unserialize($data);
-                if ($cache && is_array($cache)) {
+            if ($data !== false && $data !== '') {
+                $cache = json_decode($data, true);
+                if (is_array($cache)) {
                     return (new ArrayQuery())->from($cache);
                 }
             }
@@ -216,7 +216,12 @@ class LogCacheService extends Component
      */
     private function _getPattern(string $logFile): string
     {
-        $format = LoggingLibrary::detectLogFormat(file_get_contents($logFile, false, null, 0, 500));
+        $sample = @file_get_contents($logFile, false, null, 0, 500);
+        if ($sample === false) {
+            return '/^(?P<datetime>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\s+(?P<message>.*)/s';
+        }
+
+        $format = LoggingLibrary::detectLogFormat($sample);
 
         if ($format === 'plugin') {
             // Plugin format: YYYY-MM-DD HH:MM:SS [user][LEVEL][category] message | context
@@ -257,7 +262,9 @@ class LogCacheService extends Component
      */
     private function _getCacheKey(string $logFile): string
     {
-        return md5($logFile . ':' . filesize($logFile));
+        $size = @filesize($logFile);
+        $mtime = @filemtime($logFile);
+        return md5($logFile . ':' . $size . ':' . $mtime);
     }
 
     /**
@@ -297,6 +304,11 @@ class LogCacheService extends Component
         }
 
         $cacheFile = $cachePath . $cacheKey . '.cache';
-        file_put_contents($cacheFile, serialize($data));
+        $encoded = json_encode($data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        if ($encoded === false) {
+            return;
+        }
+
+        file_put_contents($cacheFile, $encoded);
     }
 }

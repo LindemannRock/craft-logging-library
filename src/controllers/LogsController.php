@@ -70,10 +70,11 @@ class LogsController extends Controller
             $pluginName = $config['pluginName'];
         } else {
             // Standalone mode - no specific config needed
+            $this->_checkPermissions([LoggingLibrary::PERMISSION_VIEW_ALL_LOGS]);
             $config = null;
             $limit = 50; // Default for standalone
             $pluginName = 'All Logs';
-            $canDownload = Craft::$app->getUser()->getIsAdmin(); // Only admins can download in standalone mode
+            $canDownload = $this->_hasPermission([LoggingLibrary::PERMISSION_DOWNLOAD_ALL_LOGS]);
         }
 
         // Get filter parameters
@@ -229,10 +230,9 @@ class LogsController extends Controller
         $isStandalone = ($pluginHandle === 'logging-library');
 
         if ($isStandalone) {
-            // Standalone mode - only admins can download
-            if (!Craft::$app->getUser()->getIsAdmin()) {
-                throw new ForbiddenHttpException('User does not have permission to download logs');
-            }
+            // Standalone mode - permission-gated
+            $this->_checkPermissions([LoggingLibrary::PERMISSION_VIEW_ALL_LOGS]);
+            $this->_checkPermissions([LoggingLibrary::PERMISSION_DOWNLOAD_ALL_LOGS]);
 
             // Get filename from query param
             $filename = trim($request->getRequiredParam('file'));
@@ -329,6 +329,10 @@ class LogsController extends Controller
      */
     private function _hasPermission(array $permissions): bool
     {
+        if (Craft::$app->getUser()->getIsAdmin()) {
+            return true;
+        }
+
         if (empty($permissions)) {
             return true; // No permissions required
         }

@@ -557,6 +557,16 @@ $event->permissions[] = [
 ];
 ```
 
+## Logging Library Permissions
+
+The Logging Library plugin registers its own permissions for the standalone
+“All Logs” viewer at `/admin/logging-library/logs`. Admins always have access.
+
+```php
+loggingLibrary:viewAllLogs     // View all logs (standalone viewer)
+loggingLibrary:downloadAllLogs // Download logs from the standalone viewer
+```
+
 ## Best Practices
 
 1. **DO NOT Log in init()** ⚠️:

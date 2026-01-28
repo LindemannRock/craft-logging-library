@@ -15,7 +15,9 @@ use craft\base\Plugin;
 use craft\events\RegisterCacheOptionsEvent;
 use craft\events\RegisterComponentTypesEvent;
 use craft\events\RegisterUrlRulesEvent;
+use craft\events\RegisterUserPermissionsEvent;
 use craft\log\MonologTarget;
+use craft\services\UserPermissions;
 use craft\services\Utilities;
 use craft\utilities\ClearCaches;
 use craft\web\UrlManager;
@@ -37,6 +39,9 @@ use yii\base\Event;
  */
 class LoggingLibrary extends \craft\base\Plugin
 {
+    public const PERMISSION_VIEW_ALL_LOGS = 'loggingLibrary:viewAllLogs';
+    public const PERMISSION_DOWNLOAD_ALL_LOGS = 'loggingLibrary:downloadAllLogs';
+
     /**
      * @var array Registered plugin configurations
      */
@@ -88,6 +93,9 @@ class LoggingLibrary extends \craft\base\Plugin
                 $event->types[] = LogsUtility::class;
             }
         );
+
+        // Register permissions
+        $this->_registerPermissions();
     }
 
     /**
@@ -95,6 +103,11 @@ class LoggingLibrary extends \craft\base\Plugin
      */
     public function getCpNavItem(): ?array
     {
+        if (!Craft::$app->getUser()->getIsAdmin() &&
+            !Craft::$app->getUser()->checkPermission(self::PERMISSION_VIEW_ALL_LOGS)) {
+            return null;
+        }
+
         $item = parent::getCpNavItem();
 
         // Add "All Logs" subnav for standalone viewer
@@ -531,5 +544,31 @@ class LoggingLibrary extends \craft\base\Plugin
         return
             isset($_ENV['SERVD_PROJECT_SLUG']);             // Servd.host - VERIFIED and tested
             // TODO: Add other platforms after testing actual deployments with Craft CMS
+    }
+
+    /**
+     * Register user permissions for standalone log viewer
+     */
+    private function _registerPermissions(): void
+    {
+        Event::on(
+            UserPermissions::class,
+            UserPermissions::EVENT_REGISTER_PERMISSIONS,
+            function(RegisterUserPermissionsEvent $event) {
+                $event->permissions[] = [
+                    'heading' => 'Logging Library',
+                    'permissions' => [
+                        self::PERMISSION_VIEW_ALL_LOGS => [
+                            'label' => 'View all logs',
+                            'nested' => [
+                                self::PERMISSION_DOWNLOAD_ALL_LOGS => [
+                                    'label' => 'Download all logs',
+                                ],
+                            ],
+                        ],
+                    ],
+                ];
+            }
+        );
     }
 }
