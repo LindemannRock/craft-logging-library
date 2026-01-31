@@ -70,8 +70,8 @@ class LoggingLibrary extends \craft\base\Plugin
             UrlManager::class,
             UrlManager::EVENT_REGISTER_CP_URL_RULES,
             function(RegisterUrlRulesEvent $event) {
-                $event->rules['logging-library/logs'] = 'logging-library/logs/index';
-                $event->rules['logging-library/logs/download'] = 'logging-library/logs/download';
+                $event->rules['logging-library/logs/system'] = 'logging-library/logs/index';
+                $event->rules['logging-library/logs/system/download'] = 'logging-library/logs/download';
             }
         );
 
@@ -117,7 +117,7 @@ class LoggingLibrary extends \craft\base\Plugin
         $item['subnav'] = [
             'all-logs' => [
                 'label' => 'All Logs',
-                'url' => 'logging-library/logs',
+                'url' => 'logging-library/logs/system',
             ],
         ];
 
@@ -327,7 +327,8 @@ class LoggingLibrary extends \craft\base\Plugin
             function(RegisterUrlRulesEvent $event) use ($handle) {
                 // Logs routes
                 $event->rules[$handle . '/logs'] = 'logging-library/logs/index';
-                $event->rules[$handle . '/logs/download'] = 'logging-library/logs/download';
+                $event->rules[$handle . '/logs/system'] = 'logging-library/logs/index';
+                $event->rules[$handle . '/logs/system/download'] = 'logging-library/logs/download';
             }
         );
     }
@@ -366,7 +367,7 @@ class LoggingLibrary extends \craft\base\Plugin
         $navItem['subnav']['logs'] = [
             'label' => 'Logs',
             'url' => $handle . '/logs',
-            'match' => $handle . '/logs*', // Match all logs pages
+            'match' => $handle . '/logs/.*', // Match all logs pages
         ];
 
         return $navItem;
@@ -562,10 +563,10 @@ class LoggingLibrary extends \craft\base\Plugin
                     'heading' => 'Logging Library',
                     'permissions' => [
                         self::PERMISSION_VIEW_ALL_LOGS => [
-                            'label' => 'View all logs',
+                            'label' => 'View all system logs',
                             'nested' => [
                                 self::PERMISSION_DOWNLOAD_ALL_LOGS => [
-                                    'label' => 'Download all logs',
+                                    'label' => 'Download all system logs',
                                 ],
                             ],
                         ],

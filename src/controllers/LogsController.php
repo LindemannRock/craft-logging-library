@@ -68,6 +68,8 @@ class LogsController extends Controller
 
             $limit = $config['itemsPerPage'] ?? 50;
             $pluginName = $config['pluginName'];
+            $logMenuItems = $config['logMenuItems'] ?? null;
+            $logMenuLabel = $config['logMenuLabel'] ?? null;
         } else {
             // Standalone mode - no specific config needed
             $this->_checkPermissions([LoggingLibrary::PERMISSION_VIEW_ALL_LOGS]);
@@ -75,6 +77,8 @@ class LogsController extends Controller
             $limit = 50; // Default for standalone
             $pluginName = 'All Logs';
             $canDownload = $this->_hasPermission([LoggingLibrary::PERMISSION_DOWNLOAD_ALL_LOGS]);
+            $logMenuItems = null;
+            $logMenuLabel = null;
         }
 
         // Get filter parameters
@@ -143,6 +147,8 @@ class LogsController extends Controller
             'pluginHandle' => $pluginHandle,
             'pluginName' => $pluginName,
             'isStandalone' => $isStandalone,
+            'logMenuItems' => $logMenuItems,
+            'logMenuLabel' => $logMenuLabel,
             'logFiles' => array_values($logFiles),
             'selectedFile' => $selectedFile,
             'sources' => $sources,

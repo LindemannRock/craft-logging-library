@@ -69,6 +69,11 @@
    TABLE CONFIGURATION
    ============================================================================ #}
 
+{% set sidebarItems = logMenuItems ?? (isStandalone ? {} : {
+    system: {label: 'System'|t('app'), url: pluginHandle ~ '/logs/system'},
+}) %}
+{% set sidebarLabel = logMenuLabel ?? 'Logs'|t('app') %}
+
 {% set tableConfig = {
     plugin: {
         handle: pluginHandle,
@@ -79,8 +84,14 @@
         subnav: 'logs',
         crumbs: [
             { label: pluginName, url: url(pluginHandle) },
-            { label: 'Logs'|t('app'), url: url(pluginHandle ~ '/logs') }
+            { label: 'Logs'|t('app'), url: url(pluginHandle ~ '/logs/') },
+            { label: 'System'|t('app'), url: url(pluginHandle ~ '/logs/system') }
         ],
+    },
+    sidebarMenu: {
+        label: sidebarLabel,
+        items: sidebarItems,
+        selected: 'system',
     },
     filters: isStandalone ? [
         {

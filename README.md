@@ -117,7 +117,8 @@ Event::on(
     function (RegisterUrlRulesEvent $event) {
         // Route logs to logging-library controller
         $event->rules['your-plugin/logs'] = 'logging-library/logs/index';
-        $event->rules['your-plugin/logs/download'] = 'logging-library/logs/download';
+        $event->rules['your-plugin/logs/system'] = 'logging-library/logs/index';
+        $event->rules['your-plugin/logs/system/download'] = 'logging-library/logs/download';
     }
 );
 ```
@@ -253,10 +254,39 @@ LoggingLibrary::configure([
     'itemsPerPage' => $settings->itemsPerPage ?? 50,     // Entries per page in log viewer
     'viewPermissions' => ['yourPlugin:viewLogs'],        // Permissions required to view logs
     'downloadPermissions' => ['yourPlugin:downloadLogs'], // Permissions required to download logs
+    'logMenuItems' => [                                  // Optional: Custom sidebar menu items
+        'system' => ['label' => 'System', 'url' => 'your-plugin/logs/system'],
+        'activity' => ['label' => 'Activity', 'url' => 'your-plugin/logs/activity'],
+    ],
+    'logMenuLabel' => 'Logs',                            // Optional: Sidebar menu aria-label
 ]);
 ```
 
 **Note**: For `pluginName`, use `$settings->pluginName ?? $this->name` to respect custom plugin names set in your config file (e.g., `config/your-plugin.php`). This allows users to customize the plugin name displayed in the log viewer.
+
+### Sidebar Menu
+
+When you provide 2 or more items in `logMenuItems`, a left sidebar navigation appears on the logs page (similar to Craft settings pages). This allows plugins to have multiple log sections like:
+
+- **System**: Core plugin logs
+- **Activity**: User activity logs
+- **API**: API request/response logs
+
+The sidebar only renders when there are 2+ items. Single-item menus are hidden automatically.
+
+If using `PluginHelper::bootstrap()` from the base plugin, pass `logMenu` in the options:
+
+```php
+PluginHelper::bootstrap($this, 'myHelper', $viewPerms, $downloadPerms, [
+    'logMenu' => [
+        'label' => 'Logs',
+        'items' => [
+            'system' => ['label' => 'System', 'url' => 'my-plugin/logs/system'],
+            'activity' => ['label' => 'Activity', 'url' => 'my-plugin/logs/activity'],
+        ],
+    ],
+]);
+```
 
 ## LoggingTrait API Reference
 
@@ -680,7 +710,8 @@ class YourPlugin extends Plugin
         Event::on(UrlManager::class, UrlManager::EVENT_REGISTER_CP_URL_RULES,
             function (RegisterUrlRulesEvent $event) {
                 $event->rules['your-plugin/logs'] = 'logging-library/logs/index';
-                $event->rules['your-plugin/logs/download'] = 'logging-library/logs/download';
+                $event->rules['your-plugin/logs/system'] = 'logging-library/logs/index';
+                $event->rules['your-plugin/logs/system/download'] = 'logging-library/logs/download';
             }
         );
 
