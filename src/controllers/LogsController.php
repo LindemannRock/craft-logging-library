@@ -56,14 +56,28 @@ class LogsController extends Controller
 
             // Check if log viewer is enabled
             if (!($config['enableLogViewer'] ?? false)) {
+                // System logs are disabled - check if we can redirect to an alternative
+                $logMenuItems = $config['logMenuItems'] ?? null;
+                $segments = $request->getSegments();
+                $isBaseLogsUrl = !in_array('system', $segments, true);
+
+                // If on base /logs URL and there are alternative menu items, redirect to first non-system item
+                if ($isBaseLogsUrl && !empty($logMenuItems)) {
+                    foreach ($logMenuItems as $key => $item) {
+                        if ($key !== 'system' && !empty($item['url'])) {
+                            return $this->redirect($item['url']);
+                        }
+                    }
+                }
+
                 throw new NotFoundHttpException('Log viewer is disabled for this plugin');
             }
 
             // Check view permissions if specified
-            $this->_checkPermissions($config['viewPermissions'] ?? []);
+            $this->_checkPermissions($config['viewSystemLogsPermissions'] ?? []);
 
-            // Check if user can download (only if downloadPermissions is configured)
-            $downloadPermissions = $config['downloadPermissions'] ?? [];
+            // Check if user can download (only if downloadSystemLogsPermissions is configured)
+            $downloadPermissions = $config['downloadSystemLogsPermissions'] ?? [];
             $canDownload = !empty($downloadPermissions) && $this->_hasPermission($downloadPermissions);
 
             $limit = $config['itemsPerPage'] ?? 50;
@@ -278,7 +292,7 @@ class LogsController extends Controller
         }
 
         // Check download permissions
-        $this->_checkPermissions($config['downloadPermissions'] ?? []);
+        $this->_checkPermissions($config['downloadSystemLogsPermissions'] ?? []);
 
         $date = trim($request->getRequiredParam('date'));
 

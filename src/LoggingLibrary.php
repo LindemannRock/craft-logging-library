@@ -155,8 +155,8 @@ class LoggingLibrary extends \craft\base\Plugin
             'retention' => 30,
             'maxFileSize' => 10240, // 10MB
             'enableLogViewer' => !$isEdgeEnvironment, // Auto-disable on edge platforms
-            'viewPermissions' => [], // Permissions required to view logs
-            'downloadPermissions' => [], // Permissions required to download logs
+            'viewSystemLogsPermissions' => [], // Permissions required to view system logs
+            'downloadSystemLogsPermissions' => [], // Permissions required to download system logs
             'itemsPerPage' => 50, // Default entries per page in log viewer
         ], $config);
 
@@ -345,11 +345,25 @@ class LoggingLibrary extends \craft\base\Plugin
     public static function addLogsNav(array $navItem, string $handle, array $permissions = []): array
     {
         $config = self::getConfig($handle);
-        if (!$config || !$config['enableLogViewer']) {
+        if (!$config) {
             return $navItem;
         }
 
-        // Check permissions if specified
+        $systemLogsEnabled = $config['enableLogViewer'] ?? false;
+        $logMenuItems = $config['logMenuItems'] ?? [];
+
+        // Check if there are non-system log types (e.g., activity logs)
+        $hasOtherLogTypes = !empty(array_filter(
+            array_keys($logMenuItems),
+            fn($key) => $key !== 'system'
+        ));
+
+        // Show logs nav if system logs enabled OR other log types exist
+        if (!$systemLogsEnabled && !$hasOtherLogTypes) {
+            return $navItem;
+        }
+
+        // Check permissions if specified (user needs ANY of the permissions)
         if (!empty($permissions)) {
             $hasPermission = false;
             foreach ($permissions as $permission) {
@@ -365,9 +379,8 @@ class LoggingLibrary extends \craft\base\Plugin
 
         $navItem['subnav'] = $navItem['subnav'] ?? [];
         $navItem['subnav']['logs'] = [
-            'label' => 'Logs',
-            'url' => $handle . '/logs',
-            'match' => $handle . '/logs/.*', // Match all logs pages
+            'label' => $config['logMenuLabel'] ?? 'Logs',
+            'url' => $handle . '/logs', // Base URL - controller handles redirect
         ];
 
         return $navItem;
