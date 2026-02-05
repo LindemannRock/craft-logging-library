@@ -1,5 +1,13 @@
 # Changelog
 
+## [5.7.0](https://github.com/LindemannRock/craft-logging-library/compare/v5.6.0...v5.7.0) (2026-02-05)
+
+
+### Features
+
+* **logs:** enhance log permissions and navigation for system logs ([8f492b4](https://github.com/LindemannRock/craft-logging-library/commit/8f492b49c3f64bdf94850ace3d065b9fa1316839))
+* **logs:** update log routing and menu structure for system logs ([941feea](https://github.com/LindemannRock/craft-logging-library/commit/941feea977c924d57b10758746bd078c5c048436))
+
 ## [5.6.0](https://github.com/LindemannRock/craft-logging-library/compare/v5.5.0...v5.6.0) (2026-01-28)
 
 
