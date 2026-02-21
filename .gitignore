@@ -33,14 +33,10 @@ yarn-error.log*
 /tmp/
 /temp/
 
-# Development files
-TODO.md
-FREEMIUM_PLAN.md
-PluginIntegration.md
-README.md.backup
+# Internal
+/.internal/
 
 # Plugin releases
 *.zip
 /releases/
 /backups/
-
