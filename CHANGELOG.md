@@ -1,5 +1,18 @@
 # Changelog
 
+## [5.7.1](https://github.com/LindemannRock/craft-logging-library/compare/v5.7.0...v5.7.1) (2026-02-22)
+
+
+### Bug Fixes
+
+* **logs:** update timestamp formatting in log templates ([d78765c](https://github.com/LindemannRock/craft-logging-library/commit/d78765c8883cdc668be95cedcc2bc01d2f5cdfde))
+
+
+### Miscellaneous Chores
+
+* add .gitattributes with export-ignore for Packagist distribution ([91a2e94](https://github.com/LindemannRock/craft-logging-library/commit/91a2e94248c6c49ea26fd46b3f7226cfbed422c5))
+* clean up .gitignore by removing development files ([0cc8017](https://github.com/LindemannRock/craft-logging-library/commit/0cc8017c14ce11b39928a0cfdfbaf1200c20a50b))
+
 ## [5.7.0](https://github.com/LindemannRock/craft-logging-library/compare/v5.6.0...v5.7.0) (2026-02-05)
 
 
