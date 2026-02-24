@@ -30,7 +30,6 @@ class LogCacheService extends Component
      *
      * @param string $logFile Full path to log file
      * @return ArrayQuery
-     * @since 1.0.0
      */
     public function getLogs(string $logFile): ArrayQuery
     {
@@ -57,8 +56,6 @@ class LogCacheService extends Component
 
     /**
      * Invalidate all log caches
-     *
-     * @since 1.0.0
      */
     public function invalidateCaches(): void
     {
@@ -82,7 +79,6 @@ class LogCacheService extends Component
      * Invalidate cache for specific log file
      *
      * @param string $logFile Full path to log file
-     * @since 1.0.0
      */
     public function invalidateLogCache(string $logFile): void
     {
@@ -98,7 +94,6 @@ class LogCacheService extends Component
      * Get cache statistics
      *
      * @return array
-     * @since 1.0.0
      */
     public function getCacheStats(): array
     {

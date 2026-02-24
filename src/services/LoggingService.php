@@ -29,7 +29,6 @@ class LoggingService extends Component
      * @param string $level Log level (debug, info, warning, error)
      * @param string|null $pluginHandle Plugin handle
      * @param array $context Additional context
-     * @since 1.0.0
      */
     public static function log(string $message, string $level = 'info', string $pluginHandle = null, array $context = []): void
     {
@@ -58,7 +57,6 @@ class LoggingService extends Component
      *
      * @param string $pluginHandle Plugin handle
      * @return array Log statistics
-     * @since 1.0.0
      */
     public static function getLogStats(string $pluginHandle): array
     {
@@ -105,7 +103,6 @@ class LoggingService extends Component
      * @param string $pluginHandle Plugin handle
      * @param int $retentionDays Days to retain logs
      * @return array List of deleted files
-     * @since 1.0.0
      */
     public static function cleanupOldLogs(string $pluginHandle, int $retentionDays = 30): array
     {
@@ -138,7 +135,6 @@ class LoggingService extends Component
      * @param int $limit Maximum entries to return
      * @param string $level Filter by log level
      * @return array Log entries
-     * @since 1.0.0
      */
     public static function getRecentEntries(string $pluginHandle, int $limit = 10, string $level = 'all'): array
     {
@@ -189,7 +185,6 @@ class LoggingService extends Component
      *
      * @param string $pluginHandle Plugin handle
      * @return bool Whether logging is configured
-     * @since 1.0.0
      */
     public static function isConfigured(string $pluginHandle): bool
     {
@@ -201,7 +196,6 @@ class LoggingService extends Component
      *
      * @param string $pluginHandle Plugin handle
      * @return string|null Log level or null if not configured
-     * @since 1.0.0
      */
     public static function getLogLevel(string $pluginHandle): ?string
     {

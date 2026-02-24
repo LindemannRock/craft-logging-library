@@ -132,7 +132,6 @@ class LoggingLibrary extends \craft\base\Plugin
      * for security reasons. Only INFO, WARNING, and ERROR levels will work.
      *
      * @param array $config Plugin configuration array
-     * @since 1.0.0
      */
     public static function configure(array $config): void
     {
@@ -179,7 +178,6 @@ class LoggingLibrary extends \craft\base\Plugin
      *
      * @param string $handle Plugin handle
      * @return array|null Plugin configuration or null if not found
-     * @since 1.0.0
      */
     public static function getConfig(string $handle): ?array
     {
@@ -190,7 +188,6 @@ class LoggingLibrary extends \craft\base\Plugin
      * Get all registered plugin configurations
      *
      * @return array All plugin configurations
-     * @since 1.0.0
      */
     public static function getAllConfigs(): array
     {
@@ -391,7 +388,6 @@ class LoggingLibrary extends \craft\base\Plugin
      *
      * @param string $handle Plugin handle
      * @return array Array of log file information
-     * @since 1.0.0
      */
     public static function getLogFiles(string $handle): array
     {
