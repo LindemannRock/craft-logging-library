@@ -376,7 +376,7 @@ class LoggingLibrary extends \craft\base\Plugin
 
         $navItem['subnav'] = $navItem['subnav'] ?? [];
         $navItem['subnav']['logs'] = [
-            'label' => $config['logMenuLabel'] ?? 'Logs',
+            'label' => $config['logMenuLabel'] ?? Craft::t($handle, 'Logs'),
             'url' => $handle . '/logs', // Base URL - controller handles redirect
         ];
 
