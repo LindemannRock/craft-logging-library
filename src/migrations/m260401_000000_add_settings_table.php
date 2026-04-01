@@ -33,12 +33,17 @@ class m260401_000000_add_settings_table extends Migration
             'pluginName' => $this->string(255)->notNull()->defaultValue('Logging Library'),
             'itemsPerPage' => $this->integer()->notNull()->defaultValue(50),
             'showCpSection' => $this->boolean()->notNull()->defaultValue(true),
+            'forceEnableLogViewer' => $this->boolean()->notNull()->defaultValue(false),
             'dateCreated' => $this->dateTime()->notNull(),
             'dateUpdated' => $this->dateTime()->notNull(),
             'uid' => $this->uid(),
         ]);
 
         $this->insert('{{%logginglibrary_settings}}', [
+            'pluginName' => 'Logging Library',
+            'itemsPerPage' => 50,
+            'showCpSection' => true,
+            'forceEnableLogViewer' => false,
             'dateCreated' => Db::prepareDateForDb(new \DateTime()),
             'dateUpdated' => Db::prepareDateForDb(new \DateTime()),
             'uid' => StringHelper::UUID(),
