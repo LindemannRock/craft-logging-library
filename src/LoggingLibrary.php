@@ -45,6 +45,11 @@ class LoggingLibrary extends \craft\base\Plugin
     public const PERMISSION_DOWNLOAD_ALL_LOGS = 'loggingLibrary:downloadAllLogs';
 
     /**
+     * @var bool Whether the plugin registers a control panel section
+     */
+    public bool $hasCpSection = true;
+
+    /**
      * @var array Registered plugin configurations
      */
     private static array $_pluginConfigs = [];
@@ -121,6 +126,7 @@ class LoggingLibrary extends \craft\base\Plugin
         }
 
         $item = parent::getCpNavItem();
+        $item['url'] = 'logging-library/logs/system';
 
         // Add "All Logs" subnav for standalone viewer
         $item['subnav'] = [
