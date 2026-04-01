@@ -81,6 +81,7 @@ return [
     'Could not save settings.' => 'No se pudo guardar la configuración.',
 
     // Validation messages
+    'Found {count, number} {count, plural, =1{error} other{errors}}' => '{count, number} {count, plural, =1{error encontrado} other{errores encontrados}}',
     'Value must be a whole number.' => 'El valor debe ser un número entero.',
 
     // Settings: General

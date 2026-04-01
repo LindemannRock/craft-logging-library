@@ -81,6 +81,7 @@ return [
     'Could not save settings.' => 'Det gick inte att spara inställningarna.',
 
     // Validation messages
+    'Found {count, number} {count, plural, =1{error} other{errors}}' => '{count, number} {count, plural, =1{fel} other{fel}} hittades',
     'Value must be a whole number.' => 'Värdet måste vara ett heltal.',
 
     // Settings: General

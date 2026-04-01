@@ -81,6 +81,7 @@ return [
     'Could not save settings.' => 'تعذّر حفظ الإعدادات.',
 
     // Validation messages
+    'Found {count, number} {count, plural, =1{error} other{errors}}' => 'تم العثور على {count, number} {count, plural, =1{خطأ} other{أخطاء}}',
     'Value must be a whole number.' => 'يجب أن تكون القيمة عدداً صحيحاً.',
 
     // Settings: General

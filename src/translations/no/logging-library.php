@@ -81,6 +81,7 @@ return [
     'Could not save settings.' => 'Kunne ikke lagre innstillinger.',
 
     // Validation messages
+    'Found {count, number} {count, plural, =1{error} other{errors}}' => '{count, number} {count, plural, =1{feil} other{feil}} funnet',
     'Value must be a whole number.' => 'Verdien må være et heltall.',
 
     // Settings: General

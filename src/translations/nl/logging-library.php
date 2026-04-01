@@ -81,6 +81,7 @@ return [
     'Could not save settings.' => 'Instellingen konden niet worden opgeslagen.',
 
     // Validation messages
+    'Found {count, number} {count, plural, =1{error} other{errors}}' => '{count, number} {count, plural, =1{fout} other{fouten}} gevonden',
     'Value must be a whole number.' => 'De waarde moet een geheel getal zijn.',
 
     // Settings: General

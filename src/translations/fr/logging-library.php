@@ -81,6 +81,7 @@ return [
     'Could not save settings.' => 'Impossible d\'enregistrer les paramètres.',
 
     // Validation messages
+    'Found {count, number} {count, plural, =1{error} other{errors}}' => '{count, number} {count, plural, =1{erreur trouvée} other{erreurs trouvées}}',
     'Value must be a whole number.' => 'La valeur doit être un nombre entier.',
 
     // Settings: General

@@ -81,6 +81,7 @@ return [
     'Could not save settings.' => '設定を保存できませんでした。',
 
     // Validation messages
+    'Found {count, number} {count, plural, =1{error} other{errors}}' => '{count, number} 件の{count, plural, =1{エラー} other{エラー}}が見つかりました',
     'Value must be a whole number.' => '値は整数である必要があります。',
 
     // Settings: General
