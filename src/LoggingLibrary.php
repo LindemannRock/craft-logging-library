@@ -11,20 +11,20 @@
 namespace lindemannrock\logginglibrary;
 
 use Craft;
+use craft\base\Model;
 use craft\base\Plugin;
 use craft\events\RegisterCacheOptionsEvent;
-use craft\events\RegisterComponentTypesEvent;
 use craft\events\RegisterUrlRulesEvent;
 use craft\events\RegisterUserPermissionsEvent;
 use craft\log\MonologTarget;
 use craft\services\UserPermissions;
-use craft\services\Utilities;
 use craft\utilities\ClearCaches;
 use craft\web\UrlManager;
+use lindemannrock\base\helpers\CpNavHelper;
 use lindemannrock\base\helpers\PluginHelper;
+use lindemannrock\logginglibrary\models\Settings;
 use lindemannrock\logginglibrary\services\LogCacheService;
 use lindemannrock\logginglibrary\services\LogsViewService;
-use lindemannrock\logginglibrary\utilities\LogsUtility;
 use Monolog\Formatter\LineFormatter;
 use Monolog\LogRecord;
 use Monolog\Processor\ProcessorInterface;
@@ -39,15 +39,26 @@ use yii\base\Event;
  * @property-read LogsViewService $logsView
  * @since 1.0.0
  */
-class LoggingLibrary extends \craft\base\Plugin
+class LoggingLibrary extends Plugin
 {
     public const PERMISSION_VIEW_ALL_LOGS = 'loggingLibrary:viewAllLogs';
     public const PERMISSION_DOWNLOAD_ALL_LOGS = 'loggingLibrary:downloadAllLogs';
+    public const PERMISSION_MANAGE_SETTINGS = 'loggingLibrary:manageSettings';
+
+    /**
+     * @var string Plugin schema version for migrations
+     */
+    public string $schemaVersion = '1.0.0';
 
     /**
      * @var bool Whether the plugin registers a control panel section
      */
     public bool $hasCpSection = true;
+
+    /**
+     * @var bool Whether the plugin exposes a control panel settings page
+     */
+    public bool $hasCpSettings = true;
 
     /**
      * @var array Registered plugin configurations
@@ -72,6 +83,7 @@ class LoggingLibrary extends \craft\base\Plugin
                 'confettiPreset' => 'surprise',
             ],
         ]);
+        PluginHelper::applyPluginNameFromConfig($this);
 
         // Register services
         $this->setComponents([
@@ -84,6 +96,12 @@ class LoggingLibrary extends \craft\base\Plugin
             UrlManager::class,
             UrlManager::EVENT_REGISTER_CP_URL_RULES,
             function(RegisterUrlRulesEvent $event) {
+                $event->rules['logging-library'] = 'logging-library/logs/index';
+                $event->rules['logging-library/logs'] = 'logging-library/logs/index';
+                $event->rules['logging-library/settings'] = 'logging-library/settings/index';
+                $event->rules['logging-library/settings/general'] = 'logging-library/settings/general';
+                $event->rules['logging-library/settings/interface'] = 'logging-library/settings/interface';
+                $event->rules['logging-library/settings/save'] = 'logging-library/settings/save';
                 $event->rules['logging-library/logs/system'] = 'logging-library/logs/index';
                 $event->rules['logging-library/logs/system/download'] = 'logging-library/logs/download';
             }
@@ -102,15 +120,6 @@ class LoggingLibrary extends \craft\base\Plugin
             }
         );
 
-        // Register utility (Tools → Utilities → Logs)
-        Event::on(
-            Utilities::class,
-            Utilities::EVENT_REGISTER_UTILITIES,
-            function(RegisterComponentTypesEvent $event) {
-                $event->types[] = LogsUtility::class;
-            }
-        );
-
         // Register permissions
         $this->_registerPermissions();
     }
@@ -120,23 +129,97 @@ class LoggingLibrary extends \craft\base\Plugin
      */
     public function getCpNavItem(): ?array
     {
-        if (!Craft::$app->getUser()->getIsAdmin() &&
-            !Craft::$app->getUser()->checkPermission(self::PERMISSION_VIEW_ALL_LOGS)) {
+        $settings = $this->getSettings();
+        if (!($settings instanceof Settings) || !$settings->showCpSection) {
             return null;
         }
 
         $item = parent::getCpNavItem();
-        $item['url'] = 'logging-library/logs/system';
+        $user = Craft::$app->getUser();
 
-        // Add "All Logs" subnav for standalone viewer
-        $item['subnav'] = [
-            'all-logs' => [
-                'label' => 'All Logs',
-                'url' => 'logging-library/logs/system',
-            ],
-        ];
+        if ($item) {
+            $item['label'] = $settings->getFullName();
+
+            $sections = $this->getCpSections($settings);
+            $item['subnav'] = CpNavHelper::buildSubnav($user, $settings, $sections);
+
+            if (empty($item['subnav'])) {
+                return null;
+            }
+        }
 
         return $item;
+    }
+
+    /**
+     * Get CP sections for nav + default route resolution.
+     */
+    public function getCpSections(Settings $settings): array
+    {
+        return [
+            [
+                'key' => 'all-logs',
+                'label' => Craft::t('logging-library', 'All Logs'),
+                'url' => 'logging-library/logs',
+                'permissionsAll' => [self::PERMISSION_VIEW_ALL_LOGS],
+            ],
+            [
+                'key' => 'settings',
+                'label' => Craft::t('logging-library', 'Settings'),
+                'url' => 'logging-library/settings',
+                'permissionsAll' => [self::PERMISSION_MANAGE_SETTINGS],
+            ],
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setSettings(array|Model $settings): void
+    {
+        // No-op: settings come from loadFromDatabase() in createSettingsModel()
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function createSettingsModel(): ?Model
+    {
+        try {
+            return Settings::loadFromDatabase();
+        } catch (\Throwable $e) {
+            Craft::warning('Could not load Logging Library settings from database: ' . $e->getMessage(), __METHOD__);
+            return new Settings();
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getSettings(): ?Model
+    {
+        $settings = parent::getSettings();
+
+        if ($settings instanceof Settings) {
+            $config = Craft::$app->getConfig()->getConfigFromFile('logging-library');
+            if (!empty($config) && is_array($config)) {
+                foreach ($config as $key => $value) {
+                    if (property_exists($settings, $key)) {
+                        $settings->$key = $value;
+                    }
+                }
+            }
+        }
+
+        return $settings;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getSettingsResponse(): mixed
+    {
+        return Craft::$app->controller->redirect('logging-library/settings');
     }
 
     /**
@@ -584,7 +667,7 @@ class LoggingLibrary extends \craft\base\Plugin
             UserPermissions::EVENT_REGISTER_PERMISSIONS,
             function(RegisterUserPermissionsEvent $event) {
                 $event->permissions[] = [
-                    'heading' => 'Logging Library',
+                    'heading' => $this->name,
                     'permissions' => [
                         self::PERMISSION_VIEW_ALL_LOGS => [
                             'label' => 'View all system logs',
@@ -593,6 +676,9 @@ class LoggingLibrary extends \craft\base\Plugin
                                     'label' => 'Download all system logs',
                                 ],
                             ],
+                        ],
+                        self::PERMISSION_MANAGE_SETTINGS => [
+                            'label' => 'Manage settings',
                         ],
                     ],
                 ];

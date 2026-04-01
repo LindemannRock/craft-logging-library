@@ -12,7 +12,9 @@ namespace lindemannrock\logginglibrary\controllers;
 
 use Craft;
 use craft\web\Controller;
+use lindemannrock\base\helpers\CpNavHelper;
 use lindemannrock\logginglibrary\LoggingLibrary;
+use lindemannrock\logginglibrary\models\Settings;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
@@ -38,6 +40,7 @@ class LogsController extends Controller
     public function actionIndex(): Response
     {
         $request = Craft::$app->getRequest();
+        $user = Craft::$app->getUser();
 
         // Get plugin handle from the URL segment
         $pluginHandle = $this->_getPluginHandleFromUrl();
@@ -85,9 +88,23 @@ class LogsController extends Controller
             $logMenuLabel = $config['logMenuLabel'] ?? null;
         } else {
             // Standalone mode - no specific config needed
+            $settings = LoggingLibrary::getInstance()->getSettings();
+
+            if (!$user->checkPermission(LoggingLibrary::PERMISSION_VIEW_ALL_LOGS)) {
+                if ($settings instanceof Settings) {
+                    $sections = LoggingLibrary::getInstance()->getCpSections($settings);
+                    $route = CpNavHelper::firstAccessibleRoute($user, $settings, $sections);
+                    if ($route) {
+                        return $this->redirect($route);
+                    }
+                }
+
+                $this->requirePermission(LoggingLibrary::PERMISSION_VIEW_ALL_LOGS);
+            }
+
             $this->_checkPermissions([LoggingLibrary::PERMISSION_VIEW_ALL_LOGS]);
             $config = null;
-            $limit = 50; // Default for standalone
+            $limit = $settings instanceof Settings ? $settings->itemsPerPage : 50;
             $pluginName = 'All Logs';
             $canDownload = $this->_hasPermission([LoggingLibrary::PERMISSION_DOWNLOAD_ALL_LOGS]);
             $logMenuItems = null;
@@ -317,6 +334,10 @@ class LogsController extends Controller
     private function _getPluginHandleFromUrl(): string
     {
         $segments = Craft::$app->getRequest()->getSegments();
+
+        if (($segments[0] ?? null) === 'logging-library') {
+            return 'logging-library';
+        }
 
         // The plugin handle should be the first segment before '/logs'
         foreach ($segments as $index => $segment) {
