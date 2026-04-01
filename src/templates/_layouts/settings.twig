@@ -21,7 +21,7 @@
                     {{ 'General'|t('logging-library') }}
                 </a>
             </li>
-            <li>
+            <li id="logging-library-interface-nav-item" class="{{ settings is defined and not settings.standaloneViewerAvailable ? 'hidden' : '' }}">
                 <a href="{{ url('logging-library/settings/interface') }}" {% if selectedSettingsItem == 'interface' %}class="sel"{% endif %} data-nav-item="interface">
                     {{ 'Interface'|t('logging-library') }}
                 </a>

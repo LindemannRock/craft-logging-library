@@ -4,11 +4,17 @@
 {% set title = "General Settings"|t('logging-library') %}
 {% set fullPageForm = true %}
 {% set selectedSettingsItem = 'general' %}
+{% set cpSectionUrl = settings.standaloneViewerAvailable ? 'logging-library' : 'logging-library/settings' %}
+{% set showMenuWrapperHidden = settings.edgeEnvironmentDetected and not settings.forceEnableLogViewer %}
+{% set edgeHiddenMessage = 'Logging Library detected an edge or ephemeral environment, so file-based log viewers are hidden for the standalone <strong>All Logs</strong> view and for every plugin&apos;s dedicated <strong>Logs</strong> section. The main menu viewer is unavailable until you enable this override. Use your hosting platform&apos;s native logs, or enable the override if persistent storage is available.'|t('logging-library') %}
+{% set edgeOverrideMessage = 'Logging Library detected an edge or ephemeral environment, but file-based log viewers are being force-enabled. This override affects the standalone <strong>All Logs</strong> view and every plugin&apos;s dedicated <strong>Logs</strong> section.'|t('logging-library') %}
+{% set standardVisibleMessage = 'Logging Library adds a consolidated <strong>All Logs</strong> view to the main Control Panel menu. Individual plugins still keep their own dedicated <strong>Logs</strong> sections.'|t('logging-library') %}
+{% set standardHiddenMessage = 'The consolidated <strong>All Logs</strong> view is hidden from the main Control Panel menu. Individual plugins still keep their own dedicated <strong>Logs</strong> sections.'|t('logging-library') %}
 
 {% set crumbs = [
     {
         label: loggingLibraryHelper.fullName|t('logging-library'),
-        url: url('logging-library/logs/system'),
+        url: url(cpSectionUrl),
     },
     {
         label: 'Settings'|t('logging-library'),
@@ -43,19 +49,123 @@
                 : null,
         }) }}
 
-        {{ forms.lightswitchField({
-            label: 'Show Main Menu'|t('logging-library'),
-            instructions: 'Show Logging Library in the main Control Panel navigation. When disabled, All Logs remains accessible from plugin settings and direct URLs.'|t('logging-library'),
-            id: 'showCpSection',
-            name: 'settings[showCpSection]',
-            on: settings.showCpSection,
-            errors: settings.getErrors('showCpSection'),
-            disabled: settings.isOverriddenByConfig('showCpSection'),
-            warning: settings.isOverriddenByConfig('showCpSection')
-                ? "This is being overridden by the <code>showCpSection</code> setting in <code>config/logging-library.php</code>."|t('logging-library')|raw
-                : null,
-        }) }}
+        {% if settings.edgeEnvironmentDetected %}
+            {{ forms.lightswitchField({
+                label: 'Force Enable Log Viewers'|t('logging-library'),
+                instructions: 'Force-enable file-based log viewers even when an edge or ephemeral environment is detected. This affects Logging Library and every plugin&apos;s dedicated Logs section.'|t('logging-library'),
+                id: 'forceEnableLogViewer',
+                name: 'settings[forceEnableLogViewer]',
+                on: settings.forceEnableLogViewer,
+                toggle: 'show-cp-section-field-wrapper',
+                errors: settings.getErrors('forceEnableLogViewer'),
+                disabled: settings.isOverriddenByConfig('forceEnableLogViewer'),
+                warning: settings.isOverriddenByConfig('forceEnableLogViewer')
+                    ? "This is being overridden by the <code>forceEnableLogViewer</code> setting in <code>config/logging-library.php</code>."|t('logging-library')|raw
+                    : null,
+            }) }}
+
+            {% include 'lindemannrock-base/_components/info-box' with {
+                boxId: 'force-log-viewers-disabled-box',
+                message: edgeHiddenMessage,
+                type: 'warning',
+                margin: 'top',
+                allowHtml: true,
+                hidden: settings.forceEnableLogViewer,
+            } %}
+
+            {% include 'lindemannrock-base/_components/info-box' with {
+                boxId: 'force-log-viewers-enabled-box',
+                message: edgeOverrideMessage,
+                type: 'warning',
+                margin: 'both',
+                allowHtml: true,
+                hidden: not settings.forceEnableLogViewer,
+            } %}
+        {% endif %}
+
+        <div id="show-cp-section-field-wrapper" class="{{ showMenuWrapperHidden ? 'hidden' : '' }}">
+            {{ forms.lightswitchField({
+                label: 'Show Main Menu'|t('logging-library'),
+                instructions: 'Show Logging Library in the main Control Panel navigation as a consolidated All Logs view when file-based log viewers are available.'|t('logging-library'),
+                id: 'showCpSection',
+                name: 'settings[showCpSection]',
+                on: settings.showCpSection,
+                errors: settings.getErrors('showCpSection'),
+                disabled: settings.isOverriddenByConfig('showCpSection'),
+                warning: settings.isOverriddenByConfig('showCpSection')
+                    ? "This is being overridden by the <code>showCpSection</code> setting in <code>config/logging-library.php</code>."|t('logging-library')|raw
+                    : null,
+            }) }}
+            {% include 'lindemannrock-base/_components/info-box' with {
+                boxId: 'standalone-visible-box',
+                message: standardVisibleMessage,
+                type: 'info',
+                margin: 'top',
+                allowHtml: true,
+                hidden: not settings.standaloneViewerAvailable,
+            } %}
+
+            {% include 'lindemannrock-base/_components/info-box' with {
+                boxId: 'standalone-hidden-box',
+                message: standardHiddenMessage,
+                type: 'warning',
+                margin: 'top',
+                allowHtml: true,
+                hidden: settings.standaloneViewerAvailable,
+            } %}
+        </div>
     </form>
 
     {% include 'lindemannrock-base/_components/plugin-credit' %}
 {% endblock %}
+
+{% js %}
+    (() => {
+        const isEdgeEnvironment = {{ settings.edgeEnvironmentDetected ? 'true' : 'false' }};
+        const forceEnableButton = document.getElementById('forceEnableLogViewer');
+        const interfaceNavItem = document.getElementById('logging-library-interface-nav-item');
+        const forceDisabledBox = document.getElementById('force-log-viewers-disabled-box');
+        const forceEnabledBox = document.getElementById('force-log-viewers-enabled-box');
+        const standaloneVisibleBox = document.getElementById('standalone-visible-box');
+        const standaloneHiddenBox = document.getElementById('standalone-hidden-box');
+
+        const showCpSectionButton = document.getElementById('showCpSection');
+        const lightswitchIsOn = (element) => !!element && element.classList.contains('on');
+
+        const updateViewerUi = () => {
+            const forceEnabled = lightswitchIsOn(forceEnableButton);
+            const logViewerAvailable = !isEdgeEnvironment || forceEnabled;
+            const showMenuEnabled = lightswitchIsOn(showCpSectionButton);
+
+            if (interfaceNavItem) {
+                interfaceNavItem.classList.toggle('hidden', !logViewerAvailable || !showMenuEnabled);
+            }
+
+            if (forceDisabledBox) {
+                forceDisabledBox.style.display = isEdgeEnvironment && !forceEnabled ? '' : 'none';
+            }
+
+            if (forceEnabledBox) {
+                forceEnabledBox.style.display = isEdgeEnvironment && forceEnabled ? '' : 'none';
+            }
+
+            if (standaloneVisibleBox) {
+                standaloneVisibleBox.style.display = logViewerAvailable && showMenuEnabled ? '' : 'none';
+            }
+
+            if (standaloneHiddenBox) {
+                standaloneHiddenBox.style.display = logViewerAvailable && !showMenuEnabled ? '' : 'none';
+            }
+        };
+
+        if (forceEnableButton) {
+            forceEnableButton.addEventListener('click', () => requestAnimationFrame(updateViewerUi));
+        }
+
+        if (showCpSectionButton) {
+            showCpSectionButton.addEventListener('click', () => requestAnimationFrame(updateViewerUi));
+        }
+
+        updateViewerUi();
+    })();
+{% endjs %}

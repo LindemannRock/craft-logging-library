@@ -4,11 +4,12 @@
 {% set title = "Interface Settings"|t('logging-library') %}
 {% set fullPageForm = true %}
 {% set selectedSettingsItem = 'interface' %}
+{% set cpSectionUrl = settings.standaloneViewerAvailable ? 'logging-library' : 'logging-library/settings' %}
 
 {% set crumbs = [
     {
         label: loggingLibraryHelper.fullName|t('logging-library'),
-        url: url('logging-library/logs/system'),
+        url: url(cpSectionUrl),
     },
     {
         label: 'Settings'|t('logging-library'),

@@ -12,6 +12,7 @@ use craft\base\Model;
 use lindemannrock\base\traits\SettingsConfigTrait;
 use lindemannrock\base\traits\SettingsDisplayNameTrait;
 use lindemannrock\base\traits\SettingsPersistenceTrait;
+use lindemannrock\logginglibrary\LoggingLibrary;
 
 /**
  * Logging Library Settings Model
@@ -38,6 +39,11 @@ class Settings extends Model
      * @var bool Whether to show Logging Library in the main control panel menu
      */
     public bool $showCpSection = true;
+
+    /**
+     * @var bool Whether to force-enable file-based log viewers on edge/ephemeral environments
+     */
+    public bool $forceEnableLogViewer = false;
 
     /**
      * Database table name for settings persistence
@@ -68,7 +74,31 @@ class Settings extends Model
      */
     protected static function booleanFields(): array
     {
-        return ['showCpSection'];
+        return ['showCpSection', 'forceEnableLogViewer'];
+    }
+
+    /**
+     * Whether the current environment matches Logging Library's edge detection.
+     */
+    public function getEdgeEnvironmentDetected(): bool
+    {
+        return LoggingLibrary::isEdgeEnvironmentDetected();
+    }
+
+    /**
+     * Whether file-based log viewers are available in the current environment.
+     */
+    public function getLogViewerAvailable(): bool
+    {
+        return LoggingLibrary::areLogViewersAvailable($this);
+    }
+
+    /**
+     * Whether the standalone viewer is available as a surfaced CP feature.
+     */
+    public function getStandaloneViewerAvailable(): bool
+    {
+        return $this->showCpSection && $this->getLogViewerAvailable();
     }
 
     /**
@@ -99,6 +129,8 @@ class Settings extends Model
             [['itemsPerPage'], 'default', 'value' => 50],
             [['showCpSection'], 'boolean'],
             [['showCpSection'], 'default', 'value' => true],
+            [['forceEnableLogViewer'], 'boolean'],
+            [['forceEnableLogViewer'], 'default', 'value' => false],
         ];
     }
 }
