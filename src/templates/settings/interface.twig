@@ -22,7 +22,7 @@
 ] %}
 
 {% block content %}
-    <form method="post" accept-charset="UTF-8">
+    <form method="post" accept-charset="UTF-8" novalidate>
         {{ actionInput('logging-library/settings/save') }}
         {{ csrfInput() }}
         {{ redirectInput('logging-library/settings/interface') }}
