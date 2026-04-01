@@ -28,7 +28,7 @@ class LogsUtility extends Utility
      */
     public static function displayName(): string
     {
-        return Craft::t('app', 'Logs');
+        return Craft::t('logging-library', 'Logs');
     }
 
     /**
