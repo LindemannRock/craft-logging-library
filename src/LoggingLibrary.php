@@ -57,7 +57,16 @@ class LoggingLibrary extends \craft\base\Plugin
         parent::init();
 
         // Bootstrap the base plugin helper
-        PluginHelper::bootstrap($this, 'loggingLibraryHelper');
+        PluginHelper::bootstrap($this, 'loggingLibraryHelper', [], [], [
+            'installExperience' => [
+                'headline' => Craft::t('logging-library', 'Logging Library'),
+                'body' => Craft::t('logging-library', 'Inspect system logs, review plugin logging output, and centralize diagnostics from one control panel workspace.'),
+                'ctaLabel' => Craft::t('logging-library', 'Open All Logs'),
+                'ctaUrl' => 'logging-library/logs/system',
+                'redirectUri' => 'logging-library/logs/system',
+                'confettiPreset' => 'surprise',
+            ],
+        ]);
 
         // Register services
         $this->setComponents([
