@@ -18,7 +18,7 @@
 
 {# Build level options #}
 {% set levelOptions = [
-    {value: 'all', label: 'All Levels'|t('app'), status: 'all'},
+    {value: 'all', label: 'All Levels'|t(pluginHandle), status: 'all'},
 ] %}
 
 {% set levelSeverity = {
@@ -45,7 +45,7 @@
 {% endfor %}
 
 {# Build file/date options #}
-{% set fileOptions = [{value: '', label: isStandalone ? 'Select File'|t('app') : 'Select Date'|t('app')}] %}
+{% set fileOptions = [{value: '', label: isStandalone ? 'Select File'|t(pluginHandle) : 'Select Date'|t(pluginHandle)}] %}
 {% for file in logFiles %}
     {% set fileOptions = fileOptions|merge([{
         value: isStandalone ? file.filename : file.date,
@@ -70,9 +70,9 @@
    ============================================================================ #}
 
 {% set sidebarItems = logMenuItems ?? (isStandalone ? {} : {
-    system: {label: 'System'|t('app'), url: pluginHandle ~ '/logs/system'},
+    system: {label: 'System'|t(pluginHandle), url: pluginHandle ~ '/logs/system'},
 }) %}
-{% set sidebarLabel = logMenuLabel ?? 'Logs'|t('app') %}
+{% set sidebarLabel = logMenuLabel ?? 'Logs'|t(pluginHandle) %}
 
 {% set tableConfig = {
     plugin: {
@@ -80,12 +80,12 @@
         name: pluginName,
     },
     page: {
-        title: 'System Logs'|t('app'),
+        title: 'System Logs'|t(pluginHandle),
         subnav: 'logs',
         crumbs: [
             { label: pluginName, url: url(pluginHandle) },
-            { label: 'Logs'|t('app'), url: url(pluginHandle ~ '/logs/') },
-            { label: 'System'|t('app'), url: url(pluginHandle ~ '/logs/system') }
+            { label: 'Logs'|t(pluginHandle), url: url(pluginHandle ~ '/logs/') },
+            { label: 'System'|t(pluginHandle), url: url(pluginHandle ~ '/logs/system') }
         ],
     },
     sidebarMenu: {
@@ -98,21 +98,21 @@
             type: 'dropdown',
             param: 'source',
             current: filters.source,
-            label: sources[filters.source] ?? 'All Sources'|t('app'),
+            label: sources[filters.source] ?? 'All Sources'|t(pluginHandle),
             options: sourceOptions,
         },
         {
             type: 'dropdown',
             param: 'file',
             current: selectedFile ? selectedFile.filename : '',
-            label: selectedFile ? selectedFile.filename : 'Select File'|t('app'),
+            label: selectedFile ? selectedFile.filename : 'Select File'|t(pluginHandle),
             options: fileOptions,
         },
         {
             type: 'status',
             param: 'level',
             current: filters.level,
-            label: levels[filters.level] ?? 'All Levels'|t('app'),
+            label: levels[filters.level] ?? 'All Levels'|t(pluginHandle),
             colorSet: 'logLevel',
             options: levelOptions,
         },
@@ -121,20 +121,20 @@
             type: 'dropdown',
             param: 'date',
             current: selectedFile ? selectedFile.date : '',
-            label: selectedFile ? selectedFile.date : 'Select Date'|t('app'),
+            label: selectedFile ? selectedFile.date : 'Select Date'|t(pluginHandle),
             options: fileOptions,
         },
         {
             type: 'status',
             param: 'level',
             current: filters.level,
-            label: levels[filters.level] ?? 'All Levels'|t('app'),
+            label: levels[filters.level] ?? 'All Levels'|t(pluginHandle),
             colorSet: 'logLevel',
             options: levelOptions,
         },
     ],
     search: {
-        placeholder: 'Search messages and context...'|t('app'),
+        placeholder: 'Search messages and context...'|t(pluginHandle),
         value: filters.search,
     },
     sort: {
@@ -143,28 +143,28 @@
     },
     table: {
         columns: isStandalone ? [
-            {key: 'timestamp', label: 'Time'|t('app'), sortable: true, width: '140px'},
-            {key: 'level', label: 'Level'|t('app'), sortable: true, width: '80px'},
-            {key: 'category', label: 'Source'|t('app'), sortable: true, width: '120px'},
-            {key: 'user', label: 'User'|t('app'), sortable: true, width: '100px'},
-            {key: 'message', label: 'Message'|t('app'), sortable: true},
+            {key: 'timestamp', label: 'Time'|t(pluginHandle), sortable: true, width: '140px'},
+            {key: 'level', label: 'Level'|t(pluginHandle), sortable: true, width: '80px'},
+            {key: 'category', label: 'Source'|t(pluginHandle), sortable: true, width: '120px'},
+            {key: 'user', label: 'User'|t(pluginHandle), sortable: true, width: '100px'},
+            {key: 'message', label: 'Message'|t(pluginHandle), sortable: true},
         ] : [
-            {key: 'timestamp', label: 'Time'|t('app'), sortable: true, width: '140px'},
-            {key: 'level', label: 'Level'|t('app'), sortable: true, width: '80px'},
-            {key: 'user', label: 'User'|t('app'), sortable: true, width: '100px'},
-            {key: 'message', label: 'Message'|t('app'), sortable: true},
+            {key: 'timestamp', label: 'Time'|t(pluginHandle), sortable: true, width: '140px'},
+            {key: 'level', label: 'Level'|t(pluginHandle), sortable: true, width: '80px'},
+            {key: 'user', label: 'User'|t(pluginHandle), sortable: true, width: '100px'},
+            {key: 'message', label: 'Message'|t(pluginHandle), sortable: true},
         ],
         items: logEntries,
         emptyMessage: logFiles|length == 0
-            ? 'No log files found. Log files are created when plugin activities occur.'|t('app')
-            : 'No log entries found for the selected filters.'|t('app'),
+            ? 'No log files found. Log files are created when plugin activities occur.'|t(pluginHandle)
+            : 'No log entries found for the selected filters.'|t(pluginHandle),
         expandable: true,
     },
     pagination: {
         page: pagination.currentPage,
         limit: pagination.perPage,
         totalCount: pagination.total,
-        itemLabel: {singular: 'entry'|t('app'), plural: 'entries'|t('app')},
+        itemLabel: {singular: 'entry'|t(pluginHandle), plural: 'entries'|t(pluginHandle)},
     },
     checkboxes: false,
     rowActions: false,
@@ -207,7 +207,7 @@
     {% if logFiles|length == 0 and logConfig %}
         <div class="info-box-table-wrapper">
             {% include 'lindemannrock-base/_components/info-box' with {
-                message: 'Current log level'|t('app') ~ ': <strong>' ~ logConfig.logLevel|upper ~ '</strong>',
+                message: 'Current log level'|t(pluginHandle) ~ ': <strong>' ~ logConfig.logLevel|capitalize|t(pluginHandle)|upper ~ '</strong>',
                 type: 'tip',
                 margin: 'none',
                 stretch: true,
@@ -230,7 +230,7 @@
     {# Level #}
     <td>
         {% include 'lindemannrock-base/_components/badge' with {
-            label: item.level|upper,
+            label: item.level|capitalize|t(pluginHandle)|upper,
             value: item.level,
             colorSet: 'logLevel',
         } only %}
@@ -269,10 +269,10 @@
 
 {% block expandableRow %}
     {% if item.context and item.context != '[]' and item.context != '' %}
-        <div style="font-size: 12px; color: #606d7b; margin-bottom: 8px; font-weight: 600;">{{ 'Context'|t('app') }}:</div>
+        <div style="font-size: 12px; color: #606d7b; margin-bottom: 8px; font-weight: 600;">{{ 'Context'|t(pluginHandle) }}:</div>
         <pre style="margin: 0; padding: 12px; background: #ffffff; border-radius: 4px; font-family: Monaco, 'Courier New', monospace; font-size: 11px; white-space: pre-wrap; overflow-x: auto; border: 1px solid #e1e8ed;">{{ item.context }}</pre>
     {% else %}
-        <span class="light">{{ 'No context data available.'|t('app') }}</span>
+        <span class="light">{{ 'No context data available.'|t(pluginHandle) }}</span>
     {% endif %}
 {% endblock %}
 
@@ -315,10 +315,10 @@
     <div class="meta" style="padding: 12px;">
         {% if not isStandalone and logConfig %}
             <div class="log-config-item">
-                <div class="label">{{ "Current Level"|t('app') }}</div>
+                <div class="label">{{ "Current Level"|t(pluginHandle) }}</div>
                 <div class="value">
                     {% include 'lindemannrock-base/_components/badge' with {
-                        label: logConfig.logLevel|upper,
+                        label: logConfig.logLevel|capitalize|t(pluginHandle)|upper,
                         value: logConfig.logLevel|lower,
                         colorSet: 'logLevel',
                     } only %}
@@ -326,38 +326,38 @@
             </div>
 
             <div class="log-config-item">
-                <div class="label">{{ "Retention"|t('app') }}</div>
-                <div class="value">{{ logConfig.retention }} {{ "days"|t('app') }}</div>
+                <div class="label">{{ "Retention"|t(pluginHandle) }}</div>
+                <div class="value">{{ logConfig.retention }} {{ "days"|t(pluginHandle) }}</div>
             </div>
         {% endif %}
 
         <div class="log-config-item">
-            <div class="label">{{ "Available Logs"|t('app') }}</div>
-            <div class="value">{{ logFiles|length|number_format }} {{ logFiles|length == 1 ? 'file' : 'files' }}</div>
+            <div class="label">{{ "Available Logs"|t(pluginHandle) }}</div>
+            <div class="value">{{ logFiles|length|number_format }} {{ logFiles|length == 1 ? 'file'|t(pluginHandle) : 'files'|t(pluginHandle) }}</div>
         </div>
 
         {% if selectedFile %}
             <div class="log-config-item">
-                <div class="label">{{ "Current File"|t('app') }}</div>
+                <div class="label">{{ "Current File"|t(pluginHandle) }}</div>
                 <div class="value">{{ selectedFile.formattedSize }}</div>
             </div>
 
             <div class="log-config-item">
-                <div class="label">{{ "Entries"|t('app') }}</div>
+                <div class="label">{{ "Entries"|t(pluginHandle) }}</div>
                 <div class="value">{{ pagination.total|number_format }}</div>
             </div>
 
             {% if canDownload %}
                 <div class="log-config-item" style="grid-template-columns: 1fr; padding: 8px 0;">
                     <a href="{{ actionUrl('logging-library/logs/download', isStandalone ? { file: selectedFile.filename, pluginHandle: pluginHandle } : { date: selectedFile.date, pluginHandle: pluginHandle }) }}" class="btn submit fullwidth" download>
-                        {{ "Download File"|t('app') }}
+                        {{ "Download File"|t(pluginHandle) }}
                     </a>
                 </div>
             {% endif %}
         {% endif %}
 
         <div class="log-config-item location">
-            <div class="label">{{ "Log Location"|t('app') }}</div>
+            <div class="label">{{ "Log Location"|t(pluginHandle) }}</div>
             <div class="value">
                 <code style="font-size: 10px; line-height: 1.5; color: #606d7b; word-break: break-all; display: block;">
                     {% if isStandalone %}
