@@ -183,11 +183,11 @@ class LogsController extends Controller
                 'totalPages' => $totalPages,
             ],
             'levels' => [
-                'all' => 'All Levels',
-                'error' => 'Error',
-                'warning' => 'Warning',
-                'info' => 'Info',
-                'debug' => 'Debug',
+                'all' => Craft::t($pluginHandle, 'All Levels'),
+                'error' => Craft::t($pluginHandle, 'Error'),
+                'warning' => Craft::t($pluginHandle, 'Warning'),
+                'info' => Craft::t($pluginHandle, 'Info'),
+                'debug' => Craft::t($pluginHandle, 'Debug'),
             ],
             'logConfig' => $config,
         ]);
@@ -369,7 +369,7 @@ class LogsController extends Controller
      */
     private function _extractSources(array $logFiles): array
     {
-        $sources = ['all' => 'All Sources'];
+        $sources = ['all' => Craft::t('logging-library', 'All Sources')];
         $seen = [];
 
         foreach ($logFiles as $file) {
@@ -378,11 +378,11 @@ class LogsController extends Controller
                 $seen[$source] = true;
                 // Create display name
                 $displayName = match ($source) {
-                    'web' => 'Web',
-                    'console' => 'Console',
-                    'queue' => 'Queue',
-                    'php-errors' => 'PHP Errors',
-                    'other' => 'Other',
+                    'web' => Craft::t('logging-library', 'Web'),
+                    'console' => Craft::t('logging-library', 'Console'),
+                    'queue' => Craft::t('logging-library', 'Queue'),
+                    'php-errors' => Craft::t('logging-library', 'PHP Errors'),
+                    'other' => Craft::t('logging-library', 'Other'),
                     default => ucwords(str_replace('-', ' ', $source)),
                 };
                 $sources[$source] = $displayName;
