@@ -10,6 +10,7 @@
 
 namespace lindemannrock\logginglibrary\services;
 
+use Craft;
 use craft\base\Component;
 use craft\web\Request;
 use lindemannrock\logginglibrary\LoggingLibrary;
@@ -120,11 +121,11 @@ class LogsViewService extends Component
                 'totalPages' => $totalPages,
             ],
             'levels' => [
-                'all' => 'All Levels',
-                'error' => 'Error',
-                'warning' => 'Warning',
-                'info' => 'Info',
-                'debug' => 'Debug',
+                'all' => Craft::t($pluginHandle, 'All Levels'),
+                'error' => Craft::t($pluginHandle, 'Error'),
+                'warning' => Craft::t($pluginHandle, 'Warning'),
+                'info' => Craft::t($pluginHandle, 'Info'),
+                'debug' => Craft::t($pluginHandle, 'Debug'),
             ],
             'logConfig' => $config,
         ];
