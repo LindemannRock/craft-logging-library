@@ -108,7 +108,7 @@ class LogsController extends Controller
             $this->_checkPermissions([LoggingLibrary::PERMISSION_VIEW_ALL_LOGS]);
             $config = null;
             $limit = $settings instanceof Settings ? $settings->itemsPerPage : 50;
-            $pluginName = 'All Logs';
+            $pluginName = $settings instanceof Settings ? $settings->getFullName() : LoggingLibrary::getInstance()->name;
             $canDownload = $this->_hasPermission([LoggingLibrary::PERMISSION_DOWNLOAD_ALL_LOGS]);
             $logMenuItems = null;
             $logMenuLabel = null;
