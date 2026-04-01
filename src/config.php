@@ -21,5 +21,8 @@ return [
 
         // Show Logging Library in the main control panel navigation
         'showCpSection' => true,
+
+        // Force-enable file-based log viewers even when an edge/ephemeral environment is detected
+        'forceEnableLogViewer' => false,
     ],
 ];
