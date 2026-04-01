@@ -1,0 +1,51 @@
+{% extends "logging-library/_layouts/settings" %}
+{% import "_includes/forms" as forms %}
+
+{% set title = "Interface Settings"|t('logging-library') %}
+{% set fullPageForm = true %}
+{% set selectedSettingsItem = 'interface' %}
+
+{% set crumbs = [
+    {
+        label: loggingLibraryHelper.fullName|t('logging-library'),
+        url: url('logging-library/logs/system'),
+    },
+    {
+        label: 'Settings'|t('logging-library'),
+        url: url('logging-library/settings'),
+    },
+    {
+        label: 'Interface'|t('logging-library'),
+        url: url('logging-library/settings/interface'),
+    },
+] %}
+
+{% block content %}
+    <form method="post" accept-charset="UTF-8">
+        {{ actionInput('logging-library/settings/save') }}
+        {{ csrfInput() }}
+        {{ redirectInput('logging-library/settings/interface') }}
+        {{ hiddenInput('section', 'interface') }}
+
+        <h2 style="margin-top: 0;">{{ "Interface Settings"|t('logging-library') }}</h2>
+
+        {{ forms.textField({
+            label: 'Items Per Page'|t('logging-library'),
+            instructions: 'Number of log entries to display per page in the log viewers'|t('logging-library'),
+            id: 'itemsPerPage',
+            name: 'settings[itemsPerPage]',
+            type: 'number',
+            value: settings.itemsPerPage,
+            min: 10,
+            max: 500,
+            required: true,
+            errors: settings.getErrors('itemsPerPage'),
+            disabled: settings.isOverriddenByConfig('itemsPerPage'),
+            warning: settings.isOverriddenByConfig('itemsPerPage')
+                ? "This is being overridden by the <code>itemsPerPage</code> setting in <code>config/logging-library.php</code>."|t('logging-library')|raw
+                : null,
+        }) }}
+    </form>
+
+    {% include 'lindemannrock-base/_components/plugin-credit' %}
+{% endblock %}

@@ -1,0 +1,61 @@
+{% extends "logging-library/_layouts/settings" %}
+{% import "_includes/forms" as forms %}
+
+{% set title = "General Settings"|t('logging-library') %}
+{% set fullPageForm = true %}
+{% set selectedSettingsItem = 'general' %}
+
+{% set crumbs = [
+    {
+        label: loggingLibraryHelper.fullName|t('logging-library'),
+        url: url('logging-library/logs/system'),
+    },
+    {
+        label: 'Settings'|t('logging-library'),
+        url: url('logging-library/settings'),
+    },
+    {
+        label: 'General'|t('logging-library'),
+        url: url('logging-library/settings/general'),
+    },
+] %}
+
+{% block content %}
+    <form method="post" accept-charset="UTF-8">
+        {{ actionInput('logging-library/settings/save') }}
+        {{ csrfInput() }}
+        {{ redirectInput('logging-library/settings/general') }}
+        {{ hiddenInput('section', 'general') }}
+
+        <h2 style="margin-top: 0;">{{ "General Settings"|t('logging-library') }}</h2>
+
+        {{ forms.textField({
+            label: 'Plugin Name'|t('logging-library'),
+            instructions: 'The name of the plugin as it appears in the Control Panel menu'|t('logging-library'),
+            id: 'pluginName',
+            name: 'settings[pluginName]',
+            value: settings.pluginName,
+            required: true,
+            errors: settings.getErrors('pluginName'),
+            disabled: settings.isOverriddenByConfig('pluginName'),
+            warning: settings.isOverriddenByConfig('pluginName')
+                ? "This is being overridden by the <code>pluginName</code> setting in <code>config/logging-library.php</code>."|t('logging-library')|raw
+                : null,
+        }) }}
+
+        {{ forms.lightswitchField({
+            label: 'Show Main Menu'|t('logging-library'),
+            instructions: 'Show Logging Library in the main Control Panel navigation. When disabled, All Logs remains accessible from plugin settings and direct URLs.'|t('logging-library'),
+            id: 'showCpSection',
+            name: 'settings[showCpSection]',
+            on: settings.showCpSection,
+            errors: settings.getErrors('showCpSection'),
+            disabled: settings.isOverriddenByConfig('showCpSection'),
+            warning: settings.isOverriddenByConfig('showCpSection')
+                ? "This is being overridden by the <code>showCpSection</code> setting in <code>config/logging-library.php</code>."|t('logging-library')|raw
+                : null,
+        }) }}
+    </form>
+
+    {% include 'lindemannrock-base/_components/plugin-credit' %}
+{% endblock %}

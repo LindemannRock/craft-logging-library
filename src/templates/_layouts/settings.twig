@@ -1,0 +1,41 @@
+{% extends "_layouts/cp" %}
+
+{% set title = title ?? 'Settings'|t('logging-library') %}
+{% set selectedSettingsItem = selectedSettingsItem ?? 'general' %}
+{% set selectedSubnavItem = 'settings' %}
+{% set errorSummary = '' %}
+
+{% if settings is defined and settings.hasErrors() %}
+    {% set errorSummary = include('lindemannrock-base/_partials/error-summary', {
+        errors: settings.getErrors(),
+        linkMode: 'field-id',
+        translationCategory: 'logging-library'
+    })|trim %}
+{% endif %}
+
+{% block sidebar %}
+    <nav id="settings-nav">
+        <ul>
+            <li>
+                <a href="{{ url('logging-library/settings/general') }}" {% if selectedSettingsItem == 'general' %}class="sel"{% endif %} data-nav-item="general">
+                    {{ 'General'|t('logging-library') }}
+                </a>
+            </li>
+            <li>
+                <a href="{{ url('logging-library/settings/interface') }}" {% if selectedSettingsItem == 'interface' %}class="sel"{% endif %} data-nav-item="interface">
+                    {{ 'Interface'|t('logging-library') }}
+                </a>
+            </li>
+        </ul>
+    </nav>
+{% endblock %}
+
+{% css %}
+    #settings-nav a {
+        transition: none;
+    }
+
+    #settings-nav a.sel {
+        cursor: default;
+    }
+{% endcss %}
