@@ -1,0 +1,9 @@
+{
+    "name": "Logging Library",
+    "handle": "logging-library",
+    "description": "Reusable logging library for Craft CMS plugins",
+    "version": "5.7.1",
+    "developer": "LindemannRock",
+    "developerUrl": "https://lindemannrock.com",
+    "documentationUrl": ""
+}

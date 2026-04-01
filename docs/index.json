@@ -1,0 +1,7 @@
+{
+    "plugin": {
+        "name": "Logging Library",
+        "handle": "logging-library",
+        "description": "Reusable logging library for Craft CMS plugins with dedicated log files and built-in log viewer."
+    }
+}

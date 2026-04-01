@@ -1,0 +1,45 @@
+[
+    {
+        "title": "Get Started",
+        "collapsable": false,
+        "children": [
+            "get-started/requirements",
+            "get-started/installation",
+            "get-started/quickstart"
+        ]
+    },
+    {
+        "title": "Feature Tour",
+        "collapsable": true,
+        "open": true,
+        "children": [
+            "feature-tour/overview",
+            "feature-tour/configuration-options",
+            "feature-tour/logging-trait",
+            "feature-tour/logging-service",
+            "feature-tour/log-viewer",
+            "feature-tour/standalone-viewer",
+            "feature-tour/caching",
+            "feature-tour/edge-detection",
+            "feature-tour/integration-guide"
+        ]
+    },
+    {
+        "title": "Developers",
+        "collapsable": true,
+        "open": false,
+        "children": [
+            "developers/permissions",
+            "developers/twig-globals",
+            "developers/shared-features"
+        ]
+    },
+    {
+        "title": "Resources",
+        "collapsable": true,
+        "open": false,
+        "children": [
+            "resources/troubleshooting"
+        ]
+    }
+]
