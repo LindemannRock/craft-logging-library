@@ -7,12 +7,12 @@
  */
 
 return [
-    // Plugin meta / install experience
+    // Plugin meta
     'Logging Library' => 'Logging Library',
     'Inspect system logs, review plugin logging output, and centralize diagnostics from one control panel workspace.' => 'Inspicér systemlogfiler, gennemgå plugin-logoutput og centraliser diagnostik fra ét arbejdsområde i kontrolpanelet.',
     'Open All Logs' => 'Åbn alle logfiler',
 
-    // Navigation & page titles
+    // Navigation
     'Logs' => 'Logfiler',
     'System Logs' => 'Systemlogfiler',
     'System' => 'System',
@@ -24,7 +24,7 @@ return [
     'Info' => 'Info',
     'Debug' => 'Debug',
 
-    // Log sources (standalone mode)
+    // Log sources
     'All Sources' => 'Alle kilder',
     'Web' => 'Web',
     'Console' => 'Konsol',
@@ -32,19 +32,19 @@ return [
     'PHP Errors' => 'PHP-fejl',
     'Other' => 'Andet',
 
-    // Filters & search
+    // Filters
     'Select File' => 'Vælg fil',
     'Select Date' => 'Vælg dato',
     'Search messages and context...' => 'Søg i beskeder og kontekst...',
 
-    // Table columns
+    // Table
     'Time' => 'Tid',
     'Level' => 'Niveau',
     'Source' => 'Kilde',
     'User' => 'Bruger',
     'Message' => 'Besked',
 
-    // Table empty states
+    // Table empty
     'No log files found. Log files are created when plugin activities occur.' => 'Ingen logfiler fundet. Logfiler oprettes, når plugin-aktiviteter forekommer.',
     'No log entries found for the selected filters.' => 'Ingen logposter fundet for de valgte filtre.',
 
@@ -52,7 +52,7 @@ return [
     'entry' => 'post',
     'entries' => 'poster',
 
-    // Expandable row
+    // Row detail
     'Context' => 'Kontekst',
     'No context data available.' => 'Ingen kontekstdata tilgængelig.',
 

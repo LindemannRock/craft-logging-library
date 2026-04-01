@@ -7,12 +7,12 @@
  */
 
 return [
-    // Plugin meta / install experience
+    // Plugin meta
     'Logging Library' => 'Logging Library',
     'Inspect system logs, review plugin logging output, and centralize diagnostics from one control panel workspace.' => 'Bekijk systeemlogboeken, controleer plugin-loguitvoer en centraliseer diagnostiek vanuit één werkruimte in het Control Panel.',
     'Open All Logs' => 'Alle logboeken openen',
 
-    // Navigation & page titles
+    // Navigation
     'Logs' => 'Logboeken',
     'System Logs' => 'Systeemlogboeken',
     'System' => 'Systeem',
@@ -24,7 +24,7 @@ return [
     'Info' => 'Info',
     'Debug' => 'Debug',
 
-    // Log sources (standalone mode)
+    // Log sources
     'All Sources' => 'Alle bronnen',
     'Web' => 'Web',
     'Console' => 'Console',
@@ -32,19 +32,19 @@ return [
     'PHP Errors' => 'PHP-fouten',
     'Other' => 'Overig',
 
-    // Filters & search
+    // Filters
     'Select File' => 'Bestand selecteren',
     'Select Date' => 'Datum selecteren',
     'Search messages and context...' => 'Berichten en context doorzoeken...',
 
-    // Table columns
+    // Table
     'Time' => 'Tijd',
     'Level' => 'Niveau',
     'Source' => 'Bron',
     'User' => 'Gebruiker',
     'Message' => 'Bericht',
 
-    // Table empty states
+    // Table empty
     'No log files found. Log files are created when plugin activities occur.' => 'Geen logbestanden gevonden. Logbestanden worden aangemaakt wanneer plugin-activiteiten plaatsvinden.',
     'No log entries found for the selected filters.' => 'Geen logvermeldingen gevonden voor de geselecteerde filters.',
 
@@ -52,7 +52,7 @@ return [
     'entry' => 'vermelding',
     'entries' => 'vermeldingen',
 
-    // Expandable row
+    // Row detail
     'Context' => 'Context',
     'No context data available.' => 'Geen contextgegevens beschikbaar.',
 

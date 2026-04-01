@@ -7,12 +7,12 @@
  */
 
 return [
-    // Plugin meta / install experience
+    // Plugin meta
     'Logging Library' => 'Logging Library',
     'Inspect system logs, review plugin logging output, and centralize diagnostics from one control panel workspace.' => 'Systemprotokolle einsehen, Plugin-Protokollausgaben überprüfen und Diagnosen über einen zentralen Arbeitsbereich im Control Panel zentralisieren.',
     'Open All Logs' => 'Alle Protokolle öffnen',
 
-    // Navigation & page titles
+    // Navigation
     'Logs' => 'Protokolle',
     'System Logs' => 'Systemprotokolle',
     'System' => 'System',
@@ -24,7 +24,7 @@ return [
     'Info' => 'Info',
     'Debug' => 'Debug',
 
-    // Log sources (standalone mode)
+    // Log sources
     'All Sources' => 'Alle Quellen',
     'Web' => 'Web',
     'Console' => 'Konsole',
@@ -32,19 +32,19 @@ return [
     'PHP Errors' => 'PHP-Fehler',
     'Other' => 'Sonstige',
 
-    // Filters & search
+    // Filters
     'Select File' => 'Datei auswählen',
     'Select Date' => 'Datum auswählen',
     'Search messages and context...' => 'Nachrichten und Kontext durchsuchen...',
 
-    // Table columns
+    // Table
     'Time' => 'Zeit',
     'Level' => 'Stufe',
     'Source' => 'Quelle',
     'User' => 'Benutzer',
     'Message' => 'Nachricht',
 
-    // Table empty states
+    // Table empty
     'No log files found. Log files are created when plugin activities occur.' => 'Keine Protokolldateien gefunden. Protokolldateien werden erstellt, wenn Plugin-Aktivitäten auftreten.',
     'No log entries found for the selected filters.' => 'Keine Protokolleinträge für die ausgewählten Filter gefunden.',
 
@@ -52,7 +52,7 @@ return [
     'entry' => 'Eintrag',
     'entries' => 'Einträge',
 
-    // Expandable row
+    // Row detail
     'Context' => 'Kontext',
     'No context data available.' => 'Keine Kontextdaten verfügbar.',
 

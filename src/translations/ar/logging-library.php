@@ -7,12 +7,12 @@
  */
 
 return [
-    // Plugin meta / install experience
+    // Plugin meta
     'Logging Library' => 'Logging Library',
     'Inspect system logs, review plugin logging output, and centralize diagnostics from one control panel workspace.' => 'فحص سجلات النظام ومراجعة مخرجات تسجيل الإضافات وتجميع التشخيصات من مساحة عمل واحدة في لوحة التحكم.',
     'Open All Logs' => 'فتح جميع السجلات',
 
-    // Navigation & page titles
+    // Navigation
     'Logs' => 'السجلات',
     'System Logs' => 'سجلات النظام',
     'System' => 'النظام',
@@ -24,7 +24,7 @@ return [
     'Info' => 'معلومات',
     'Debug' => 'تصحيح',
 
-    // Log sources (standalone mode)
+    // Log sources
     'All Sources' => 'جميع المصادر',
     'Web' => 'Web',
     'Console' => 'Console',
@@ -32,19 +32,19 @@ return [
     'PHP Errors' => 'أخطاء PHP',
     'Other' => 'أخرى',
 
-    // Filters & search
+    // Filters
     'Select File' => 'اختيار ملف',
     'Select Date' => 'اختيار تاريخ',
     'Search messages and context...' => 'البحث في الرسائل والسياق...',
 
-    // Table columns
+    // Table
     'Time' => 'الوقت',
     'Level' => 'المستوى',
     'Source' => 'المصدر',
     'User' => 'المستخدم',
     'Message' => 'الرسالة',
 
-    // Table empty states
+    // Table empty
     'No log files found. Log files are created when plugin activities occur.' => 'لم يتم العثور على ملفات سجل. يتم إنشاء ملفات السجل عند حدوث أنشطة الإضافة.',
     'No log entries found for the selected filters.' => 'لم يتم العثور على إدخالات سجل للمرشحات المحددة.',
 
@@ -52,7 +52,7 @@ return [
     'entry' => 'إدخال',
     'entries' => 'إدخالات',
 
-    // Expandable row
+    // Row detail
     'Context' => 'السياق',
     'No context data available.' => 'لا تتوفر بيانات سياقية.',
 

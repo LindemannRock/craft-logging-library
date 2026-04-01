@@ -7,12 +7,12 @@
  */
 
 return [
-    // Plugin meta / install experience
+    // Plugin meta
     'Logging Library' => 'Logging Library',
     'Inspect system logs, review plugin logging output, and centralize diagnostics from one control panel workspace.' => 'システムログの確認、プラグインのログ出力の確認、コントロールパネルのワークスペースからの診断の一元管理が行えます。',
     'Open All Logs' => 'すべてのログを開く',
 
-    // Navigation & page titles
+    // Navigation
     'Logs' => 'ログ',
     'System Logs' => 'システムログ',
     'System' => 'システム',
@@ -24,7 +24,7 @@ return [
     'Info' => '情報',
     'Debug' => 'デバッグ',
 
-    // Log sources (standalone mode)
+    // Log sources
     'All Sources' => 'すべてのソース',
     'Web' => 'Web',
     'Console' => 'コンソール',
@@ -32,19 +32,19 @@ return [
     'PHP Errors' => 'PHP エラー',
     'Other' => 'その他',
 
-    // Filters & search
+    // Filters
     'Select File' => 'ファイルを選択',
     'Select Date' => '日付を選択',
     'Search messages and context...' => 'メッセージとコンテキストを検索...',
 
-    // Table columns
+    // Table
     'Time' => '時刻',
     'Level' => 'レベル',
     'Source' => 'ソース',
     'User' => 'ユーザー',
     'Message' => 'メッセージ',
 
-    // Table empty states
+    // Table empty
     'No log files found. Log files are created when plugin activities occur.' => 'ログファイルが見つかりません。プラグインのアクティビティが発生するとログファイルが作成されます。',
     'No log entries found for the selected filters.' => '選択したフィルターに一致するログエントリが見つかりません。',
 
@@ -52,7 +52,7 @@ return [
     'entry' => 'エントリ',
     'entries' => 'エントリ',
 
-    // Expandable row
+    // Row detail
     'Context' => 'コンテキスト',
     'No context data available.' => 'コンテキストデータがありません。',
 
