@@ -48,8 +48,13 @@ class SettingsController extends Controller
     {
         $this->requirePermission(LoggingLibrary::PERMISSION_MANAGE_SETTINGS);
 
+        $settings = LoggingLibrary::getInstance()->getSettings();
+        if ($settings instanceof Settings && !$settings->getStandaloneViewerAvailable()) {
+            return $this->redirect('logging-library/settings/general');
+        }
+
         return $this->renderTemplate('logging-library/settings/interface', [
-            'settings' => LoggingLibrary::getInstance()->getSettings(),
+            'settings' => $settings,
         ]);
     }
 
@@ -83,8 +88,12 @@ class SettingsController extends Controller
         }
 
         $section = $this->_validSettingsSection($this->request->getBodyParam('section', 'general'));
+        if ($section === 'interface' && !$settings->getStandaloneViewerAvailable()) {
+            return $this->redirect('logging-library/settings/general');
+        }
+
         $attributesToValidate = match ($section) {
-            'general' => ['pluginName', 'showCpSection'],
+            'general' => ['pluginName', 'showCpSection', 'forceEnableLogViewer'],
             'interface' => ['itemsPerPage'],
             default => ['pluginName'],
         };

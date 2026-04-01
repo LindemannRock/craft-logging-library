@@ -72,14 +72,18 @@ class LoggingLibrary extends Plugin
     {
         parent::init();
 
+        $logViewersAvailable = self::areLogViewersAvailable();
+
         // Bootstrap the base plugin helper
         PluginHelper::bootstrap($this, 'loggingLibraryHelper', [], [], [
             'installExperience' => [
                 'headline' => Craft::t('logging-library', 'Logging Library'),
                 'body' => Craft::t('logging-library', 'Inspect system logs, review plugin logging output, and centralize diagnostics from one control panel workspace.'),
-                'ctaLabel' => Craft::t('logging-library', 'Open All Logs'),
-                'ctaUrl' => 'logging-library/logs/system',
-                'redirectUri' => 'logging-library/logs/system',
+                'ctaLabel' => $logViewersAvailable
+                    ? Craft::t('logging-library', 'Open All Logs')
+                    : Craft::t('logging-library', 'Open Settings'),
+                'ctaUrl' => $logViewersAvailable ? 'logging-library/logs/system' : 'logging-library/settings/general',
+                'redirectUri' => $logViewersAvailable ? 'logging-library/logs/system' : 'logging-library/settings/general',
                 'confettiPreset' => 'surprise',
             ],
         ]);
@@ -130,7 +134,7 @@ class LoggingLibrary extends Plugin
     public function getCpNavItem(): ?array
     {
         $settings = $this->getSettings();
-        if (!($settings instanceof Settings) || !$settings->showCpSection) {
+        if (!($settings instanceof Settings) || !$settings->showCpSection || !self::areLogViewersAvailable($settings)) {
             return null;
         }
 
@@ -160,8 +164,9 @@ class LoggingLibrary extends Plugin
             [
                 'key' => 'all-logs',
                 'label' => Craft::t('logging-library', 'All Logs'),
-                'url' => 'logging-library/logs',
+                'url' => 'logging-library',
                 'permissionsAll' => [self::PERMISSION_VIEW_ALL_LOGS],
+                'when' => self::areLogViewersAvailable($settings),
             ],
             [
                 'key' => 'settings',
@@ -219,6 +224,17 @@ class LoggingLibrary extends Plugin
      */
     public function getSettingsResponse(): mixed
     {
+        $settings = $this->getSettings();
+        $user = Craft::$app->getUser();
+
+        if ($settings instanceof Settings) {
+            $sections = $this->getCpSections($settings);
+            $route = CpNavHelper::firstAccessibleRoute($user, $settings, $sections);
+            if ($route) {
+                return Craft::$app->controller->redirect($route);
+            }
+        }
+
         return Craft::$app->controller->redirect('logging-library/settings');
     }
 
@@ -244,6 +260,7 @@ class LoggingLibrary extends Plugin
 
         // Detect edge/CDN hosting environments
         $isEdgeEnvironment = self::_detectEdgeEnvironment();
+        $logViewersAvailable = !$isEdgeEnvironment || self::isForceEnableLogViewer();
 
         // Validate required config
         $config = array_merge([
@@ -251,7 +268,7 @@ class LoggingLibrary extends Plugin
             'logLevel' => 'info', // Options: 'debug', 'info', 'warning', 'error'
             'retention' => 30,
             'maxFileSize' => 10240, // 10MB
-            'enableLogViewer' => !$isEdgeEnvironment, // Auto-disable on edge platforms
+            'enableLogViewer' => $logViewersAvailable, // Auto-disable on edge platforms unless force-enabled
             'viewSystemLogsPermissions' => [], // Permissions required to view system logs
             'downloadSystemLogsPermissions' => [], // Permissions required to download system logs
             'itemsPerPage' => 50, // Default entries per page in log viewer
@@ -290,6 +307,46 @@ class LoggingLibrary extends Plugin
     public static function getAllConfigs(): array
     {
         return self::$_pluginConfigs;
+    }
+
+    /**
+     * Whether the current environment matches Logging Library's edge detection.
+     */
+    public static function isEdgeEnvironmentDetected(): bool
+    {
+        return self::_detectEdgeEnvironment();
+    }
+
+    /**
+     * Whether file-based log viewers are force-enabled via settings/config.
+     */
+    public static function isForceEnableLogViewer(?Settings $settings = null): bool
+    {
+        if ($settings instanceof Settings) {
+            return $settings->forceEnableLogViewer;
+        }
+
+        $instance = self::getInstance();
+        $pluginSettings = $instance?->getSettings();
+        if ($pluginSettings instanceof Settings) {
+            return $pluginSettings->forceEnableLogViewer;
+        }
+
+        try {
+            $config = Craft::$app->getConfig()->getConfigFromFile('logging-library');
+        } catch (\Throwable $e) {
+            return false;
+        }
+
+        return is_array($config) ? (bool)($config['forceEnableLogViewer'] ?? false) : false;
+    }
+
+    /**
+     * Whether file-based log viewers should be available in the current environment.
+     */
+    public static function areLogViewersAvailable(?Settings $settings = null): bool
+    {
+        return !self::_detectEdgeEnvironment() || self::isForceEnableLogViewer($settings);
     }
 
     /**

@@ -89,6 +89,9 @@ class LogsController extends Controller
         } else {
             // Standalone mode - no specific config needed
             $settings = LoggingLibrary::getInstance()->getSettings();
+            if ($settings instanceof Settings && !LoggingLibrary::areLogViewersAvailable($settings)) {
+                throw new NotFoundHttpException('Log viewer is disabled for this environment');
+            }
 
             if (!$user->checkPermission(LoggingLibrary::PERMISSION_VIEW_ALL_LOGS)) {
                 if ($settings instanceof Settings) {
@@ -265,6 +268,11 @@ class LogsController extends Controller
         $isStandalone = ($pluginHandle === 'logging-library');
 
         if ($isStandalone) {
+            $settings = LoggingLibrary::getInstance()->getSettings();
+            if ($settings instanceof Settings && !LoggingLibrary::areLogViewersAvailable($settings)) {
+                throw new NotFoundHttpException('Log viewer is disabled for this environment');
+            }
+
             // Standalone mode - permission-gated
             $this->_checkPermissions([LoggingLibrary::PERMISSION_VIEW_ALL_LOGS]);
             $this->_checkPermissions([LoggingLibrary::PERMISSION_DOWNLOAD_ALL_LOGS]);
