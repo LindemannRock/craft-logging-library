@@ -13,9 +13,13 @@ return [
     'Open All Logs' => 'Alle Protokolle öffnen',
 
     // Navigation
+    'All Logs' => 'Alle Protokolle',
     'Logs' => 'Protokolle',
+    'Settings' => 'Einstellungen',
     'System Logs' => 'Systemprotokolle',
     'System' => 'System',
+    'General' => 'Allgemein',
+    'Interface' => 'Oberfläche',
 
     // Log levels
     'All Levels' => 'Alle Stufen',
@@ -68,4 +72,29 @@ return [
     'Entries' => 'Einträge',
     'Download File' => 'Datei herunterladen',
     'Log Location' => 'Protokollspeicherort',
+
+    // Common
+    'Save Settings' => 'Einstellungen speichern',
+
+    // Controller messages
+    'Settings saved.' => 'Einstellungen gespeichert.',
+    'Could not save settings.' => 'Einstellungen konnten nicht gespeichert werden.',
+
+    // Validation messages
+    'Value must be a whole number.' => 'Der Wert muss eine ganze Zahl sein.',
+
+    // Settings: General
+    'General Settings' => 'Allgemeine Einstellungen',
+    'Plugin Name' => 'Plugin-Name',
+    'The name of the plugin as it appears in the Control Panel menu' => 'Der Name des Plugins, wie er im Control-Panel-Menü angezeigt wird',
+    'This is being overridden by the <code>pluginName</code> setting in <code>config/logging-library.php</code>.' => 'Dies wird durch die Einstellung <code>pluginName</code> in <code>config/logging-library.php</code> überschrieben.',
+    'Show Main Menu' => 'Hauptmenü anzeigen',
+    'Show Logging Library in the main Control Panel navigation. When disabled, All Logs remains accessible from plugin settings and direct URLs.' => 'Logging Library in der Hauptnavigation des Control Panels anzeigen. Wenn deaktiviert, ist „Alle Protokolle" weiterhin über die Plugin-Einstellungen und direkte URLs erreichbar.',
+    'This is being overridden by the <code>showCpSection</code> setting in <code>config/logging-library.php</code>.' => 'Dies wird durch die Einstellung <code>showCpSection</code> in <code>config/logging-library.php</code> überschrieben.',
+
+    // Settings: Interface
+    'Interface Settings' => 'Oberflächeneinstellungen',
+    'Items Per Page' => 'Einträge pro Seite',
+    'Number of log entries to display per page in the log viewers' => 'Anzahl der Protokolleinträge, die pro Seite in den Protokoll-Ansichten angezeigt werden',
+    'This is being overridden by the <code>itemsPerPage</code> setting in <code>config/logging-library.php</code>.' => 'Dies wird durch die Einstellung <code>itemsPerPage</code> in <code>config/logging-library.php</code> überschrieben.',
 ];

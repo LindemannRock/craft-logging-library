@@ -13,9 +13,13 @@ return [
     'Open All Logs' => 'Ouvrir tous les journaux',
 
     // Navigation
+    'All Logs' => 'Tous les journaux',
     'Logs' => 'Journaux',
+    'Settings' => 'Paramètres',
     'System Logs' => 'Journaux système',
     'System' => 'Système',
+    'General' => 'Général',
+    'Interface' => 'Interface',
 
     // Log levels
     'All Levels' => 'Tous les niveaux',
@@ -68,4 +72,29 @@ return [
     'Entries' => 'Entrées',
     'Download File' => 'Télécharger le fichier',
     'Log Location' => 'Emplacement du journal',
+
+    // Common
+    'Save Settings' => 'Enregistrer les paramètres',
+
+    // Controller messages
+    'Settings saved.' => 'Paramètres enregistrés.',
+    'Could not save settings.' => 'Impossible d\'enregistrer les paramètres.',
+
+    // Validation messages
+    'Value must be a whole number.' => 'La valeur doit être un nombre entier.',
+
+    // Settings: General
+    'General Settings' => 'Paramètres généraux',
+    'Plugin Name' => 'Nom du plugin',
+    'The name of the plugin as it appears in the Control Panel menu' => 'Le nom du plugin tel qu\'il apparaît dans le menu du panneau de contrôle',
+    'This is being overridden by the <code>pluginName</code> setting in <code>config/logging-library.php</code>.' => 'Ce paramètre est remplacé par le paramètre <code>pluginName</code> dans <code>config/logging-library.php</code>.',
+    'Show Main Menu' => 'Afficher le menu principal',
+    'Show Logging Library in the main Control Panel navigation. When disabled, All Logs remains accessible from plugin settings and direct URLs.' => 'Afficher Logging Library dans la navigation principale du panneau de contrôle. Lorsqu\'elle est désactivée, Tous les journaux reste accessible depuis les paramètres du plugin et les URL directes.',
+    'This is being overridden by the <code>showCpSection</code> setting in <code>config/logging-library.php</code>.' => 'Ce paramètre est remplacé par le paramètre <code>showCpSection</code> dans <code>config/logging-library.php</code>.',
+
+    // Settings: Interface
+    'Interface Settings' => 'Paramètres d\'interface',
+    'Items Per Page' => 'Éléments par page',
+    'Number of log entries to display per page in the log viewers' => 'Nombre d\'entrées de journal à afficher par page dans les visionneuses de journaux',
+    'This is being overridden by the <code>itemsPerPage</code> setting in <code>config/logging-library.php</code>.' => 'Ce paramètre est remplacé par le paramètre <code>itemsPerPage</code> dans <code>config/logging-library.php</code>.',
 ];

@@ -13,9 +13,13 @@ return [
     'Open All Logs' => 'Åbn alle logfiler',
 
     // Navigation
+    'All Logs' => 'Alle logfiler',
     'Logs' => 'Logfiler',
+    'Settings' => 'Indstillinger',
     'System Logs' => 'Systemlogfiler',
     'System' => 'System',
+    'General' => 'Generelt',
+    'Interface' => 'Grænseflade',
 
     // Log levels
     'All Levels' => 'Alle niveauer',
@@ -68,4 +72,29 @@ return [
     'Entries' => 'Poster',
     'Download File' => 'Download fil',
     'Log Location' => 'Logplacering',
+
+    // Common
+    'Save Settings' => 'Gem indstillinger',
+
+    // Controller messages
+    'Settings saved.' => 'Indstillinger gemt.',
+    'Could not save settings.' => 'Indstillinger kunne ikke gemmes.',
+
+    // Validation messages
+    'Value must be a whole number.' => 'Værdien skal være et helt tal.',
+
+    // Settings: General
+    'General Settings' => 'Generelle indstillinger',
+    'Plugin Name' => 'Plugin-navn',
+    'The name of the plugin as it appears in the Control Panel menu' => 'Navnet på plugin-programmet, som det vises i kontrolpanelets menu',
+    'This is being overridden by the <code>pluginName</code> setting in <code>config/logging-library.php</code>.' => 'Dette tilsidesættes af indstillingen <code>pluginName</code> i <code>config/logging-library.php</code>.',
+    'Show Main Menu' => 'Vis hovedmenu',
+    'Show Logging Library in the main Control Panel navigation. When disabled, All Logs remains accessible from plugin settings and direct URLs.' => 'Vis Logging Library i kontrolpanelets hovednavigation. Når det er deaktiveret, forbliver Alle logfiler tilgængeligt via plugin-indstillinger og direkte URL\'er.',
+    'This is being overridden by the <code>showCpSection</code> setting in <code>config/logging-library.php</code>.' => 'Dette tilsidesættes af indstillingen <code>showCpSection</code> i <code>config/logging-library.php</code>.',
+
+    // Settings: Interface
+    'Interface Settings' => 'Grænsefladeindstillinger',
+    'Items Per Page' => 'Elementer pr. side',
+    'Number of log entries to display per page in the log viewers' => 'Antal logposter der skal vises pr. side i logviserne',
+    'This is being overridden by the <code>itemsPerPage</code> setting in <code>config/logging-library.php</code>.' => 'Dette tilsidesættes af indstillingen <code>itemsPerPage</code> i <code>config/logging-library.php</code>.',
 ];

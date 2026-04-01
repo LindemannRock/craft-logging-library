@@ -13,9 +13,13 @@ return [
     'Open All Logs' => 'Open All Logs',
 
     // Navigation
+    'All Logs' => 'All Logs',
     'Logs' => 'Logs',
+    'Settings' => 'Settings',
     'System Logs' => 'System Logs',
     'System' => 'System',
+    'General' => 'General',
+    'Interface' => 'Interface',
 
     // Log levels
     'All Levels' => 'All Levels',
@@ -68,4 +72,29 @@ return [
     'Entries' => 'Entries',
     'Download File' => 'Download File',
     'Log Location' => 'Log Location',
+
+    // Common
+    'Save Settings' => 'Save Settings',
+
+    // Controller messages
+    'Settings saved.' => 'Settings saved.',
+    'Could not save settings.' => 'Could not save settings.',
+
+    // Validation messages
+    'Value must be a whole number.' => 'Value must be a whole number.',
+
+    // Settings: General
+    'General Settings' => 'General Settings',
+    'Plugin Name' => 'Plugin Name',
+    'The name of the plugin as it appears in the Control Panel menu' => 'The name of the plugin as it appears in the Control Panel menu',
+    'This is being overridden by the <code>pluginName</code> setting in <code>config/logging-library.php</code>.' => 'This is being overridden by the <code>pluginName</code> setting in <code>config/logging-library.php</code>.',
+    'Show Main Menu' => 'Show Main Menu',
+    'Show Logging Library in the main Control Panel navigation. When disabled, All Logs remains accessible from plugin settings and direct URLs.' => 'Show Logging Library in the main Control Panel navigation. When disabled, All Logs remains accessible from plugin settings and direct URLs.',
+    'This is being overridden by the <code>showCpSection</code> setting in <code>config/logging-library.php</code>.' => 'This is being overridden by the <code>showCpSection</code> setting in <code>config/logging-library.php</code>.',
+
+    // Settings: Interface
+    'Interface Settings' => 'Interface Settings',
+    'Items Per Page' => 'Items Per Page',
+    'Number of log entries to display per page in the log viewers' => 'Number of log entries to display per page in the log viewers',
+    'This is being overridden by the <code>itemsPerPage</code> setting in <code>config/logging-library.php</code>.' => 'This is being overridden by the <code>itemsPerPage</code> setting in <code>config/logging-library.php</code>.',
 ];

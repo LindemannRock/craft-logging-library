@@ -13,9 +13,13 @@ return [
     'Open All Logs' => 'すべてのログを開く',
 
     // Navigation
+    'All Logs' => 'すべてのログ',
     'Logs' => 'ログ',
+    'Settings' => '設定',
     'System Logs' => 'システムログ',
     'System' => 'システム',
+    'General' => '一般',
+    'Interface' => 'インターフェース',
 
     // Log levels
     'All Levels' => 'すべてのレベル',
@@ -68,4 +72,29 @@ return [
     'Entries' => 'エントリ',
     'Download File' => 'ファイルをダウンロード',
     'Log Location' => 'ログの場所',
+
+    // Common
+    'Save Settings' => '設定を保存',
+
+    // Controller messages
+    'Settings saved.' => '設定を保存しました。',
+    'Could not save settings.' => '設定を保存できませんでした。',
+
+    // Validation messages
+    'Value must be a whole number.' => '値は整数である必要があります。',
+
+    // Settings: General
+    'General Settings' => '一般設定',
+    'Plugin Name' => 'プラグイン名',
+    'The name of the plugin as it appears in the Control Panel menu' => 'コントロールパネルのメニューに表示されるプラグインの名前',
+    'This is being overridden by the <code>pluginName</code> setting in <code>config/logging-library.php</code>.' => 'この設定は <code>config/logging-library.php</code> の <code>pluginName</code> 設定によって上書きされています。',
+    'Show Main Menu' => 'メインメニューを表示',
+    'Show Logging Library in the main Control Panel navigation. When disabled, All Logs remains accessible from plugin settings and direct URLs.' => 'コントロールパネルのメインナビゲーションに Logging Library を表示します。無効にした場合でも、すべてのログはプラグイン設定および直接 URL からアクセスできます。',
+    'This is being overridden by the <code>showCpSection</code> setting in <code>config/logging-library.php</code>.' => 'この設定は <code>config/logging-library.php</code> の <code>showCpSection</code> 設定によって上書きされています。',
+
+    // Settings: Interface
+    'Interface Settings' => 'インターフェース設定',
+    'Items Per Page' => '1 ページあたりの件数',
+    'Number of log entries to display per page in the log viewers' => 'ログビューアーで 1 ページに表示するログエントリの件数',
+    'This is being overridden by the <code>itemsPerPage</code> setting in <code>config/logging-library.php</code>.' => 'この設定は <code>config/logging-library.php</code> の <code>itemsPerPage</code> 設定によって上書きされています。',
 ];

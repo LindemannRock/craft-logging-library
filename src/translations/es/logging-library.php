@@ -13,9 +13,13 @@ return [
     'Open All Logs' => 'Abrir todos los registros',
 
     // Navigation
+    'All Logs' => 'Todos los registros',
     'Logs' => 'Registros',
+    'Settings' => 'Configuración',
     'System Logs' => 'Registros del sistema',
     'System' => 'Sistema',
+    'General' => 'General',
+    'Interface' => 'Interfaz',
 
     // Log levels
     'All Levels' => 'Todos los niveles',
@@ -68,4 +72,29 @@ return [
     'Entries' => 'Entradas',
     'Download File' => 'Descargar archivo',
     'Log Location' => 'Ubicación del registro',
+
+    // Common
+    'Save Settings' => 'Guardar configuración',
+
+    // Controller messages
+    'Settings saved.' => 'Configuración guardada.',
+    'Could not save settings.' => 'No se pudo guardar la configuración.',
+
+    // Validation messages
+    'Value must be a whole number.' => 'El valor debe ser un número entero.',
+
+    // Settings: General
+    'General Settings' => 'Configuración general',
+    'Plugin Name' => 'Nombre del plugin',
+    'The name of the plugin as it appears in the Control Panel menu' => 'El nombre del plugin tal como aparece en el menú del panel de control',
+    'This is being overridden by the <code>pluginName</code> setting in <code>config/logging-library.php</code>.' => 'Este valor está siendo anulado por la configuración <code>pluginName</code> en <code>config/logging-library.php</code>.',
+    'Show Main Menu' => 'Mostrar menú principal',
+    'Show Logging Library in the main Control Panel navigation. When disabled, All Logs remains accessible from plugin settings and direct URLs.' => 'Mostrar Logging Library en la navegación principal del panel de control. Cuando está desactivado, Todos los registros sigue siendo accesible desde la configuración del plugin y las URL directas.',
+    'This is being overridden by the <code>showCpSection</code> setting in <code>config/logging-library.php</code>.' => 'Este valor está siendo anulado por la configuración <code>showCpSection</code> en <code>config/logging-library.php</code>.',
+
+    // Settings: Interface
+    'Interface Settings' => 'Configuración de interfaz',
+    'Items Per Page' => 'Elementos por página',
+    'Number of log entries to display per page in the log viewers' => 'Número de entradas de registro que se mostrarán por página en los visores de registros',
+    'This is being overridden by the <code>itemsPerPage</code> setting in <code>config/logging-library.php</code>.' => 'Este valor está siendo anulado por la configuración <code>itemsPerPage</code> en <code>config/logging-library.php</code>.',
 ];
