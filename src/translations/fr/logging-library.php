@@ -7,6 +7,11 @@
  */
 
 return [
+    // Plugin meta / install experience
+    'Logging Library' => 'Logging Library',
+    'Inspect system logs, review plugin logging output, and centralize diagnostics from one control panel workspace.' => 'Inspectez les journaux système, examinez les sorties de journalisation des plugins et centralisez les diagnostics depuis un espace de travail du panneau de contrôle.',
+    'Open All Logs' => 'Ouvrir tous les journaux',
+
     // Navigation & page titles
     'Logs' => 'Journaux',
     'System Logs' => 'Journaux système',

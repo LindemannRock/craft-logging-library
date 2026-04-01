@@ -7,6 +7,11 @@
  */
 
 return [
+    // Plugin meta / install experience
+    'Logging Library' => 'Logging Library',
+    'Inspect system logs, review plugin logging output, and centralize diagnostics from one control panel workspace.' => 'فحص سجلات النظام ومراجعة مخرجات تسجيل الإضافات وتجميع التشخيصات من مساحة عمل واحدة في لوحة التحكم.',
+    'Open All Logs' => 'فتح جميع السجلات',
+
     // Navigation & page titles
     'Logs' => 'السجلات',
     'System Logs' => 'سجلات النظام',
