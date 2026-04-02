@@ -61,6 +61,11 @@ class LoggingLibrary extends Plugin
     public bool $hasCpSettings = true;
 
     /**
+     * @var bool Whether the plugin settings page is accessible when allowAdminChanges is false
+     */
+    public bool $hasReadOnlyCpSettings = true;
+
+    /**
      * @var array Registered plugin configurations
      */
     private static array $_pluginConfigs = [];
@@ -223,6 +228,25 @@ class LoggingLibrary extends Plugin
      * @inheritdoc
      */
     public function getSettingsResponse(): mixed
+    {
+        $settings = $this->getSettings();
+        $user = Craft::$app->getUser();
+
+        if ($settings instanceof Settings) {
+            $sections = $this->getCpSections($settings);
+            $route = CpNavHelper::firstAccessibleRoute($user, $settings, $sections);
+            if ($route) {
+                return Craft::$app->controller->redirect($route);
+            }
+        }
+
+        return Craft::$app->controller->redirect('logging-library/settings');
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getReadOnlySettingsResponse(): mixed
     {
         $settings = $this->getSettings();
         $user = Craft::$app->getUser();
