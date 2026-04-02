@@ -1,5 +1,27 @@
 # Changelog
 
+## [5.8.0](https://github.com/LindemannRock/craft-logging-library/compare/v5.7.1...v5.8.0) (2026-04-02)
+
+
+### Features
+
+* **icon:** replace old SVG icon with new design ([dc0bed9](https://github.com/LindemannRock/craft-logging-library/commit/dc0bed9a1d2eb5f4ac8e7a64c23a6bcc9706215f))
+* **LoggingLibrary:** add settings management and configuration options ([56de0ae](https://github.com/LindemannRock/craft-logging-library/commit/56de0ae6db735a42321560bf1339b273f5e0b53d))
+* **LoggingLibrary:** enhance log viewer availability and settings handling ([8bc7a54](https://github.com/LindemannRock/craft-logging-library/commit/8bc7a54115483f0c944812b0c669ee97aa19c0e2))
+* **migrations:** add forceEnableLogViewer setting to logging library ([04d77e7](https://github.com/LindemannRock/craft-logging-library/commit/04d77e75e7628977f8857fecd438eff54ac0a716))
+* **settings:** add forceEnableLogViewer option and related UI updates ([03ade12](https://github.com/LindemannRock/craft-logging-library/commit/03ade122cab7a91c21369ba68a00b359cba966dc))
+* **settings:** add general and interface settings templates ([c866c33](https://github.com/LindemannRock/craft-logging-library/commit/c866c338179bd4e46d7bc5116a2a1a570c0972ed))
+
+
+### Bug Fixes
+
+* log menu label translation ([5a22de6](https://github.com/LindemannRock/craft-logging-library/commit/5a22de65823fcf8cabbdddbefdc34dc2ff552d33))
+* **LoggingLibrary:** enhance plugin helper bootstrap with install experience ([d22867b](https://github.com/LindemannRock/craft-logging-library/commit/d22867b9d22ffcd9be26d9c72c8495fad941b2e7))
+* **LogsController:** update log level and source labels for translation ([9ca656e](https://github.com/LindemannRock/craft-logging-library/commit/9ca656e4a84c64daa624a83cc16fab059ef221c5))
+* **LogsUtility:** update displayName translation scope to logging-library ([6de0db9](https://github.com/LindemannRock/craft-logging-library/commit/6de0db997c190bbaa91e3fd94c07c12fd1ba641c))
+* **LogsViewService:** update log level labels for translation ([3e5fded](https://github.com/LindemannRock/craft-logging-library/commit/3e5fded52c86e7c27490428d997be0efb2631568))
+* **twig templates:** update translation labels to use pluginHandle ([6bd08da](https://github.com/LindemannRock/craft-logging-library/commit/6bd08da50c34db1ce0fe93bb03c8138aaea92b17))
+
 ## [5.7.1](https://github.com/LindemannRock/craft-logging-library/compare/v5.7.0...v5.7.1) (2026-02-22)
 
 
