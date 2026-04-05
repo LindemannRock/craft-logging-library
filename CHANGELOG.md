@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.8.1](https://github.com/LindemannRock/craft-logging-library/compare/v5.8.0...v5.8.1) (2026-04-05)
+
+
+### Bug Fixes
+
+* read-only settings response handling ([313cbcb](https://github.com/LindemannRock/craft-logging-library/commit/313cbcb4b0abdd310157c27eb43261e08b812eb1))
+
 ## [5.8.0](https://github.com/LindemannRock/craft-logging-library/compare/v5.7.1...v5.8.0) (2026-04-02)
 
 
