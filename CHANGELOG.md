@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.8.2](https://github.com/LindemannRock/craft-logging-library/compare/v5.8.1...v5.8.2) (2026-04-05)
+
+
+### Bug Fixes
+
+* **logs:** update translation keys for log levels and messages ([6cb84f4](https://github.com/LindemannRock/craft-logging-library/commit/6cb84f4de087d7f03e1ee1804407b7febbbd13ac))
+
 ## [5.8.1](https://github.com/LindemannRock/craft-logging-library/compare/v5.8.0...v5.8.1) (2026-04-05)
 
 
