@@ -203,11 +203,11 @@ class LogsController extends Controller
                 'totalPages' => $totalPages,
             ],
             'levels' => [
-                'all' => Craft::t($pluginHandle, 'All Levels'),
-                'error' => Craft::t($pluginHandle, 'Error'),
-                'warning' => Craft::t($pluginHandle, 'Warning'),
-                'info' => Craft::t($pluginHandle, 'Info'),
-                'debug' => Craft::t($pluginHandle, 'Debug'),
+                'all' => Craft::t('logging-library', 'All Levels'),
+                'error' => Craft::t('logging-library', 'Error'),
+                'warning' => Craft::t('logging-library', 'Warning'),
+                'info' => Craft::t('logging-library', 'Info'),
+                'debug' => Craft::t('logging-library', 'Debug'),
             ],
             'logConfig' => $config,
         ]);
