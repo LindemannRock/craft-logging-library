@@ -211,14 +211,7 @@ class LoggingLibrary extends Plugin
         $settings = parent::getSettings();
 
         if ($settings instanceof Settings) {
-            $config = Craft::$app->getConfig()->getConfigFromFile('logging-library');
-            if (!empty($config) && is_array($config)) {
-                foreach ($config as $key => $value) {
-                    if (property_exists($settings, $key)) {
-                        $settings->$key = $value;
-                    }
-                }
-            }
+            PluginHelper::applyConfigOverridesToSettings($settings, 'logging-library');
         }
 
         return $settings;
