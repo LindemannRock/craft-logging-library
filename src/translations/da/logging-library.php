@@ -19,7 +19,7 @@ return [
     'System Logs' => 'Systemlogfiler',
     'System' => 'System',
     'General' => 'Generelt',
-    'Interface' => 'Grænseflade',
+    'Interface' => 'Brugerflade',
 
     // Log levels
     'All Levels' => 'Alle niveauer',

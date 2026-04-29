@@ -15,7 +15,7 @@ return [
     // Navigation
     'All Logs' => 'Todos os registros',
     'Logs' => 'Registros',
-    'Settings' => 'Configurações',
+    'Settings' => 'Definições',
     'System Logs' => 'Registros do sistema',
     'System' => 'Sistema',
     'General' => 'Geral',

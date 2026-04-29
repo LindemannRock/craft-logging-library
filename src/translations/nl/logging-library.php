@@ -86,7 +86,7 @@ return [
 
     // Settings: General
     'General Settings' => 'Algemene instellingen',
-    'Plugin Name' => 'Plugin-naam',
+    'Plugin Name' => 'Pluginnaam',
     'The name of the plugin as it appears in the Control Panel menu' => 'De naam van de plugin zoals die wordt weergegeven in het Control Panel-menu',
     'This is being overridden by the <code>pluginName</code> setting in <code>config/logging-library.php</code>.' => 'Dit wordt overschreven door de instelling <code>pluginName</code> in <code>config/logging-library.php</code>.',
     'Force Enable Log Viewers' => 'Logviewers geforceerd inschakelen',
