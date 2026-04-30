@@ -22,11 +22,9 @@
 ] %}
 
 {% block content %}
-    <form method="post" accept-charset="UTF-8" novalidate>
-        {{ actionInput('logging-library/settings/save') }}
-        {{ csrfInput() }}
-        {{ redirectInput('logging-library/settings/interface') }}
-        {{ hiddenInput('section', 'interface') }}
+    {{ actionInput('logging-library/settings/save') }}
+    {{ redirectInput('logging-library/settings/interface') }}
+    {{ hiddenInput('section', 'interface') }}
 
         <h2 class="first">{{ "Interface Settings"|t('logging-library') }}</h2>
 
@@ -46,7 +44,6 @@
                 ? "This is being overridden by the <code>itemsPerPage</code> setting in <code>config/logging-library.php</code>."|t('logging-library')|raw
                 : null,
         }) }}
-    </form>
 
     {% include 'lindemannrock-base/_components/plugin-credit' %}
 {% endblock %}

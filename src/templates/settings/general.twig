@@ -27,11 +27,9 @@
 ] %}
 
 {% block content %}
-    <form method="post" accept-charset="UTF-8" novalidate>
-        {{ actionInput('logging-library/settings/save') }}
-        {{ csrfInput() }}
-        {{ redirectInput('logging-library/settings/general') }}
-        {{ hiddenInput('section', 'general') }}
+    {{ actionInput('logging-library/settings/save') }}
+    {{ redirectInput('logging-library/settings/general') }}
+    {{ hiddenInput('section', 'general') }}
 
         <h2 class="first">{{ "General Settings"|t('logging-library') }}</h2>
 
@@ -114,7 +112,6 @@
                 hidden: settings.standaloneViewerAvailable,
             } %}
         </div>
-    </form>
 
     {% include 'lindemannrock-base/_components/plugin-credit' %}
 {% endblock %}
