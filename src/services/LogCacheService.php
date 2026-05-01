@@ -21,7 +21,7 @@ use yii2mod\query\ArrayQuery;
  * Log Cache Service
  * Provides cached, queryable access to parsed log files
  *
- * @since 1.0.0
+ * @since 5.2.2
  */
 class LogCacheService extends Component
 {

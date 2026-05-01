@@ -18,7 +18,7 @@ use lindemannrock\logginglibrary\LoggingLibrary;
 /**
  * Logs View Service
  *
- * @since 5.6.0
+ * @since 1.0.0
  */
 class LogsViewService extends Component
 {
