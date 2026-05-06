@@ -1,5 +1,18 @@
 # Changelog
 
+## [5.8.3](https://github.com/LindemannRock/craft-logging-library/compare/v5.8.2...v5.8.3) (2026-05-06)
+
+
+### Bug Fixes
+
+* apply config overrides through shared settings helper ([eedbb1d](https://github.com/LindemannRock/craft-logging-library/commit/eedbb1da4f575e17ebc3666e6a80326436bb5f90))
+* drop PAT requirement for release-please — use built-in GITHUB_TOKEN ([a559dfd](https://github.com/LindemannRock/craft-logging-library/commit/a559dfd7e7d2eb5d63d96d41f101e97d8b611e35))
+* **interface:** update heading class for interface settings page ([9c10bf9](https://github.com/LindemannRock/craft-logging-library/commit/9c10bf9fb8e348e5b4a85815256d11cfac890f88))
+* **LogCacheService:** update version annotation to reflect correct version ([ba7f120](https://github.com/LindemannRock/craft-logging-library/commit/ba7f120e63146d7f858d02fc1d1b8d6c58581afe))
+* **LogsViewService:** correct version annotation to reflect initial release ([ba7f120](https://github.com/LindemannRock/craft-logging-library/commit/ba7f120e63146d7f858d02fc1d1b8d6c58581afe))
+* **settings:** update heading class for general settings page ([3b5f6a4](https://github.com/LindemannRock/craft-logging-library/commit/3b5f6a418842f11991cbe9262866b8e8cf04da18))
+* **translations:** correct Danish and Dutch translations for interface and plugin name ([6ce4f4e](https://github.com/LindemannRock/craft-logging-library/commit/6ce4f4e63a79e73bf8c1031f9ed8a91c6977cf6a))
+
 ## [5.8.2](https://github.com/LindemannRock/craft-logging-library/compare/v5.8.1...v5.8.2) (2026-04-05)
 
 
