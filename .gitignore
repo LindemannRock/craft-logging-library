@@ -41,3 +41,10 @@ yarn-error.log*
 *.zip
 /releases/
 /backups/
+
+# PHPUnit
+/.phpunit.cache/
+/.phpunit.result.cache
+/phpunit.xml
+/coverage/
+/coverage.xml
