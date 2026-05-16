@@ -15,6 +15,7 @@ use craft\web\Controller;
 use lindemannrock\base\helpers\CpNavHelper;
 use lindemannrock\logginglibrary\LoggingLibrary;
 use lindemannrock\logginglibrary\models\Settings;
+use lindemannrock\logginglibrary\services\LogCacheService;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
@@ -493,26 +494,9 @@ class LogsController extends Controller
         // Count total before pagination
         $totalCount = count($logs);
 
-        // Apply sorting
-        $orderDirection = $dir === 'asc' ? SORT_ASC : SORT_DESC;
-
-        if ($sort === 'level') {
-            $levelOrder = ['error' => 1, 'warning' => 2, 'info' => 3, 'debug' => 4, 'unknown' => 5];
-            usort($logs, function($a, $b) use ($levelOrder, $orderDirection) {
-                $aLevel = $levelOrder[$a['level'] ?? 'unknown'] ?? 99;
-                $bLevel = $levelOrder[$b['level'] ?? 'unknown'] ?? 99;
-                $result = $aLevel - $bLevel;
-                return $orderDirection === SORT_ASC ? $result : -$result;
-            });
-        } else {
-            // Sort by the requested column
-            usort($logs, function($a, $b) use ($sort, $orderDirection) {
-                $aVal = $a[$sort] ?? '';
-                $bVal = $b[$sort] ?? '';
-                $result = $aVal <=> $bVal;
-                return $orderDirection === SORT_ASC ? $result : -$result;
-            });
-        }
+        // Apply sorting with stable parse-order tiebreaker (same-second entries
+        // reverse correctly when dir=desc — see LogCacheService::sortLogs)
+        $logs = LogCacheService::sortLogs($logs, $sort, $dir);
 
         // Apply pagination
         $offset = ($page - 1) * $limit;
