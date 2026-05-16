@@ -55,6 +55,63 @@ class LogCacheService extends Component
     }
 
     /**
+     * Sort log entries with a stable parse-order tiebreaker.
+     *
+     * Standard `usort` is stable for equal items, which means entries sharing the same
+     * value for the sort column (commonly same-second timestamps) keep their input order
+     * regardless of direction. For `desc` sort this leaves later events buried *below*
+     * earlier ones in the same-second cluster — the opposite of what the operator expects.
+     *
+     * This helper injects a synthetic `_seq` index before sorting, applies it as a
+     * tiebreaker, then strips it from the result.
+     *
+     * @param array $logs Parsed log entries (assoc arrays with at least the `$sort` key)
+     * @param string $sort Column name (`timestamp`, `level`, `user`, `category`, `message`)
+     * @param string $dir `asc` or `desc`
+     * @return array Sorted entries with `_seq` stripped
+     * @since 5.9.0
+     */
+    public static function sortLogs(array $logs, string $sort, string $dir): array
+    {
+        $orderDirection = $dir === 'asc' ? SORT_ASC : SORT_DESC;
+
+        foreach ($logs as $i => &$log) {
+            $log['_seq'] = $i;
+        }
+        unset($log);
+
+        if ($sort === 'level') {
+            $levelOrder = ['error' => 1, 'warning' => 2, 'info' => 3, 'debug' => 4, 'unknown' => 5];
+            usort($logs, function($a, $b) use ($levelOrder, $orderDirection) {
+                $aLevel = $levelOrder[$a['level'] ?? 'unknown'] ?? 99;
+                $bLevel = $levelOrder[$b['level'] ?? 'unknown'] ?? 99;
+                $result = $aLevel - $bLevel;
+                if ($result === 0) {
+                    $result = ($a['_seq'] ?? 0) <=> ($b['_seq'] ?? 0);
+                }
+                return $orderDirection === SORT_ASC ? $result : -$result;
+            });
+        } else {
+            usort($logs, function($a, $b) use ($sort, $orderDirection) {
+                $aVal = $a[$sort] ?? '';
+                $bVal = $b[$sort] ?? '';
+                $result = $aVal <=> $bVal;
+                if ($result === 0) {
+                    $result = ($a['_seq'] ?? 0) <=> ($b['_seq'] ?? 0);
+                }
+                return $orderDirection === SORT_ASC ? $result : -$result;
+            });
+        }
+
+        foreach ($logs as &$log) {
+            unset($log['_seq']);
+        }
+        unset($log);
+
+        return $logs;
+    }
+
+    /**
      * Invalidate all log caches
      */
     public function invalidateCaches(): void
