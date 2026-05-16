@@ -16,6 +16,7 @@ use craft\base\Plugin;
 use craft\events\RegisterCacheOptionsEvent;
 use craft\events\RegisterUrlRulesEvent;
 use craft\events\RegisterUserPermissionsEvent;
+use craft\helpers\App;
 use craft\log\MonologTarget;
 use craft\services\UserPermissions;
 use craft\utilities\ClearCaches;
@@ -24,7 +25,6 @@ use lindemannrock\base\helpers\CpNavHelper;
 use lindemannrock\base\helpers\PluginHelper;
 use lindemannrock\logginglibrary\models\Settings;
 use lindemannrock\logginglibrary\services\LogCacheService;
-use lindemannrock\logginglibrary\services\LogsViewService;
 use Monolog\Formatter\LineFormatter;
 use Monolog\LogRecord;
 use Monolog\Processor\ProcessorInterface;
@@ -36,7 +36,6 @@ use yii\base\Event;
  * Provides centralized logging configuration for Craft CMS plugins
  *
  * @property-read LogCacheService $logCache
- * @property-read LogsViewService $logsView
  * @since 1.0.0
  */
 class LoggingLibrary extends Plugin
@@ -97,7 +96,6 @@ class LoggingLibrary extends Plugin
         // Register services
         $this->setComponents([
             'logCache' => LogCacheService::class,
-            'logsView' => LogsViewService::class,
         ]);
 
         // Register CP routes for all plugins using the logging library
@@ -727,7 +725,7 @@ class LoggingLibrary extends Plugin
     private static function _detectEdgeEnvironment(): bool
     {
         return
-            isset($_ENV['SERVD_PROJECT_SLUG']);             // Servd.host - VERIFIED and tested
+            App::env('SERVD_PROJECT_SLUG') !== null;        // Servd.host - VERIFIED and tested
             // TODO: Add other platforms after testing actual deployments with Craft CMS
     }
 
@@ -744,15 +742,15 @@ class LoggingLibrary extends Plugin
                     'heading' => $this->name,
                     'permissions' => [
                         self::PERMISSION_VIEW_ALL_LOGS => [
-                            'label' => 'View all system logs',
+                            'label' => Craft::t('logging-library', 'View all system logs'),
                             'nested' => [
                                 self::PERMISSION_DOWNLOAD_ALL_LOGS => [
-                                    'label' => 'Download all system logs',
+                                    'label' => Craft::t('logging-library', 'Download all system logs'),
                                 ],
                             ],
                         ],
                         self::PERMISSION_MANAGE_SETTINGS => [
-                            'label' => 'Manage settings',
+                            'label' => Craft::t('logging-library', 'Manage settings'),
                         ],
                     ],
                 ];
