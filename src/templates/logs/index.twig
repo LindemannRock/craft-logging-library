@@ -261,7 +261,7 @@
 
     {# Message #}
     <td style="word-break: break-word;">
-        {{ item.message }}
+        {{ item.message|e }}
     </td>
 {% endblock %}
 
@@ -273,7 +273,7 @@
 {% block expandableRow %}
     {% if item.context and item.context != '[]' and item.context != '' %}
         <div style="font-size: 12px; color: #606d7b; margin-bottom: 8px; font-weight: 600;">{{ 'Context'|t('logging-library') }}:</div>
-        <pre style="margin: 0; padding: 12px; background: #ffffff; border-radius: 4px; font-family: Monaco, 'Courier New', monospace; font-size: 11px; white-space: pre-wrap; overflow-x: auto; border: 1px solid #e1e8ed;">{{ item.context }}</pre>
+        <pre style="margin: 0; padding: 12px; background: #ffffff; border-radius: 4px; font-family: Monaco, 'Courier New', monospace; font-size: 11px; white-space: pre-wrap; overflow-x: auto; border: 1px solid #e1e8ed;">{{ item.context|e }}</pre>
     {% else %}
         <span class="light">{{ 'No context data available.'|t('logging-library') }}</span>
     {% endif %}
