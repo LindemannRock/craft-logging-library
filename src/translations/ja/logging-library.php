@@ -21,6 +21,11 @@ return [
     'General' => '一般',
     'Interface' => 'インターフェース',
 
+    // Permissions
+    'View all system logs' => 'すべてのシステムログを表示する',
+    'Download all system logs' => 'すべてのシステムログをダウンロードする',
+    'Manage settings' => '設定を管理する',
+
     // Log levels
     'All Levels' => 'すべてのレベル',
     'Error' => 'エラー',

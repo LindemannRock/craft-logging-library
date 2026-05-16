@@ -21,6 +21,11 @@ return [
     'General' => 'عام',
     'Interface' => 'الواجهة',
 
+    // Permissions
+    'View all system logs' => 'عرض جميع سجلات النظام',
+    'Download all system logs' => 'تنزيل جميع سجلات النظام',
+    'Manage settings' => 'إدارة الإعدادات',
+
     // Log levels
     'All Levels' => 'جميع المستويات',
     'Error' => 'خطأ',

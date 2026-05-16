@@ -21,6 +21,11 @@ return [
     'General' => 'Allmänt',
     'Interface' => 'Gränssnitt',
 
+    // Permissions
+    'View all system logs' => 'Visa alla systemloggar',
+    'Download all system logs' => 'Ladda ner alla systemloggar',
+    'Manage settings' => 'Hantera inställningar',
+
     // Log levels
     'All Levels' => 'Alla nivåer',
     'Error' => 'Fel',

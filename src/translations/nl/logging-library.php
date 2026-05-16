@@ -21,6 +21,11 @@ return [
     'General' => 'Algemeen',
     'Interface' => 'Interface',
 
+    // Permissions
+    'View all system logs' => 'Alle systeemlogboeken bekijken',
+    'Download all system logs' => 'Alle systeemlogboeken downloaden',
+    'Manage settings' => 'Instellingen beheren',
+
     // Log levels
     'All Levels' => 'Alle niveaus',
     'Error' => 'Fout',

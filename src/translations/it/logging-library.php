@@ -21,6 +21,11 @@ return [
     'General' => 'Generale',
     'Interface' => 'Interfaccia',
 
+    // Permissions
+    'View all system logs' => 'Visualizza tutti i log di sistema',
+    'Download all system logs' => 'Scarica tutti i log di sistema',
+    'Manage settings' => 'Gestisci impostazioni',
+
     // Log levels
     'All Levels' => 'Tutti i livelli',
     'Error' => 'Errore',

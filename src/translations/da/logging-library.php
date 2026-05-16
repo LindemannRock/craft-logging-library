@@ -21,6 +21,11 @@ return [
     'General' => 'Generelt',
     'Interface' => 'Brugerflade',
 
+    // Permissions
+    'View all system logs' => 'Vis alle systemlogfiler',
+    'Download all system logs' => 'Download alle systemlogfiler',
+    'Manage settings' => 'Administrer indstillinger',
+
     // Log levels
     'All Levels' => 'Alle niveauer',
     'Error' => 'Fejl',
