@@ -8,6 +8,7 @@
 
 namespace lindemannrock\logginglibrary\models;
 
+use Craft;
 use craft\base\Model;
 use lindemannrock\base\traits\SettingsConfigTrait;
 use lindemannrock\base\traits\SettingsDisplayNameTrait;
@@ -131,6 +132,19 @@ class Settings extends Model
             [['showCpSection'], 'default', 'value' => true],
             [['forceEnableLogViewer'], 'boolean'],
             [['forceEnableLogViewer'], 'default', 'value' => false],
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function attributeLabels(): array
+    {
+        return [
+            'pluginName' => Craft::t('logging-library', 'Plugin Name'),
+            'itemsPerPage' => Craft::t('logging-library', 'Items Per Page'),
+            'showCpSection' => Craft::t('logging-library', 'Show Main Menu'),
+            'forceEnableLogViewer' => Craft::t('logging-library', 'Force Enable Log Viewers'),
         ];
     }
 }
