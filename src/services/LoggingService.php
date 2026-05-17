@@ -49,7 +49,7 @@ class LoggingService extends Component
      * @param string|null $pluginHandle Plugin handle
      * @param array $context Additional context
      */
-    public static function log(string $message, string $level = 'info', string $pluginHandle = null, array $context = []): void
+    public static function log(string $message, string $level = 'info', ?string $pluginHandle = null, array $context = []): void
     {
         if (!$pluginHandle) {
             throw new \InvalidArgumentException('Plugin handle is required for logging');
