@@ -23,6 +23,25 @@ use lindemannrock\logginglibrary\LoggingLibrary;
 class LoggingService extends Component
 {
     /**
+     * Neutralize CR/LF in a log message so attacker-controlled values can't
+     * forge new log lines (CWE-117). Each `\r\n`, `\r`, or `\n` becomes the
+     * two-character literal `\n` — multi-line intent is preserved for the
+     * reader, but the file always sees one log entry per emit.
+     *
+     * Called from the Monolog formatter so every code path that reaches a
+     * logging-library channel is covered, including third-party callers that
+     * invoke `Craft::info()` / `Craft::error()` directly.
+     *
+     * @param string $message Raw message
+     * @return string Newline-sanitized message
+     * @since 5.9.0
+     */
+    public static function sanitizeLogMessage(string $message): string
+    {
+        return str_replace(["\r\n", "\r", "\n"], '\\n', $message);
+    }
+
+    /**
      * Log a message for a specific plugin
      *
      * @param string $message Message to log
