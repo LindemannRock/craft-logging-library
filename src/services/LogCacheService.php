@@ -119,7 +119,7 @@ class LogCacheService extends Component
         $cachePath = $this->_getCachePath();
 
         if (is_dir($cachePath)) {
-            $files = glob($cachePath . '*.cache');
+            $files = glob($cachePath . '*.cache') ?: [];
             $count = 0;
 
             foreach ($files as $file) {
@@ -162,7 +162,7 @@ class LogCacheService extends Component
         ];
 
         if (is_dir($cachePath)) {
-            $files = glob($cachePath . '*.cache');
+            $files = glob($cachePath . '*.cache') ?: [];
             $stats['totalFiles'] = count($files);
 
             foreach ($files as $file) {
