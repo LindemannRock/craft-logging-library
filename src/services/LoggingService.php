@@ -130,7 +130,7 @@ class LoggingService extends Component
         $cutoffDate = (new \DateTime())->modify("-{$retentionDays} days");
 
         $deleted = [];
-        $logFiles = glob($pattern);
+        $logFiles = glob($pattern) ?: [];
 
         foreach ($logFiles as $file) {
             if (preg_match('/' . preg_quote($pluginHandle, '/') . '-(\d{4}-\d{2}-\d{2})\.log$/', basename($file), $matches)) {
