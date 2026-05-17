@@ -161,6 +161,8 @@ class LoggingLibrary extends Plugin
 
     /**
      * Get CP sections for nav + default route resolution.
+     *
+     * @since 5.8.0
      */
     public function getCpSections(Settings $settings): array
     {
@@ -327,6 +329,8 @@ class LoggingLibrary extends Plugin
 
     /**
      * Whether the current environment matches Logging Library's edge detection.
+     *
+     * @since 5.8.0
      */
     public static function isEdgeEnvironmentDetected(): bool
     {
@@ -335,6 +339,8 @@ class LoggingLibrary extends Plugin
 
     /**
      * Whether file-based log viewers are force-enabled via settings/config.
+     *
+     * @since 5.8.0
      */
     public static function isForceEnableLogViewer(?Settings $settings = null): bool
     {
@@ -359,6 +365,8 @@ class LoggingLibrary extends Plugin
 
     /**
      * Whether file-based log viewers should be available in the current environment.
+     *
+     * @since 5.8.0
      */
     public static function areLogViewersAvailable(?Settings $settings = null): bool
     {
