@@ -572,7 +572,7 @@ class LoggingLibrary extends Plugin
 
         if (is_dir($logPath)) {
             $pattern = $logPath . '/' . $handle . '-*.log';
-            $logFiles = glob($pattern);
+            $logFiles = glob($pattern) ?: [];
 
             foreach ($logFiles as $file) {
                 if (preg_match('/' . preg_quote($handle, '/') . '-(\d{4}-\d{2}-\d{2})\.log$/', basename($file), $matches)) {
@@ -609,7 +609,7 @@ class LoggingLibrary extends Plugin
             return [];
         }
 
-        $allLogFiles = glob($logPath . '/*.log*');
+        $allLogFiles = glob($logPath . '/*.log*') ?: [];
 
         foreach ($allLogFiles as $file) {
             $basename = basename($file);
