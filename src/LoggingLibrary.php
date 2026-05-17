@@ -25,6 +25,7 @@ use lindemannrock\base\helpers\CpNavHelper;
 use lindemannrock\base\helpers\PluginHelper;
 use lindemannrock\logginglibrary\models\Settings;
 use lindemannrock\logginglibrary\services\LogCacheService;
+use lindemannrock\logginglibrary\services\LoggingService;
 use Monolog\Formatter\LineFormatter;
 use Monolog\LogRecord;
 use Monolog\Processor\ProcessorInterface;
@@ -446,13 +447,18 @@ class LoggingLibrary extends Plugin
 
             public function format(LogRecord $record): string
             {
+                // Neutralize CR/LF in the message to prevent log injection (CWE-117).
+                // Without this, attacker-controlled values containing newlines + a
+                // crafted timestamp prefix would forge fake log entries.
+                $message = LoggingService::sanitizeLogMessage($record->message);
+
                 $output = sprintf(
                     "%s [%s][%s][%s] %s",
                     $record->datetime->format($this->dateFormat),
                     $record->extra['user'] ?? '',
                     $record->level->getName(),
                     $record->channel,
-                    $record->message
+                    $message
                 );
 
                 // Only add context if it's not empty
