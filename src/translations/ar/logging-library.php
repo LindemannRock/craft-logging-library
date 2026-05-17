@@ -11,6 +11,7 @@ return [
     'Logging Library' => 'Logging Library',
     'Inspect system logs, review plugin logging output, and centralize diagnostics from one control panel workspace.' => 'فحص سجلات النظام ومراجعة مخرجات تسجيل الإضافات وتجميع التشخيصات من مساحة عمل واحدة في لوحة التحكم.',
     'Open All Logs' => 'فتح جميع السجلات',
+    'Open Settings' => 'فتح الإعدادات',
 
     // Navigation
     'All Logs' => 'جميع السجلات',

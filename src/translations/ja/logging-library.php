@@ -11,6 +11,7 @@ return [
     'Logging Library' => 'Logging Library',
     'Inspect system logs, review plugin logging output, and centralize diagnostics from one control panel workspace.' => 'システムログの確認、プラグインのログ出力の確認、コントロールパネルのワークスペースからの診断の一元管理が行えます。',
     'Open All Logs' => 'すべてのログを開く',
+    'Open Settings' => '設定を開く',
 
     // Navigation
     'All Logs' => 'すべてのログ',
