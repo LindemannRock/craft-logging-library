@@ -521,7 +521,6 @@ class LoggingLibrary extends Plugin
      * @param string $handle Plugin handle
      * @param array $permissions Permissions required to view logs
      * @return array Modified nav item with logs subnav
-     * @since 1.7.0
      */
     public static function addLogsNav(array $navItem, string $handle, array $permissions = []): array
     {
@@ -606,7 +605,7 @@ class LoggingLibrary extends Plugin
      * Get all log files from storage/logs directory (for standalone viewer)
      *
      * @return array Array of log file information grouped by source
-     * @since 5.0.0
+     * @since 5.2.2
      */
     public static function getAllLogFiles(): array
     {
@@ -705,7 +704,7 @@ class LoggingLibrary extends Plugin
      *
      * @param string $line A line from the log file
      * @return string Format type: 'plugin', 'craft', 'php', or 'unknown'
-     * @since 5.0.0
+     * @since 5.2.2
      */
     public static function detectLogFormat(string $line): string
     {
