@@ -286,8 +286,8 @@ class LogsController extends Controller
                 throw new \InvalidArgumentException('Invalid filename');
             }
 
-            // Ensure it's a .log file
-            if (!str_ends_with(strtolower($filename), '.log')) {
+            // Ensure it's a .log file (allow rotated variants like web.log.1)
+            if (!preg_match('/\.log(\.\d+)?$/i', $filename)) {
                 throw new \InvalidArgumentException('Invalid file type');
             }
 
