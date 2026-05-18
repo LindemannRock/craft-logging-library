@@ -54,7 +54,7 @@ class LogsController extends Controller
             $config = LoggingLibrary::getConfig($pluginHandle);
 
             if (!$config) {
-                throw new NotFoundHttpException('Plugin logging not configured');
+                throw new NotFoundHttpException(Craft::t('logging-library', 'Plugin logging not configured'));
             }
 
             // Check if log viewer is enabled
@@ -73,7 +73,7 @@ class LogsController extends Controller
                     }
                 }
 
-                throw new NotFoundHttpException('Log viewer is disabled for this plugin');
+                throw new NotFoundHttpException(Craft::t('logging-library', 'Log viewer is disabled for this plugin'));
             }
 
             // Check view permissions if specified
@@ -91,7 +91,7 @@ class LogsController extends Controller
             // Standalone mode - no specific config needed
             $settings = LoggingLibrary::getInstance()->getSettings();
             if ($settings instanceof Settings && !LoggingLibrary::areLogViewersAvailable($settings)) {
-                throw new NotFoundHttpException('Log viewer is disabled for this environment');
+                throw new NotFoundHttpException(Craft::t('logging-library', 'Log viewer is disabled for this environment'));
             }
 
             if (!$user->checkPermission(LoggingLibrary::PERMISSION_VIEW_ALL_LOGS)) {
@@ -278,7 +278,7 @@ class LogsController extends Controller
         if ($isStandalone) {
             $settings = LoggingLibrary::getInstance()->getSettings();
             if ($settings instanceof Settings && !LoggingLibrary::areLogViewersAvailable($settings)) {
-                throw new NotFoundHttpException('Log viewer is disabled for this environment');
+                throw new NotFoundHttpException(Craft::t('logging-library', 'Log viewer is disabled for this environment'));
             }
 
             // Standalone mode - permission-gated
@@ -301,7 +301,7 @@ class LogsController extends Controller
             $logPath = Craft::$app->getPath()->getLogPath() . '/' . $filename;
 
             if (!file_exists($logPath)) {
-                throw new NotFoundHttpException('Log file not found');
+                throw new NotFoundHttpException(Craft::t('logging-library', 'Log file not found'));
             }
 
             return Craft::$app->getResponse()->sendFile($logPath, $filename, [
@@ -314,12 +314,12 @@ class LogsController extends Controller
         $config = LoggingLibrary::getConfig($pluginHandle);
 
         if (!$config) {
-            throw new NotFoundHttpException('Plugin logging not configured');
+            throw new NotFoundHttpException(Craft::t('logging-library', 'Plugin logging not configured'));
         }
 
         // Check if log viewer is enabled
         if (!($config['enableLogViewer'] ?? false)) {
-            throw new NotFoundHttpException('Log viewer is disabled for this plugin');
+            throw new NotFoundHttpException(Craft::t('logging-library', 'Log viewer is disabled for this plugin'));
         }
 
         // Check download permissions
@@ -335,7 +335,7 @@ class LogsController extends Controller
         $logPath = Craft::$app->getPath()->getLogPath() . "/{$pluginHandle}-{$date}.log";
 
         if (!file_exists($logPath)) {
-            throw new NotFoundHttpException('Log file not found');
+            throw new NotFoundHttpException(Craft::t('logging-library', 'Log file not found'));
         }
 
         return Craft::$app->getResponse()->sendFile($logPath, "{$pluginHandle}-{$date}.log", [
@@ -363,7 +363,7 @@ class LogsController extends Controller
         if ($isStandalone) {
             $settings = LoggingLibrary::getInstance()->getSettings();
             if ($settings instanceof Settings && !LoggingLibrary::areLogViewersAvailable($settings)) {
-                throw new NotFoundHttpException('Log viewer is disabled for this environment');
+                throw new NotFoundHttpException(Craft::t('logging-library', 'Log viewer is disabled for this environment'));
             }
 
             $this->_checkPermissions([LoggingLibrary::PERMISSION_VIEW_ALL_LOGS]);
@@ -377,11 +377,11 @@ class LogsController extends Controller
         } else {
             $config = LoggingLibrary::getConfig($pluginHandle);
             if (!$config) {
-                throw new NotFoundHttpException('Plugin logging not configured');
+                throw new NotFoundHttpException(Craft::t('logging-library', 'Plugin logging not configured'));
             }
 
             if (!($config['enableLogViewer'] ?? false)) {
-                throw new NotFoundHttpException('Log viewer is disabled for this plugin');
+                throw new NotFoundHttpException(Craft::t('logging-library', 'Log viewer is disabled for this plugin'));
             }
 
             $this->_checkPermissions($config['viewSystemLogsPermissions'] ?? []);
@@ -395,7 +395,7 @@ class LogsController extends Controller
         }
 
         if (!file_exists($logPath)) {
-            throw new NotFoundHttpException('Log file not found');
+            throw new NotFoundHttpException(Craft::t('logging-library', 'Log file not found'));
         }
 
         LoggingLibrary::getInstance()->logCache->invalidateLogCache($logPath);
@@ -432,7 +432,7 @@ class LogsController extends Controller
             }
         }
 
-        throw new NotFoundHttpException('Unable to determine plugin handle from URL');
+        throw new NotFoundHttpException(Craft::t('logging-library', 'Unable to determine plugin handle from URL'));
     }
 
     /**
@@ -445,7 +445,7 @@ class LogsController extends Controller
         }
 
         if (!$this->_hasPermission($permissions)) {
-            throw new ForbiddenHttpException('User does not have permission to view logs');
+            throw new ForbiddenHttpException(Craft::t('logging-library', 'User does not have permission to view logs'));
         }
     }
 
