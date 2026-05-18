@@ -44,12 +44,16 @@
     {% endif %}
 {% endfor %}
 
-{# Build file/date options #}
+{# Build file/date options.
+   `label` is the full filename + size, shown in the dropdown options.
+   `shortLabel` is just the date, shown in the button once a file is selected
+   (the source filter already tells the user which plugin/source they're on). #}
 {% set fileOptions = [{value: '', label: isStandalone ? 'Select File'|t('logging-library') : 'Select Date'|t('logging-library')}] %}
 {% for file in logFiles %}
     {% set fileOptions = fileOptions|merge([{
         value: isStandalone ? file.filename : file.date,
         label: (isStandalone ? file.filename : file.date) ~ ' (' ~ file.formattedSize ~ ')',
+        shortLabel: file.date,
         extraParams: {category: 'all'},
     }]) %}
 {% endfor %}
@@ -59,7 +63,7 @@
     type: 'dropdown',
     param: 'category',
     current: filters.category,
-    label: filters.category == 'all' ? 'Category'|t('app') : filters.category,
+    label: filters.category == 'all' ? 'Source'|t('logging-library') : filters.category,
     options: categoryOptions,
     menuStyle: 'min-width: 320px;',
 } : null %}
@@ -156,10 +160,10 @@
         direction: filters.dir,
     },
     table: {
-        columns: isStandalone ? [
+        columns: (isStandalone and supportsCategoryFilter) ? [
             {key: 'timestamp', label: 'Time'|t('logging-library'), sortable: true, width: '140px'},
             {key: 'level', label: 'Level'|t('logging-library'), sortable: true, width: '80px'},
-            {key: 'category', label: 'Source'|t('logging-library'), sortable: true, width: '120px'},
+            {key: 'category', label: 'Source'|t('logging-library'), sortable: true},
             {key: 'user', label: 'User'|t('logging-library'), sortable: true, width: '100px'},
             {key: 'message', label: 'Message'|t('logging-library'), sortable: true},
         ] : [
@@ -193,25 +197,15 @@
     {% include 'lindemannrock-base/_partials/log-level-row-styles' only %}
 
     <style>
-        /* Source / category outline chip — transparent bg lets the row's
-           level tint show through; monospace for the namespaced identifiers
-           that typically appear here. */
-        .lr-source-label {
-            display: inline-block;
-            max-width: 100%;
-            padding: 1px 6px;
-            font-size: 10px;
-            font-family: var(--mono-font, Monaco, 'Courier New', monospace);
-            color: var(--medium-text-color);
-            background: transparent;
-            border: 1px solid var(--hairline-color);
-            border-radius: 3px;
-            /* Truncate long namespaces with ellipsis; the full value is
-               available via the title attribute on hover. */
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            vertical-align: middle;
+        table#lr-data-table {
+            table-layout: fixed;
+        }
+        .lr-log-pre {
+            margin: 0;
+            font-family: Monaco, 'Courier New', monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            overflow-x: auto;
         }
     </style>
 
@@ -264,12 +258,11 @@
         {% endif %}
     </td>
 
-    {# Category/Source (standalone mode only) #}
-    {% if isStandalone %}
+    {# Category/Source — shown only for multi-category sources (web/queue/console).
+       For php-errors and plugin-specific logs the value is uniform across rows. #}
+    {% if isStandalone and supportsCategoryFilter %}
         {% set sourceLabel = item.category ?: (selectedFile.source ?? 'unknown') %}
-        <td class="nowrap">
-            <code class="lr-source-label" title="{{ sourceLabel }}">{{ sourceLabel }}</code>
-        </td>
+        <td class="truncate" title="{{ sourceLabel }}">{{ sourceLabel }}</td>
     {% endif %}
 
     {# User #}
@@ -283,9 +276,10 @@
         {% endif %}
     </td>
 
-    {# Message #}
-    <td style="word-break: break-word;">
-        {{ item.message|e }}
+    {# Message + context inline; click row to see them on separate lines. #}
+    {% set previewText = item.message ~ ((item.context and item.context not in ['[]', '']) ? ' ' ~ item.context : '') %}
+    <td class="truncate" title="{{ previewText }}">
+        {{ previewText|e }}
     </td>
 {% endblock %}
 
@@ -295,11 +289,10 @@
    ============================================================================ #}
 
 {% block expandableRow %}
+    <pre class="lr-log-pre">{{ item.message|e }}</pre>
+
     {% if item.context and item.context != '[]' and item.context != '' %}
-        <div style="font-size: 12px; color: #606d7b; margin-bottom: 8px; font-weight: 600;">{{ 'Context'|t('logging-library') }}:</div>
-        <pre style="margin: 0; padding: 12px 0; font-family: Monaco, 'Courier New', monospace; font-size: 11px; white-space: pre-wrap; overflow-x: auto;">{{ item.context|e }}</pre>
-    {% else %}
-        <div style="font-size: 12px; color: #606d7b;">{{ 'No context data available.'|t('logging-library') }}</div>
+        <pre class="lr-log-pre" style="margin-top: 12px;">{{ item.context|e }}</pre>
     {% endif %}
 {% endblock %}
 
