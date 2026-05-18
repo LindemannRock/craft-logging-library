@@ -679,17 +679,19 @@ class LogsController extends Controller
 
     private function _buildCategoryOptions(array $categoryCounts): array
     {
+        $formatter = Craft::$app->getFormatter();
+
         $options = [[
             'value' => 'all',
-            'label' => Craft::t('app', 'Category'),
-            'extra' => '(' . array_sum($categoryCounts) . ')',
+            'label' => Craft::t('logging-library', 'Source'),
+            'extra' => '(' . $formatter->asInteger(array_sum($categoryCounts)) . ')',
         ]];
 
         foreach ($categoryCounts as $category => $count) {
             $options[] = [
                 'value' => $category,
                 'label' => $category,
-                'extra' => '(' . Craft::$app->getFormatter()->asInteger($count) . ')',
+                'extra' => '(' . $formatter->asInteger($count) . ')',
             ];
         }
 
