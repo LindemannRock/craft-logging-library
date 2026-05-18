@@ -89,6 +89,12 @@ return [
     'Could not save settings.' => 'Indstillinger kunne ikke gemmes.',
     'Log cache refreshed.' => 'Log-cache opdateret.',
     'Failed to refresh log cache.' => 'Log-cache kunne ikke opdateres.',
+    'Plugin logging not configured' => 'Plugin-logning er ikke konfigureret',
+    'Log viewer is disabled for this plugin' => 'Logviseren er deaktiveret for dette plugin',
+    'Log viewer is disabled for this environment' => 'Logviseren er deaktiveret for dette miljø',
+    'Log file not found' => 'Logfilen blev ikke fundet',
+    'Unable to determine plugin handle from URL' => 'Plugin-handle kunne ikke bestemmes ud fra URL',
+    'User does not have permission to view logs' => 'Brugeren har ikke tilladelse til at vise logfiler',
 
     // Validation messages
     'Found {count, number} {count, plural, =1{error} other{errors}}' => '{count, number} {count, plural, =1{fejl} other{fejl}} fundet',

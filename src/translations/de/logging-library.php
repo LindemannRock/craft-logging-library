@@ -89,6 +89,12 @@ return [
     'Could not save settings.' => 'Einstellungen konnten nicht gespeichert werden.',
     'Log cache refreshed.' => 'Protokoll-Cache aktualisiert.',
     'Failed to refresh log cache.' => 'Protokoll-Cache konnte nicht aktualisiert werden.',
+    'Plugin logging not configured' => 'Plugin-Protokollierung nicht konfiguriert',
+    'Log viewer is disabled for this plugin' => 'Protokoll-Viewer ist für dieses Plugin deaktiviert',
+    'Log viewer is disabled for this environment' => 'Protokoll-Viewer ist für diese Umgebung deaktiviert',
+    'Log file not found' => 'Protokolldatei nicht gefunden',
+    'Unable to determine plugin handle from URL' => 'Plugin-Handle konnte nicht aus URL ermittelt werden',
+    'User does not have permission to view logs' => 'Der Benutzer hat keine Berechtigung, Protokolle anzuzeigen',
 
     // Validation messages
     'Found {count, number} {count, plural, =1{error} other{errors}}' => 'Es wurde {count, number} {count, plural, =1{Fehler} other{Fehler}} gefunden',

@@ -89,6 +89,12 @@ return [
     'Could not save settings.' => 'Impossible d\'enregistrer les paramètres.',
     'Log cache refreshed.' => 'Cache des journaux actualisé.',
     'Failed to refresh log cache.' => 'Échec de l\'actualisation du cache des journaux.',
+    'Plugin logging not configured' => 'Journalisation du plugin non configurée',
+    'Log viewer is disabled for this plugin' => 'La visionneuse de journaux est désactivée pour ce plugin',
+    'Log viewer is disabled for this environment' => 'La visionneuse de journaux est désactivée pour cet environnement',
+    'Log file not found' => 'Fichier journal introuvable',
+    'Unable to determine plugin handle from URL' => 'Impossible de déterminer l\'identifiant du plugin depuis l\'URL',
+    'User does not have permission to view logs' => 'L\'utilisateur n\'a pas la permission de consulter les journaux',
 
     // Validation messages
     'Found {count, number} {count, plural, =1{error} other{errors}}' => '{count, number} {count, plural, =1{erreur trouvée} other{erreurs trouvées}}',

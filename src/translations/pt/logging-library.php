@@ -89,6 +89,12 @@ return [
     'Could not save settings.' => 'Não foi possível salvar as configurações.',
     'Log cache refreshed.' => 'Cache do registro atualizada.',
     'Failed to refresh log cache.' => 'Não foi possível atualizar a cache do registro.',
+    'Plugin logging not configured' => 'Registros do plugin não configurados',
+    'Log viewer is disabled for this plugin' => 'O visualizador de registros está desativado para este plugin',
+    'Log viewer is disabled for this environment' => 'O visualizador de registros está desativado para este ambiente',
+    'Log file not found' => 'Arquivo de registro não encontrado',
+    'Unable to determine plugin handle from URL' => 'Não foi possível determinar o handle do plugin a partir da URL',
+    'User does not have permission to view logs' => 'O usuário não tem permissão para ver os registros',
 
     // Validation messages
     'Found {count, number} {count, plural, =1{error} other{errors}}' => '{count, number} {count, plural, =1{erro encontrado} other{erros encontrados}}',

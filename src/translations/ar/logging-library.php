@@ -89,6 +89,12 @@ return [
     'Could not save settings.' => 'تعذّر حفظ الإعدادات.',
     'Log cache refreshed.' => 'تم تحديث Cache السجل.',
     'Failed to refresh log cache.' => 'تعذّر تحديث Cache السجل.',
+    'Plugin logging not configured' => 'تسجيل الإضافة غير مكوّن',
+    'Log viewer is disabled for this plugin' => 'عارض السجلات معطّل لهذه الإضافة',
+    'Log viewer is disabled for this environment' => 'عارض السجلات معطّل لهذه البيئة',
+    'Log file not found' => 'ملف السجل غير موجود',
+    'Unable to determine plugin handle from URL' => 'تعذّر تحديد مُعرِّف الإضافة من URL',
+    'User does not have permission to view logs' => 'ليس لدى المستخدم صلاحية لعرض السجلات',
 
     // Validation messages
     'Found {count, number} {count, plural, =1{error} other{errors}}' => 'تم العثور على {count, number} {count, plural, =1{خطأ} other{أخطاء}}',

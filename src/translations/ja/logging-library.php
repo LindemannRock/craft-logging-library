@@ -89,6 +89,12 @@ return [
     'Could not save settings.' => '設定を保存できませんでした。',
     'Log cache refreshed.' => 'ログキャッシュを更新しました。',
     'Failed to refresh log cache.' => 'ログキャッシュを更新できませんでした。',
+    'Plugin logging not configured' => 'プラグインのログ機能が設定されていません',
+    'Log viewer is disabled for this plugin' => 'このプラグインではログビューアーが無効になっています',
+    'Log viewer is disabled for this environment' => 'この環境ではログビューアーが無効になっています',
+    'Log file not found' => 'ログファイルが見つかりません',
+    'Unable to determine plugin handle from URL' => 'URL からプラグイン Handle を特定できません',
+    'User does not have permission to view logs' => 'ユーザーにログを表示する権限がありません',
 
     // Validation messages
     'Found {count, number} {count, plural, =1{error} other{errors}}' => '{count, number} 件の{count, plural, =1{エラー} other{エラー}}が見つかりました',

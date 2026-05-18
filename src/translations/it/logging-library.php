@@ -89,6 +89,12 @@ return [
     'Could not save settings.' => 'Impossibile salvare le impostazioni.',
     'Log cache refreshed.' => 'Cache dei log aggiornata.',
     'Failed to refresh log cache.' => 'Impossibile aggiornare la cache dei log.',
+    'Plugin logging not configured' => 'Log del plugin non configurati',
+    'Log viewer is disabled for this plugin' => 'Il visualizzatore di log è disabilitato per questo plugin',
+    'Log viewer is disabled for this environment' => 'Il visualizzatore di log è disabilitato per questo ambiente',
+    'Log file not found' => 'File di log non trovato',
+    'Unable to determine plugin handle from URL' => 'Impossibile determinare l\'handle del plugin dall\'URL',
+    'User does not have permission to view logs' => 'L\'utente non dispone dell\'autorizzazione per visualizzare i log',
 
     // Validation messages
     'Found {count, number} {count, plural, =1{error} other{errors}}' => '{count, number} {count, plural, =1{errore trovato} other{errori trovati}}',

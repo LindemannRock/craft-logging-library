@@ -89,6 +89,12 @@ return [
     'Could not save settings.' => 'Could not save settings.',
     'Log cache refreshed.' => 'Log cache refreshed.',
     'Failed to refresh log cache.' => 'Failed to refresh log cache.',
+    'Plugin logging not configured' => 'Plugin logging not configured',
+    'Log viewer is disabled for this plugin' => 'Log viewer is disabled for this plugin',
+    'Log viewer is disabled for this environment' => 'Log viewer is disabled for this environment',
+    'Log file not found' => 'Log file not found',
+    'Unable to determine plugin handle from URL' => 'Unable to determine plugin handle from URL',
+    'User does not have permission to view logs' => 'User does not have permission to view logs',
 
     // Validation messages
     'Found {count, number} {count, plural, =1{error} other{errors}}' => 'Found {count, number} {count, plural, =1{error} other{errors}}',
