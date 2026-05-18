@@ -43,6 +43,7 @@ class LoggingLibrary extends Plugin
 {
     public const PERMISSION_VIEW_ALL_LOGS = 'loggingLibrary:viewAllLogs';
     public const PERMISSION_DOWNLOAD_ALL_LOGS = 'loggingLibrary:downloadAllLogs';
+    public const PERMISSION_CLEAR_CACHE = 'loggingLibrary:clearCache';
     public const PERMISSION_MANAGE_SETTINGS = 'loggingLibrary:manageSettings';
 
     /**
@@ -121,9 +122,16 @@ class LoggingLibrary extends Plugin
             ClearCaches::class,
             ClearCaches::EVENT_REGISTER_CACHE_OPTIONS,
             function(RegisterCacheOptionsEvent $event) {
+                if (!Craft::$app->getUser()->checkPermission(self::PERMISSION_CLEAR_CACHE)) {
+                    return;
+                }
+
+                $settings = $this->getSettings();
+                $displayName = $settings instanceof Settings ? $settings->getDisplayName() : $this->name;
+
                 $event->options[] = [
                     'key' => 'logging-library-cache',
-                    'label' => Craft::t('app', 'Logging Library caches'),
+                    'label' => Craft::t('logging-library', '{displayName} caches', ['displayName' => $displayName]),
                     'action' => [$this->logCache, 'invalidateCaches'],
                 ];
             }
@@ -768,6 +776,9 @@ class LoggingLibrary extends Plugin
                                     'label' => Craft::t('logging-library', 'Download all system logs'),
                                 ],
                             ],
+                        ],
+                        self::PERMISSION_CLEAR_CACHE => [
+                            'label' => Craft::t('logging-library', 'Clear cache'),
                         ],
                         self::PERMISSION_MANAGE_SETTINGS => [
                             'label' => Craft::t('logging-library', 'Manage settings'),
