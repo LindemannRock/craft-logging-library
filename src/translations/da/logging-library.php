@@ -52,6 +52,7 @@ return [
     'Level' => 'Niveau',
     'Source' => 'Kilde',
     'User' => 'Bruger',
+    'User #{id}' => 'Bruger #{id}',
     'Message' => 'Besked',
 
     // Table empty
@@ -76,6 +77,7 @@ return [
     'files' => 'filer',
     'Current File' => 'Nuværende fil',
     'Entries' => 'Poster',
+    'Refresh Cache' => 'Opdater cache',
     'Download File' => 'Download fil',
     'Log Location' => 'Logplacering',
 
@@ -85,6 +87,8 @@ return [
     // Controller messages
     'Settings saved.' => 'Indstillinger gemt.',
     'Could not save settings.' => 'Indstillinger kunne ikke gemmes.',
+    'Log cache refreshed.' => 'Log-cache opdateret.',
+    'Failed to refresh log cache.' => 'Log-cache kunne ikke opdateres.',
 
     // Validation messages
     'Found {count, number} {count, plural, =1{error} other{errors}}' => '{count, number} {count, plural, =1{fejl} other{fejl}} fundet',

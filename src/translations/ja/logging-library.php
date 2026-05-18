@@ -52,6 +52,7 @@ return [
     'Level' => 'レベル',
     'Source' => 'ソース',
     'User' => 'ユーザー',
+    'User #{id}' => 'ユーザー #{id}',
     'Message' => 'メッセージ',
 
     // Table empty
@@ -76,6 +77,7 @@ return [
     'files' => 'ファイル',
     'Current File' => '現在のファイル',
     'Entries' => 'エントリ',
+    'Refresh Cache' => 'キャッシュを更新',
     'Download File' => 'ファイルをダウンロード',
     'Log Location' => 'ログの場所',
 
@@ -85,6 +87,8 @@ return [
     // Controller messages
     'Settings saved.' => '設定を保存しました。',
     'Could not save settings.' => '設定を保存できませんでした。',
+    'Log cache refreshed.' => 'ログキャッシュを更新しました。',
+    'Failed to refresh log cache.' => 'ログキャッシュを更新できませんでした。',
 
     // Validation messages
     'Found {count, number} {count, plural, =1{error} other{errors}}' => '{count, number} 件の{count, plural, =1{エラー} other{エラー}}が見つかりました',

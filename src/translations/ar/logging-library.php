@@ -52,6 +52,7 @@ return [
     'Level' => 'المستوى',
     'Source' => 'المصدر',
     'User' => 'المستخدم',
+    'User #{id}' => 'مستخدم #{id}',
     'Message' => 'الرسالة',
 
     // Table empty
@@ -76,6 +77,7 @@ return [
     'files' => 'ملفات',
     'Current File' => 'الملف الحالي',
     'Entries' => 'الإدخالات',
+    'Refresh Cache' => 'تحديث Cache',
     'Download File' => 'تنزيل الملف',
     'Log Location' => 'موقع السجل',
 
@@ -85,6 +87,8 @@ return [
     // Controller messages
     'Settings saved.' => 'تم حفظ الإعدادات.',
     'Could not save settings.' => 'تعذّر حفظ الإعدادات.',
+    'Log cache refreshed.' => 'تم تحديث Cache السجل.',
+    'Failed to refresh log cache.' => 'تعذّر تحديث Cache السجل.',
 
     // Validation messages
     'Found {count, number} {count, plural, =1{error} other{errors}}' => 'تم العثور على {count, number} {count, plural, =1{خطأ} other{أخطاء}}',

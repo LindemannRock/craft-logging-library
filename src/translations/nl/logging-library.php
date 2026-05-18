@@ -52,6 +52,7 @@ return [
     'Level' => 'Niveau',
     'Source' => 'Bron',
     'User' => 'Gebruiker',
+    'User #{id}' => 'Gebruiker #{id}',
     'Message' => 'Bericht',
 
     // Table empty
@@ -76,6 +77,7 @@ return [
     'files' => 'bestanden',
     'Current File' => 'Huidig bestand',
     'Entries' => 'Vermeldingen',
+    'Refresh Cache' => 'Cache vernieuwen',
     'Download File' => 'Bestand downloaden',
     'Log Location' => 'Loglocatie',
 
@@ -85,6 +87,8 @@ return [
     // Controller messages
     'Settings saved.' => 'Instellingen opgeslagen.',
     'Could not save settings.' => 'Instellingen konden niet worden opgeslagen.',
+    'Log cache refreshed.' => 'Logcache vernieuwd.',
+    'Failed to refresh log cache.' => 'Logcache kon niet worden vernieuwd.',
 
     // Validation messages
     'Found {count, number} {count, plural, =1{error} other{errors}}' => '{count, number} {count, plural, =1{fout} other{fouten}} gevonden',

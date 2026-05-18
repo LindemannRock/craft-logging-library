@@ -52,6 +52,7 @@ return [
     'Level' => 'Nivå',
     'Source' => 'Källa',
     'User' => 'Användare',
+    'User #{id}' => 'Användare #{id}',
     'Message' => 'Meddelande',
 
     // Table empty
@@ -76,6 +77,7 @@ return [
     'files' => 'filer',
     'Current File' => 'Aktuell fil',
     'Entries' => 'Poster',
+    'Refresh Cache' => 'Uppdatera cache',
     'Download File' => 'Ladda ner fil',
     'Log Location' => 'Loggplats',
 
@@ -85,6 +87,8 @@ return [
     // Controller messages
     'Settings saved.' => 'Inställningar sparade.',
     'Could not save settings.' => 'Det gick inte att spara inställningarna.',
+    'Log cache refreshed.' => 'Loggcachen uppdaterades.',
+    'Failed to refresh log cache.' => 'Det gick inte att uppdatera loggcachen.',
 
     // Validation messages
     'Found {count, number} {count, plural, =1{error} other{errors}}' => '{count, number} {count, plural, =1{fel} other{fel}} hittades',

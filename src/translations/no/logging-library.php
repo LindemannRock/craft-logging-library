@@ -52,6 +52,7 @@ return [
     'Level' => 'Nivå',
     'Source' => 'Kilde',
     'User' => 'Bruker',
+    'User #{id}' => 'Bruker #{id}',
     'Message' => 'Melding',
 
     // Table empty
@@ -76,6 +77,7 @@ return [
     'files' => 'filer',
     'Current File' => 'Gjeldende fil',
     'Entries' => 'Oppføringer',
+    'Refresh Cache' => 'Oppdater cache',
     'Download File' => 'Last ned fil',
     'Log Location' => 'Loggplassering',
 
@@ -85,6 +87,8 @@ return [
     // Controller messages
     'Settings saved.' => 'Innstillinger lagret.',
     'Could not save settings.' => 'Kunne ikke lagre innstillinger.',
+    'Log cache refreshed.' => 'Logg-cache oppdatert.',
+    'Failed to refresh log cache.' => 'Kunne ikke oppdatere logg-cache.',
 
     // Validation messages
     'Found {count, number} {count, plural, =1{error} other{errors}}' => '{count, number} {count, plural, =1{feil} other{feil}} funnet',

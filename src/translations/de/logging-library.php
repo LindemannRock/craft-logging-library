@@ -52,6 +52,7 @@ return [
     'Level' => 'Stufe',
     'Source' => 'Quelle',
     'User' => 'Benutzer',
+    'User #{id}' => 'Benutzer #{id}',
     'Message' => 'Nachricht',
 
     // Table empty
@@ -76,6 +77,7 @@ return [
     'files' => 'Dateien',
     'Current File' => 'Aktuelle Datei',
     'Entries' => 'Einträge',
+    'Refresh Cache' => 'Cache aktualisieren',
     'Download File' => 'Datei herunterladen',
     'Log Location' => 'Protokollspeicherort',
 
@@ -85,6 +87,8 @@ return [
     // Controller messages
     'Settings saved.' => 'Einstellungen gespeichert.',
     'Could not save settings.' => 'Einstellungen konnten nicht gespeichert werden.',
+    'Log cache refreshed.' => 'Protokoll-Cache aktualisiert.',
+    'Failed to refresh log cache.' => 'Protokoll-Cache konnte nicht aktualisiert werden.',
 
     // Validation messages
     'Found {count, number} {count, plural, =1{error} other{errors}}' => 'Es wurde {count, number} {count, plural, =1{Fehler} other{Fehler}} gefunden',

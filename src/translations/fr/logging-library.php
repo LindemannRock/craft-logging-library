@@ -52,6 +52,7 @@ return [
     'Level' => 'Niveau',
     'Source' => 'Source',
     'User' => 'Utilisateur',
+    'User #{id}' => 'Utilisateur #{id}',
     'Message' => 'Message',
 
     // Table empty
@@ -76,6 +77,7 @@ return [
     'files' => 'fichiers',
     'Current File' => 'Fichier actuel',
     'Entries' => 'Entrées',
+    'Refresh Cache' => 'Actualiser le cache',
     'Download File' => 'Télécharger le fichier',
     'Log Location' => 'Emplacement du journal',
 
@@ -85,6 +87,8 @@ return [
     // Controller messages
     'Settings saved.' => 'Paramètres enregistrés.',
     'Could not save settings.' => 'Impossible d\'enregistrer les paramètres.',
+    'Log cache refreshed.' => 'Cache des journaux actualisé.',
+    'Failed to refresh log cache.' => 'Échec de l\'actualisation du cache des journaux.',
 
     // Validation messages
     'Found {count, number} {count, plural, =1{error} other{errors}}' => '{count, number} {count, plural, =1{erreur trouvée} other{erreurs trouvées}}',
