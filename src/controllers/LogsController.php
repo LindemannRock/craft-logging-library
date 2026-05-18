@@ -644,6 +644,34 @@ class LogsController extends Controller
 
         foreach ($entries as $index => &$log) {
             $log['lineNumber'] = $offset + $index + 1;
+
+            // Canonicalize the level so the template and the row-tint CSS share a single value.
+            // Computed in PHP (per page) instead of Twig (per render) so large pages avoid the
+            // overhead of per-row :has() selector matching in the browser.
+            $levelLower = strtolower((string)($log['level'] ?? ''));
+            $canonical = '';
+            if ($levelLower !== '') {
+                if (
+                    str_contains($levelLower, 'fatal')
+                    || str_contains($levelLower, 'parse')
+                    || str_contains($levelLower, 'recoverable')
+                    || str_contains($levelLower, 'error')
+                ) {
+                    $canonical = 'error';
+                } elseif (str_contains($levelLower, 'warning')) {
+                    $canonical = 'warning';
+                } elseif (
+                    str_contains($levelLower, 'notice')
+                    || str_contains($levelLower, 'deprecated')
+                    || str_contains($levelLower, 'strict')
+                ) {
+                    $canonical = 'info';
+                } elseif (in_array($levelLower, ['debug', 'info'], true)) {
+                    $canonical = $levelLower;
+                }
+            }
+            $log['canonicalLevel'] = $canonical;
+            $log['levelClass'] = $canonical !== '' ? 'lr-level-' . $canonical : '';
         }
         unset($log);
 
