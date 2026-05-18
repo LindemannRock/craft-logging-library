@@ -63,8 +63,9 @@
     options: categoryOptions,
     menuStyle: 'min-width: 320px;',
 } : null %}
-{% set selectedStandaloneFile = selectedFile.filename ?? '' %}
-{% set selectedPluginDate = selectedFile.date ?? '' %}
+{# In standalone mode, files have a `filename` key; in plugin mode they have `date`. Guard both accesses against the other mode + null `selectedFile`. #}
+{% set selectedStandaloneFile = (isStandalone and selectedFile and selectedFile.filename is defined) ? selectedFile.filename : '' %}
+{% set selectedPluginDate = (not isStandalone and selectedFile and selectedFile.date is defined) ? selectedFile.date : '' %}
 
 {% set standaloneFilters = [
     {
@@ -197,6 +198,7 @@
            that typically appear here. */
         .lr-source-label {
             display: inline-block;
+            max-width: 100%;
             padding: 1px 6px;
             font-size: 10px;
             font-family: var(--mono-font, Monaco, 'Courier New', monospace);
@@ -204,6 +206,12 @@
             background: transparent;
             border: 1px solid var(--hairline-color);
             border-radius: 3px;
+            /* Truncate long namespaces with ellipsis; the full value is
+               available via the title attribute on hover. */
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            vertical-align: middle;
         }
     </style>
 
@@ -258,8 +266,9 @@
 
     {# Category/Source (standalone mode only) #}
     {% if isStandalone %}
+        {% set sourceLabel = item.category ?: (selectedFile.source ?? 'unknown') %}
         <td class="nowrap">
-            <code class="lr-source-label">{{ item.category ?: (selectedFile.source ?? 'unknown') }}</code>
+            <code class="lr-source-label" title="{{ sourceLabel }}">{{ sourceLabel }}</code>
         </td>
     {% endif %}
 
@@ -288,9 +297,9 @@
 {% block expandableRow %}
     {% if item.context and item.context != '[]' and item.context != '' %}
         <div style="font-size: 12px; color: #606d7b; margin-bottom: 8px; font-weight: 600;">{{ 'Context'|t('logging-library') }}:</div>
-        <pre style="margin: 0; padding: 12px; background: #ffffff; border-radius: 4px; font-family: Monaco, 'Courier New', monospace; font-size: 11px; white-space: pre-wrap; overflow-x: auto; border: 1px solid #e1e8ed;">{{ item.context|e }}</pre>
+        <pre style="margin: 0; padding: 12px 0; font-family: Monaco, 'Courier New', monospace; font-size: 11px; white-space: pre-wrap; overflow-x: auto;">{{ item.context|e }}</pre>
     {% else %}
-        <span class="light">{{ 'No context data available.'|t('logging-library') }}</span>
+        <div style="font-size: 12px; color: #606d7b;">{{ 'No context data available.'|t('logging-library') }}</div>
     {% endif %}
 {% endblock %}
 
