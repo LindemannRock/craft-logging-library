@@ -187,6 +187,7 @@
     },
     checkboxes: false,
     rowActions: false,
+    rowClassKey: 'levelClass',
 } %}
 
 
@@ -233,21 +234,14 @@
         <time datetime="{{ item.timestamp|lrToApiString }}">{{ item.timestamp|lrTime('short', true, false) }}</time>
     </td>
 
-    {# Level — `data-level` on the cell drives the row-tint CSS via `:has()`
-       in `lindemannrock-base/_partials/log-level-row-styles`. Emit only for
-       canonical levels (`error`/`warning`/`info`/`debug`); unknown levels
-       fall through to the default row styling. #}
+    {# Level — `canonicalLevel` and `levelClass` are precomputed in the
+       controller (LogsController::_getLogPageFromFile). `levelClass` is
+       applied to the parent <tr> via `tableConfig.rowClassKey` and drives
+       row-tint CSS in `lindemannrock-base/_partials/log-level-row-styles`. #}
     {% set levelValue = item.level ?: 'unknown' %}
-    {% set canonicalLevel = levelValue %}
-    {% if 'fatal' in levelValue or 'parse' in levelValue or 'recoverable' in levelValue or 'error' in levelValue %}
-        {% set canonicalLevel = 'error' %}
-    {% elseif 'warning' in levelValue %}
-        {% set canonicalLevel = 'warning' %}
-    {% elseif 'notice' in levelValue or 'deprecated' in levelValue or 'strict' in levelValue %}
-        {% set canonicalLevel = 'info' %}
-    {% endif %}
-    {% set isCanonical = canonicalLevel in ['debug', 'info', 'warning', 'error'] %}
-    <td{% if isCanonical %} data-level="{{ canonicalLevel }}"{% endif %}>
+    {% set canonicalLevel = item.canonicalLevel ?? '' %}
+    {% set isCanonical = canonicalLevel != '' %}
+    <td>
         {% if isCanonical %}
             {% include 'lindemannrock-base/_components/badge' with {
                 label: (levels[canonicalLevel] ?? canonicalLevel|title)|upper,
@@ -385,9 +379,48 @@
                         {{ hiddenInput('date', selectedPluginDate) }}
                     {% endif %}
                     <button type="submit" class="btn fullwidth" id="refresh-log-cache">
-                        {{ "Refresh Cache"|t('logging-library') }}
+                        <div class="inline-flex">
+                            <div class="label">{{ "Refresh Cache"|t('logging-library') }}</div>
+                        </div>
+                        <div class="spinner spinner-absolute">
+                            <span class="visually-hidden">{{ "Loading"|t('app') }}</span>
+                        </div>
                     </button>
                 </form>
+                <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const refreshForm = document.getElementById('refresh-log-cache-form');
+                    const refreshButton = document.getElementById('refresh-log-cache');
+                    if (!refreshForm || !refreshButton || !window.jQuery) {
+                        return;
+                    }
+                    jQuery(refreshForm).on('submit', function(e) {
+                        e.preventDefault();
+                        const $button = jQuery(refreshButton);
+                        $button.addClass('loading').prop('disabled', true);
+                        jQuery.ajax({
+                            url: '{{ actionUrl('logging-library/logs/refresh-cache')|raw }}',
+                            type: 'POST',
+                            dataType: 'json',
+                            data: jQuery(refreshForm).serialize(),
+                            success: function(response) {
+                                if (response && response.success) {
+                                    Craft.cp.displayNotice(response.message || '{{ "Log cache refreshed."|t('logging-library')|e('js') }}');
+                                    setTimeout(function() { window.location.reload(); }, 300);
+                                } else {
+                                    Craft.cp.displayError('{{ "Failed to refresh log cache."|t('logging-library')|e('js') }}');
+                                }
+                            },
+                            error: function() {
+                                Craft.cp.displayError('{{ "Failed to refresh log cache."|t('logging-library')|e('js') }}');
+                            },
+                            complete: function() {
+                                $button.removeClass('loading').prop('disabled', false);
+                            }
+                        });
+                    });
+                });
+                </script>
             </div>
 
             {% if canDownload %}
@@ -415,47 +448,3 @@
 {% endblock %}
 
 
-{# ============================================================================
-   CUSTOM SCRIPTS
-   ============================================================================ #}
-
-{% block scripts %}
-    <script>
-    (function() {
-
-        const refreshForm = document.getElementById('refresh-log-cache-form');
-        const refreshButton = document.getElementById('refresh-log-cache');
-        if (refreshForm && refreshButton && window.jQuery) {
-            jQuery(refreshForm).on('submit', function(e) {
-                e.preventDefault();
-
-                const $button = jQuery(refreshButton);
-                $button.addClass('loading').prop('disabled', true);
-
-                jQuery.ajax({
-                    url: '{{ actionUrl('logging-library/logs/refresh-cache')|raw }}',
-                    type: 'POST',
-                    dataType: 'json',
-                    data: jQuery(refreshForm).serialize(),
-                    success: function(response) {
-                        if (response && response.success) {
-                            Craft.cp.displayNotice(response.message || '{{ "Log cache refreshed."|t('logging-library')|e('js') }}');
-                            setTimeout(function() {
-                                window.location.reload();
-                            }, 300);
-                        } else {
-                            Craft.cp.displayError('{{ "Failed to refresh log cache."|t('logging-library')|e('js') }}');
-                        }
-                    },
-                    error: function() {
-                        Craft.cp.displayError('{{ "Failed to refresh log cache."|t('logging-library')|e('js') }}');
-                    },
-                    complete: function() {
-                        $button.removeClass('loading').prop('disabled', false);
-                    }
-                });
-            });
-        }
-    })();
-    </script>
-{% endblock %}
