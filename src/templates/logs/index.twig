@@ -189,31 +189,21 @@
    ============================================================================ #}
 
 {% block beforeTable %}
-    <style>
-        /* Log level colors in table rows */
-        .lr-data-row[data-level="error"] {
-            background: rgba(231, 76, 60, 0.05);
-            border-left: 3px solid rgba(231, 76, 60, 0.3);
-        }
-        .lr-data-row[data-level="warning"] {
-            background: rgba(243, 156, 18, 0.05);
-            border-left: 3px solid rgba(243, 156, 18, 0.3);
-        }
-        .lr-data-row[data-level="info"] {
-            background: rgba(52, 152, 219, 0.05);
-            border-left: 3px solid rgba(52, 152, 219, 0.3);
-        }
-        .lr-data-row[data-level="debug"] {
-            background: rgba(155, 89, 182, 0.08);
-            border-left: 3px solid rgba(155, 89, 182, 0.4);
-        }
-        .lr-data-row td {
-            vertical-align: top;
-        }
+    {% include 'lindemannrock-base/_partials/log-level-row-styles' only %}
 
-        /* Context row styling */
-        .lr-context-row.error .lr-context-content {
-            border-left-color: #ef4444;
+    <style>
+        /* Source / category outline chip — transparent bg lets the row's
+           level tint show through; monospace for the namespaced identifiers
+           that typically appear here. */
+        .lr-source-label {
+            display: inline-block;
+            padding: 1px 6px;
+            font-size: 10px;
+            font-family: var(--mono-font, Monaco, 'Courier New', monospace);
+            color: var(--medium-text-color);
+            background: transparent;
+            border: 1px solid var(--hairline-color);
+            border-radius: 3px;
         }
     </style>
 
@@ -240,18 +230,22 @@
         <time datetime="{{ item.timestamp|lrToApiString }}">{{ item.timestamp|lrTime('short', true, false) }}</time>
     </td>
 
-    {# Level #}
-    <td>
-        {% set levelValue = item.level ?: 'unknown' %}
-        {% set canonicalLevel = levelValue %}
-        {% if 'fatal' in levelValue or 'parse' in levelValue or 'recoverable' in levelValue or 'error' in levelValue %}
-            {% set canonicalLevel = 'error' %}
-        {% elseif 'warning' in levelValue %}
-            {% set canonicalLevel = 'warning' %}
-        {% elseif 'notice' in levelValue or 'deprecated' in levelValue or 'strict' in levelValue %}
-            {% set canonicalLevel = 'info' %}
-        {% endif %}
-        {% if canonicalLevel in ['debug', 'info', 'warning', 'error'] %}
+    {# Level — `data-level` on the cell drives the row-tint CSS via `:has()`
+       in `lindemannrock-base/_partials/log-level-row-styles`. Emit only for
+       canonical levels (`error`/`warning`/`info`/`debug`); unknown levels
+       fall through to the default row styling. #}
+    {% set levelValue = item.level ?: 'unknown' %}
+    {% set canonicalLevel = levelValue %}
+    {% if 'fatal' in levelValue or 'parse' in levelValue or 'recoverable' in levelValue or 'error' in levelValue %}
+        {% set canonicalLevel = 'error' %}
+    {% elseif 'warning' in levelValue %}
+        {% set canonicalLevel = 'warning' %}
+    {% elseif 'notice' in levelValue or 'deprecated' in levelValue or 'strict' in levelValue %}
+        {% set canonicalLevel = 'info' %}
+    {% endif %}
+    {% set isCanonical = canonicalLevel in ['debug', 'info', 'warning', 'error'] %}
+    <td{% if isCanonical %} data-level="{{ canonicalLevel }}"{% endif %}>
+        {% if isCanonical %}
             {% include 'lindemannrock-base/_components/badge' with {
                 label: (levels[canonicalLevel] ?? canonicalLevel|title)|upper,
                 value: canonicalLevel,
@@ -265,9 +259,7 @@
     {# Category/Source (standalone mode only) #}
     {% if isStandalone %}
         <td class="nowrap">
-            <span style="font-size: 11px; padding: 2px 6px; background: #f0f0f0; border-radius: 3px;">
-                {{ (item.category ?: (selectedFile.source ?? 'unknown'))|upper }}
-            </span>
+            <code class="lr-source-label">{{ item.category ?: (selectedFile.source ?? 'unknown') }}</code>
         </td>
     {% endif %}
 
@@ -427,32 +419,6 @@
 {% block scripts %}
     <script>
     (function() {
-        function normalizeLevel(text) {
-            const level = text.trim().toLowerCase();
-            if (level.includes('fatal') || level.includes('parse') || level.includes('recoverable') || level.includes('error')) {
-                return 'error';
-            }
-            if (level.includes('warning')) {
-                return 'warning';
-            }
-            if (level.includes('notice') || level.includes('deprecated') || level.includes('strict') || level.includes('info')) {
-                return 'info';
-            }
-            if (level.includes('debug')) {
-                return 'debug';
-            }
-            return '';
-        }
-
-        // Add level data attributes to rows for severity-aware styling.
-        document.querySelectorAll('.lr-data-row').forEach((row, index) => {
-            const levelCell = row.querySelector('td:nth-child(2)');
-            if (levelCell) {
-                const level = normalizeLevel(levelCell.textContent);
-                row.setAttribute('data-level', level);
-
-            }
-        });
 
         const refreshForm = document.getElementById('refresh-log-cache-form');
         const refreshButton = document.getElementById('refresh-log-cache');
