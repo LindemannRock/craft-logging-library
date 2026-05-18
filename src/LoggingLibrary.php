@@ -112,6 +112,7 @@ class LoggingLibrary extends Plugin
                 $event->rules['logging-library/settings/save'] = 'logging-library/settings/save';
                 $event->rules['logging-library/logs/system'] = 'logging-library/logs/index';
                 $event->rules['logging-library/logs/system/download'] = 'logging-library/logs/download';
+                $event->rules['logging-library/logs/system/refresh-cache'] = 'logging-library/logs/refresh-cache';
             }
         );
 
@@ -510,6 +511,7 @@ class LoggingLibrary extends Plugin
                 $event->rules[$handle . '/logs'] = 'logging-library/logs/index';
                 $event->rules[$handle . '/logs/system'] = 'logging-library/logs/index';
                 $event->rules[$handle . '/logs/system/download'] = 'logging-library/logs/download';
+                $event->rules[$handle . '/logs/system/refresh-cache'] = 'logging-library/logs/refresh-cache';
             }
         );
     }
@@ -718,8 +720,13 @@ class LoggingLibrary extends Plugin
         }
 
         // Craft format: YYYY-MM-DD HH:MM:SS [category.LEVEL] [class.name] message
-        if (preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\s+\[[a-z]+\.[A-Z]+\]/', $line)) {
+        if (preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\s+\[[a-z0-9_.\\\\-]+\.[A-Z ]+\]/', $line)) {
             return 'craft';
+        }
+
+        // Bracket-level format: YYYY-MM-DD HH:MM:SS [LEVEL] message
+        if (preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\s+\[[A-Z ]+\]/', $line)) {
+            return 'bracket-level';
         }
 
         // PHP error format: [DD-MMM-YYYY HH:MM:SS Timezone] PHP Error Type:

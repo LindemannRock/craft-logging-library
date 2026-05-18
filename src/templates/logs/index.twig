@@ -50,20 +50,69 @@
     {% set fileOptions = fileOptions|merge([{
         value: isStandalone ? file.filename : file.date,
         label: (isStandalone ? file.filename : file.date) ~ ' (' ~ file.formattedSize ~ ')',
+        extraParams: {category: 'all'},
     }]) %}
 {% endfor %}
 
-{# Build source options (standalone mode only) #}
-{% set sourceOptions = [] %}
-{% if isStandalone %}
-    {% for sourceValue, sourceLabel in sources %}
-        {% set sourceOptions = sourceOptions|merge([{
-            value: sourceValue,
-            label: sourceLabel,
-        }]) %}
-    {% endfor %}
-{% endif %}
+{% set supportsCategoryFilter = selectedFile and ((selectedFile.source ?? '') in ['web', 'queue', 'console']) %}
+{% set categoryFilter = supportsCategoryFilter and categoryOptions|length > 1 ? {
+    type: 'dropdown',
+    param: 'category',
+    current: filters.category,
+    label: filters.category == 'all' ? 'Category'|t('app') : filters.category,
+    options: categoryOptions,
+    menuStyle: 'min-width: 320px;',
+} : null %}
+{% set selectedStandaloneFile = selectedFile.filename ?? '' %}
+{% set selectedPluginDate = selectedFile.date ?? '' %}
 
+{% set standaloneFilters = [
+    {
+        type: 'status',
+        param: 'source',
+        current: filters.source,
+        label: sources[filters.source] ?? 'All Sources'|t('logging-library'),
+        groups: sourceGroups,
+    },
+    {
+        type: 'dropdown',
+        param: 'file',
+        current: selectedStandaloneFile,
+        label: selectedStandaloneFile ?: 'Select File'|t('logging-library'),
+        options: fileOptions,
+    },
+    {
+        type: 'status',
+        param: 'level',
+        current: filters.level,
+        label: levels[filters.level] ?? 'All Levels'|t('logging-library'),
+        colorSet: 'logLevel',
+        options: levelOptions,
+    },
+] %}
+
+{% set pluginFilters = [
+    {
+        type: 'dropdown',
+        param: 'date',
+        current: selectedPluginDate,
+        label: selectedPluginDate ?: 'Select Date'|t('logging-library'),
+        options: fileOptions,
+    },
+    {
+        type: 'status',
+        param: 'level',
+        current: filters.level,
+        label: levels[filters.level] ?? 'All Levels'|t('logging-library'),
+        colorSet: 'logLevel',
+        options: levelOptions,
+    },
+] %}
+
+{% if categoryFilter %}
+    {% set standaloneFilters = standaloneFilters|merge([categoryFilter]) %}
+    {% set pluginFilters = pluginFilters|merge([categoryFilter]) %}
+{% endif %}
 
 {# ============================================================================
    TABLE CONFIGURATION
@@ -96,46 +145,7 @@
         items: sidebarItems,
         selected: 'system',
     },
-    filters: isStandalone ? [
-        {
-            type: 'dropdown',
-            param: 'source',
-            current: filters.source,
-            label: sources[filters.source] ?? 'All Sources'|t('logging-library'),
-            options: sourceOptions,
-        },
-        {
-            type: 'dropdown',
-            param: 'file',
-            current: selectedFile ? selectedFile.filename : '',
-            label: selectedFile ? selectedFile.filename : 'Select File'|t('logging-library'),
-            options: fileOptions,
-        },
-        {
-            type: 'status',
-            param: 'level',
-            current: filters.level,
-            label: levels[filters.level] ?? 'All Levels'|t('logging-library'),
-            colorSet: 'logLevel',
-            options: levelOptions,
-        },
-    ] : [
-        {
-            type: 'dropdown',
-            param: 'date',
-            current: selectedFile ? selectedFile.date : '',
-            label: selectedFile ? selectedFile.date : 'Select Date'|t('logging-library'),
-            options: fileOptions,
-        },
-        {
-            type: 'status',
-            param: 'level',
-            current: filters.level,
-            label: levels[filters.level] ?? 'All Levels'|t('logging-library'),
-            colorSet: 'logLevel',
-            options: levelOptions,
-        },
-    ],
+    filters: isStandalone ? standaloneFilters : pluginFilters,
     search: {
         placeholder: 'Search messages and context...'|t('logging-library'),
         value: filters.search,
@@ -232,18 +242,31 @@
 
     {# Level #}
     <td>
-        {% include 'lindemannrock-base/_components/badge' with {
-            label: item.level|capitalize|t('logging-library')|upper,
-            value: item.level,
-            colorSet: 'logLevel',
-        } only %}
+        {% set levelValue = item.level ?: 'unknown' %}
+        {% set canonicalLevel = levelValue %}
+        {% if 'fatal' in levelValue or 'parse' in levelValue or 'recoverable' in levelValue or 'error' in levelValue %}
+            {% set canonicalLevel = 'error' %}
+        {% elseif 'warning' in levelValue %}
+            {% set canonicalLevel = 'warning' %}
+        {% elseif 'notice' in levelValue or 'deprecated' in levelValue or 'strict' in levelValue %}
+            {% set canonicalLevel = 'info' %}
+        {% endif %}
+        {% if canonicalLevel in ['debug', 'info', 'warning', 'error'] %}
+            {% include 'lindemannrock-base/_components/badge' with {
+                label: (levels[canonicalLevel] ?? canonicalLevel|title)|upper,
+                value: canonicalLevel,
+                colorSet: 'logLevel',
+            } only %}
+        {% else %}
+            <span class="light code">{{ (levels[levelValue] ?? levelValue|replace({'-': ' ', '_': ' '})|title)|upper }}</span>
+        {% endif %}
     </td>
 
     {# Category/Source (standalone mode only) #}
     {% if isStandalone %}
         <td class="nowrap">
             <span style="font-size: 11px; padding: 2px 6px; background: #f0f0f0; border-radius: 3px;">
-                {{ item.category|upper }}
+                {{ (item.category ?: (selectedFile.source ?? 'unknown'))|upper }}
             </span>
         </td>
     {% endif %}
@@ -253,9 +276,9 @@
         {% if item.user matches '/user:(\\d+)/' %}
             {% set userId = item.user|replace('user:', '') %}
             {% set user = craft.users.id(userId).one() %}
-            {{ user ? user.username : 'User #' ~ userId }}
+            {{ user ? user.username : 'User #{id}'|t('logging-library', {id: userId}) }}
         {% else %}
-            {{ item.user ?: 'System' }}
+            {{ item.user ?: 'System'|t('logging-library') }}
         {% endif %}
     </td>
 
@@ -340,6 +363,11 @@
         </div>
 
         {% if selectedFile %}
+            {% set selectedFileParams = isStandalone
+                ? {file: selectedStandaloneFile, pluginHandle: pluginHandle}
+                : {date: selectedPluginDate, pluginHandle: pluginHandle}
+            %}
+
             <div class="log-config-item">
                 <div class="label">{{ "Current File"|t('logging-library') }}</div>
                 <div class="value">{{ selectedFile.formattedSize }}</div>
@@ -350,9 +378,26 @@
                 <div class="value">{{ pagination.total|number_format }}</div>
             </div>
 
+            <div class="log-config-item" style="grid-template-columns: 1fr; padding: 8px 0;">
+                <form method="post" accept-charset="UTF-8" id="refresh-log-cache-form">
+                    {{ csrfInput() }}
+                    {{ actionInput('logging-library/logs/refresh-cache') }}
+                    {{ redirectInput(craft.app.request.url) }}
+                    {{ hiddenInput('pluginHandle', pluginHandle) }}
+                    {% if isStandalone %}
+                        {{ hiddenInput('file', selectedStandaloneFile) }}
+                    {% else %}
+                        {{ hiddenInput('date', selectedPluginDate) }}
+                    {% endif %}
+                    <button type="submit" class="btn fullwidth" id="refresh-log-cache">
+                        {{ "Refresh Cache"|t('logging-library') }}
+                    </button>
+                </form>
+            </div>
+
             {% if canDownload %}
                 <div class="log-config-item" style="grid-template-columns: 1fr; padding: 8px 0;">
-                    <a href="{{ actionUrl('logging-library/logs/download', isStandalone ? { file: selectedFile.filename, pluginHandle: pluginHandle } : { date: selectedFile.date, pluginHandle: pluginHandle }) }}" class="btn submit fullwidth" download>
+                    <a href="{{ actionUrl('logging-library/logs/download', selectedFileParams) }}" class="btn submit fullwidth" download>
                         {{ "Download File"|t('logging-library') }}
                     </a>
                 </div>
@@ -382,23 +427,66 @@
 {% block scripts %}
     <script>
     (function() {
-        // Add level data attribute to rows for styling
+        function normalizeLevel(text) {
+            const level = text.trim().toLowerCase();
+            if (level.includes('fatal') || level.includes('parse') || level.includes('recoverable') || level.includes('error')) {
+                return 'error';
+            }
+            if (level.includes('warning')) {
+                return 'warning';
+            }
+            if (level.includes('notice') || level.includes('deprecated') || level.includes('strict') || level.includes('info')) {
+                return 'info';
+            }
+            if (level.includes('debug')) {
+                return 'debug';
+            }
+            return '';
+        }
+
+        // Add level data attributes to rows for severity-aware styling.
         document.querySelectorAll('.lr-data-row').forEach((row, index) => {
             const levelCell = row.querySelector('td:nth-child(2)');
             if (levelCell) {
-                const level = levelCell.textContent.trim().toLowerCase();
+                const level = normalizeLevel(levelCell.textContent);
                 row.setAttribute('data-level', level);
 
-                // Also mark context row if error
-                if (level === 'error') {
-                    const entryId = row.dataset.entryId;
-                    const contextRow = document.querySelector('.lr-context-row[data-entry-id="' + entryId + '"]');
-                    if (contextRow) {
-                        contextRow.classList.add('error');
-                    }
-                }
             }
         });
+
+        const refreshForm = document.getElementById('refresh-log-cache-form');
+        const refreshButton = document.getElementById('refresh-log-cache');
+        if (refreshForm && refreshButton && window.jQuery) {
+            jQuery(refreshForm).on('submit', function(e) {
+                e.preventDefault();
+
+                const $button = jQuery(refreshButton);
+                $button.addClass('loading').prop('disabled', true);
+
+                jQuery.ajax({
+                    url: '{{ actionUrl('logging-library/logs/refresh-cache')|raw }}',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: jQuery(refreshForm).serialize(),
+                    success: function(response) {
+                        if (response && response.success) {
+                            Craft.cp.displayNotice(response.message || '{{ "Log cache refreshed."|t('logging-library')|e('js') }}');
+                            setTimeout(function() {
+                                window.location.reload();
+                            }, 300);
+                        } else {
+                            Craft.cp.displayError('{{ "Failed to refresh log cache."|t('logging-library')|e('js') }}');
+                        }
+                    },
+                    error: function() {
+                        Craft.cp.displayError('{{ "Failed to refresh log cache."|t('logging-library')|e('js') }}');
+                    },
+                    complete: function() {
+                        $button.removeClass('loading').prop('disabled', false);
+                    }
+                });
+            });
+        }
     })();
     </script>
 {% endblock %}

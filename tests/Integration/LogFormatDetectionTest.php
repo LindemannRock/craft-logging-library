@@ -37,6 +37,13 @@ final class LogFormatDetectionTest extends TestCase
         self::assertSame('craft', LoggingLibrary::detectLogFormat($line));
     }
 
+    public function testBracketLevelFormatIsRecognised(): void
+    {
+        $line = '2026-05-16 10:00:00 [ERROR] dev: Failed to send SMS';
+
+        self::assertSame('bracket-level', LoggingLibrary::detectLogFormat($line));
+    }
+
     public function testPhpErrorFormatIsRecognised(): void
     {
         $line = '[16-May-2026 10:00:00 UTC] PHP Fatal error: Uncaught Error in foo.php';

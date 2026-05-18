@@ -117,6 +117,7 @@ class LogsController extends Controller
 
         // Get filter parameters
         $level = trim($request->getParam('level', 'all'));
+        $category = trim($request->getParam('category', 'all'));
         $source = trim($request->getParam('source', 'all')); // New: source/category filter
         $search = trim($request->getParam('search', ''));
         $sort = trim($request->getParam('sort', 'timestamp'));
@@ -129,6 +130,7 @@ class LogsController extends Controller
 
             // Extract unique sources for filter dropdown
             $sources = $this->_extractSources($allLogFiles);
+            $sourceGroups = $this->_buildSourceGroups($allLogFiles, $sources);
 
             // Filter files by selected source
             if ($source !== 'all') {
@@ -139,6 +141,7 @@ class LogsController extends Controller
         } else {
             $logFiles = LoggingLibrary::getLogFiles($pluginHandle);
             $sources = [];
+            $sourceGroups = [];
         }
 
         // Get the selected log file
@@ -146,9 +149,10 @@ class LogsController extends Controller
 
         // Read and parse log entries (cached for performance)
         if ($selectedFile) {
-            $logEntries = $this->_getLogEntriesFromFile(
+            $logPage = $this->_getLogPageFromFile(
                 $selectedFile['path'],
                 $level,
+                $category,
                 $search,
                 $sort,
                 $dir,
@@ -156,17 +160,17 @@ class LogsController extends Controller
                 $limit
             );
 
-            $totalEntries = $this->_getLogEntriesCountFromFile(
-                $selectedFile['path'],
-                $level,
-                $search
-            );
+            $logEntries = $logPage['entries'];
+            $totalEntries = $logPage['total'];
+            $category = $logPage['category'];
+            $categoryOptions = $logPage['categoryOptions'];
 
             // Detect which columns have variance (should be shown)
             $columnVariance = $this->_detectColumnVariance($logEntries);
         } else {
             $logEntries = [];
             $totalEntries = 0;
+            $categoryOptions = [];
             $columnVariance = [
                 'level' => true,
                 'user' => true,
@@ -186,11 +190,14 @@ class LogsController extends Controller
             'logFiles' => array_values($logFiles),
             'selectedFile' => $selectedFile,
             'sources' => $sources,
+            'sourceGroups' => $sourceGroups,
+            'categoryOptions' => $categoryOptions,
             'logEntries' => $logEntries,
             'columnVariance' => $columnVariance,
             'canDownload' => $canDownload,
             'filters' => [
                 'level' => $level,
+                'category' => $category,
                 'source' => $source,
                 'search' => $search,
                 'sort' => $sort,
@@ -338,6 +345,76 @@ class LogsController extends Controller
     }
 
     /**
+     * Invalidate the parsed cache for the selected log file and return to the viewer.
+     */
+    public function actionRefreshCache(): Response
+    {
+        $this->requirePostRequest();
+
+        $request = Craft::$app->getRequest();
+        $pluginHandle = trim($request->getRequiredParam('pluginHandle'));
+
+        if (!preg_match('/^[a-zA-Z0-9\-]+$/', $pluginHandle)) {
+            throw new \InvalidArgumentException('Invalid plugin handle');
+        }
+
+        $isStandalone = ($pluginHandle === 'logging-library');
+
+        if ($isStandalone) {
+            $settings = LoggingLibrary::getInstance()->getSettings();
+            if ($settings instanceof Settings && !LoggingLibrary::areLogViewersAvailable($settings)) {
+                throw new NotFoundHttpException('Log viewer is disabled for this environment');
+            }
+
+            $this->_checkPermissions([LoggingLibrary::PERMISSION_VIEW_ALL_LOGS]);
+
+            $filename = trim($request->getRequiredParam('file'));
+            if (!preg_match('/^[a-zA-Z0-9_\-\.]+$/', $filename) || !preg_match('/\.log(\.\d+)?$/i', $filename)) {
+                throw new \InvalidArgumentException('Invalid filename');
+            }
+
+            $logPath = Craft::$app->getPath()->getLogPath() . '/' . $filename;
+        } else {
+            $config = LoggingLibrary::getConfig($pluginHandle);
+            if (!$config) {
+                throw new NotFoundHttpException('Plugin logging not configured');
+            }
+
+            if (!($config['enableLogViewer'] ?? false)) {
+                throw new NotFoundHttpException('Log viewer is disabled for this plugin');
+            }
+
+            $this->_checkPermissions($config['viewSystemLogsPermissions'] ?? []);
+
+            $date = trim($request->getRequiredParam('date'));
+            if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
+                throw new \InvalidArgumentException('Invalid date format');
+            }
+
+            $logPath = Craft::$app->getPath()->getLogPath() . "/{$pluginHandle}-{$date}.log";
+        }
+
+        if (!file_exists($logPath)) {
+            throw new NotFoundHttpException('Log file not found');
+        }
+
+        LoggingLibrary::getInstance()->logCache->invalidateLogCache($logPath);
+        $entryCount = LoggingLibrary::getInstance()->logCache->getLogs($logPath)->count();
+
+        if ($request->getAcceptsJson()) {
+            return $this->asJson([
+                'success' => true,
+                'message' => Craft::t('logging-library', 'Log cache refreshed.'),
+                'entries' => $entryCount,
+            ]);
+        }
+
+        Craft::$app->getSession()->setNotice(Craft::t('logging-library', 'Log cache refreshed.'));
+
+        return $this->redirectToPostedUrl(null, $isStandalone ? 'logging-library' : "{$pluginHandle}/logs/system");
+    }
+
+    /**
      * Get plugin handle from the current URL
      */
     private function _getPluginHandleFromUrl(): string
@@ -423,6 +500,67 @@ class LogsController extends Controller
     }
 
     /**
+     * Build grouped source options for the standalone source filter.
+     */
+    private function _buildSourceGroups(array $logFiles, array $sources): array
+    {
+        $systemSources = ['web' => true, 'console' => true, 'queue' => true, 'php-errors' => true];
+        $systemColors = [
+            'web' => '#3b82f6',
+            'queue' => '#8b5cf6',
+            'console' => '#14b8a6',
+            'php-errors' => '#ef4444',
+        ];
+        $pluginColor = '#64748b';
+
+        $groups = [
+            'all' => [
+                'options' => [[
+                    'value' => 'all',
+                    'label' => $sources['all'],
+                    'status' => 'all',
+                    'extraParams' => ['file' => '', 'category' => 'all'],
+                ]],
+            ],
+            'system' => [
+                'header' => Craft::t('logging-library', 'System'),
+                'options' => [],
+            ],
+            'plugins' => [
+                'header' => Craft::t('logging-library', 'Plugins'),
+                'options' => [],
+            ],
+        ];
+
+        $seen = [];
+        foreach ($logFiles as $file) {
+            $source = $file['source'] ?? 'unknown';
+            if (isset($seen[$source]) || $source === 'all') {
+                continue;
+            }
+
+            $seen[$source] = true;
+            $option = [
+                'value' => $source,
+                'label' => $sources[$source] ?? ucwords(str_replace('-', ' ', $source)),
+                'statusColor' => $systemColors[$source] ?? $pluginColor,
+                'extraParams' => ['file' => '', 'category' => 'all'],
+            ];
+
+            if (isset($systemSources[$source])) {
+                $groups['system']['options'][] = $option;
+            } else {
+                $groups['plugins']['options'][] = $option;
+            }
+        }
+
+        return array_values(array_filter(
+            $groups,
+            fn($group) => !empty($group['options'])
+        ));
+    }
+
+    /**
      * Get the selected log file from request parameters
      */
     private function _getSelectedLogFile($request, array $logFiles, bool $isStandalone): ?array
@@ -463,81 +601,98 @@ class LogsController extends Controller
     }
 
     /**
-     * Get log entries from a file with filtering, sorting, and pagination
-     * Uses cached ArrayQuery for high performance
+     * Get filtered, sorted, paginated log entries plus category metadata in one pass.
+     *
+     * @return array{entries: array, total: int, category: string, categoryOptions: array}
      */
-    private function _getLogEntriesFromFile(string $filePath, string $level, string $search, string $sort, string $dir, int $page, int $limit): array
+    private function _getLogPageFromFile(string $filePath, string $level, string $category, string $search, string $sort, string $dir, int $page, int $limit): array
     {
         if (!file_exists($filePath)) {
-            return [];
+            return [
+                'entries' => [],
+                'total' => 0,
+                'category' => 'all',
+                'categoryOptions' => [],
+            ];
         }
 
-        // Get cached parsed logs as ArrayQuery
-        $logQuery = LoggingLibrary::getInstance()->logCache->getLogs($filePath);
+        $logs = LoggingLibrary::getInstance()->logCache->getLogs($filePath)->all();
 
-        // Apply level filter
         if ($level !== 'all') {
-            $logQuery->andFilterWhere(['level' => $level]);
+            $logs = array_values(array_filter($logs, fn($log) => ($log['level'] ?? '') === $level));
         }
 
-        // Get all results first (we'll filter search manually)
-        $logs = $logQuery->all();
-
-        // Apply search filter manually since ArrayQuery doesn't support LIKE
         if ($search) {
             $logs = array_values(array_filter($logs, function($log) use ($search) {
                 return stripos($log['message'] ?? '', $search) !== false ||
-                       stripos($log['context'] ?? '', $search) !== false;
+                       stripos($log['context'] ?? '', $search) !== false ||
+                       stripos($log['category'] ?? '', $search) !== false;
             }));
         }
 
-        // Count total before pagination
+        $categoryCounts = $this->_countCategories($logs);
+        if ($category !== 'all' && !isset($categoryCounts[$category])) {
+            $category = 'all';
+        }
+
+        if ($category !== 'all') {
+            $logs = array_values(array_filter($logs, fn($log) => ($log['category'] ?? '') === $category));
+        }
+
         $totalCount = count($logs);
 
         // Apply sorting with stable parse-order tiebreaker (same-second entries
         // reverse correctly when dir=desc — see LogCacheService::sortLogs)
         $logs = LogCacheService::sortLogs($logs, $sort, $dir);
 
-        // Apply pagination
-        $offset = ($page - 1) * $limit;
-        $logs = array_slice($logs, $offset, $limit);
+        $offset = max(0, ($page - 1) * $limit);
+        $entries = array_slice($logs, $offset, $limit);
 
-        // Add line numbers
-        foreach ($logs as $index => &$log) {
+        foreach ($entries as $index => &$log) {
             $log['lineNumber'] = $offset + $index + 1;
         }
+        unset($log);
 
-        return $logs;
+        return [
+            'entries' => $entries,
+            'total' => $totalCount,
+            'category' => $category,
+            'categoryOptions' => $this->_buildCategoryOptions($categoryCounts),
+        ];
     }
 
-    /**
-     * Get total count of log entries from a file
-     */
-    private function _getLogEntriesCountFromFile(string $filePath, string $level, string $search): int
+    private function _countCategories(array $logs): array
     {
-        if (!file_exists($filePath)) {
-            return 0;
+        $counts = [];
+        foreach ($logs as $log) {
+            $category = (string)($log['category'] ?? '');
+            if ($category === '') {
+                continue;
+            }
+
+            $counts[$category] = ($counts[$category] ?? 0) + 1;
         }
 
-        // Get cached parsed logs as ArrayQuery
-        $logQuery = LoggingLibrary::getInstance()->logCache->getLogs($filePath);
+        ksort($counts, SORT_NATURAL | SORT_FLAG_CASE);
+        return $counts;
+    }
 
-        // Apply level filter
-        if ($level !== 'all') {
-            $logQuery->andFilterWhere(['level' => $level]);
+    private function _buildCategoryOptions(array $categoryCounts): array
+    {
+        $options = [[
+            'value' => 'all',
+            'label' => Craft::t('app', 'Category'),
+            'extra' => '(' . array_sum($categoryCounts) . ')',
+        ]];
+
+        foreach ($categoryCounts as $category => $count) {
+            $options[] = [
+                'value' => $category,
+                'label' => $category,
+                'extra' => '(' . Craft::$app->getFormatter()->asInteger($count) . ')',
+            ];
         }
 
-        // Get all results
-        $logs = $logQuery->all();
-
-        // Apply search filter manually since ArrayQuery doesn't support LIKE
-        if ($search) {
-            $logs = array_filter($logs, function($log) use ($search) {
-                return stripos($log['message'] ?? '', $search) !== false ||
-                       stripos($log['context'] ?? '', $search) !== false;
-            });
-        }
-
-        return count($logs);
+        return $options;
     }
 }

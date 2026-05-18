@@ -25,6 +25,8 @@ use yii2mod\query\ArrayQuery;
  */
 class LogCacheService extends Component
 {
+    private const PARSER_CACHE_VERSION = '2026-05-17-php-location-context-split';
+
     /**
      * Get logs from file as ArrayQuery (with caching)
      *
@@ -244,13 +246,36 @@ class LogCacheService extends Component
             $datetime = $matches['datetime'] ?? null;
 
             if ($datetime) {
+                $format = LoggingLibrary::detectLogFormat($log);
+                $level = isset($matches['level']) ? strtolower(trim($matches['level'])) : 'unknown';
+                $category = trim($matches['category'] ?? '');
+                $message = trim($matches['message'] ?? '');
+                $context = trim($matches['context'] ?? '');
+
+                if ($level === '') {
+                    $level = 'unknown';
+                }
+
+                if ($format === 'php') {
+                    $level = $this->_normalizePhpErrorLevel($level);
+                    [$message, $context] = $this->_splitPhpErrorContext($message, $context);
+                }
+
+                if ($category === '') {
+                    $category = match ($format) {
+                        'php' => 'php-errors',
+                        default => $this->_inferCategoryFromFilename($logFile),
+                    };
+                }
+
                 $logs[$key] = [
                     'timestamp' => $matches['datetime'] ?? null,  // Use 'timestamp' to match template expectations
                     'user' => $matches['user'] ?? 'System',
-                    'level' => isset($matches['level']) ? strtolower($matches['level']) : null,
-                    'category' => $matches['category'] ?? null,
-                    'message' => $matches['message'] ?? null,
-                    'context' => $matches['context'] ?? null,
+                    'level' => $level,
+                    'channel' => $matches['channel'] ?? null,
+                    'category' => $category,
+                    'message' => $message !== '' ? $message : trim($log),
+                    'context' => $context,
                     'raw' => $log,
                 ];
             } else {
@@ -280,14 +305,91 @@ class LogCacheService extends Component
             return '/^(?P<datetime>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\s+\[(?P<user>.*?)\]\[(?P<level>.*?)\]\[(?P<category>.*?)\]\s+(?P<message>.*?)(?:\s+\|\s+(?P<context>.*))?$/s';
         } elseif ($format === 'craft') {
             // Craft format: YYYY-MM-DD HH:MM:SS [category.LEVEL] [class] message
-            return '/^(?P<datetime>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\s+\[(?P<category>[a-z]+)\.(?P<level>[A-Z]+)\]\s+\[(?P<class>.*?)\]\s+(?P<message>.*?)(?:\s+(?P<context>\{.*\}))?$/s';
+            return '/^(?P<datetime>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\s+\[(?P<channel>[a-z0-9_.\\\\-]+)\.(?P<level>[A-Z ]+)\](?:\s+\[(?P<category>.*?)\])?\s+(?P<message>[^\r\n]*)(?P<context>.*)?$/s';
+        } elseif ($format === 'bracket-level') {
+            // Simple plugin format used by some third-party plugins: YYYY-MM-DD HH:MM:SS [LEVEL] message
+            return '/^(?P<datetime>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\s+\[(?P<level>[A-Z ]+)\]\s+(?P<message>[^\r\n]*)(?P<context>.*)?$/s';
         } elseif ($format === 'php') {
             // PHP error format: [DD-MMM-YYYY HH:MM:SS Timezone] PHP Error: message
-            return '/^\[(?P<datetime>.*)\] PHP\s+(?P<level>[^:]+):\s+(?P<message>.*)/s';
+            return '/^\[(?P<datetime>.*)\] PHP\s+(?P<level>[^:]+):\s+(?P<message>[^\r\n]*)(?P<context>.*)?$/s';
         }
 
         // Default/fallback pattern
         return '/^(?P<datetime>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\s+(?P<message>.*)/s';
+    }
+
+    /**
+     * Map PHP's error labels onto the viewer's canonical log levels.
+     */
+    private function _normalizePhpErrorLevel(string $level): string
+    {
+        if (
+            str_contains($level, 'fatal') ||
+            str_contains($level, 'parse') ||
+            str_contains($level, 'recoverable') ||
+            str_contains($level, 'error')
+        ) {
+            return 'error';
+        }
+
+        if (str_contains($level, 'warning')) {
+            return 'warning';
+        }
+
+        if (str_contains($level, 'notice') || str_contains($level, 'deprecated') || str_contains($level, 'strict')) {
+            return 'info';
+        }
+
+        return 'unknown';
+    }
+
+    /**
+     * Keep PHP exception/error headlines in the table and move traces into context.
+     *
+     * PHP error logs often write `Stack trace:` on the same first line as the
+     * error headline, so the regex newline split alone is not enough.
+     *
+     * @return array{0: string, 1: string}
+     */
+    private function _splitPhpErrorContext(string $message, string $context): array
+    {
+        $stackTraceMarker = ' Stack trace:';
+        $stackTracePosition = strpos($message, $stackTraceMarker);
+
+        if ($stackTracePosition !== false) {
+            $trace = trim(substr($message, $stackTracePosition + 1));
+            $message = trim(substr($message, 0, $stackTracePosition));
+            $context = trim($trace . ($context !== '' ? "\n" . $context : ''));
+        }
+
+        if (preg_match('/^(?P<headline>.+?)\s+(?P<location>in\s+\/.+?(?::\d+| on line \d+))$/s', $message, $matches)) {
+            $message = trim($matches['headline']);
+            $context = trim($matches['location'] . ($context !== '' ? "\n" . $context : ''));
+        }
+
+        return [$message, $context];
+    }
+
+    /**
+     * Infer a stable source category for log formats that don't carry one.
+     */
+    private function _inferCategoryFromFilename(string $logFile): string
+    {
+        $basename = basename($logFile);
+
+        if ($basename === 'phperrors.log') {
+            return 'php-errors';
+        }
+
+        if (preg_match('/^([a-z0-9\-]+)-\d{4}-\d{2}-\d{2}\.log$/', $basename, $matches)) {
+            return $matches[1];
+        }
+
+        if (preg_match('/^(web|console|queue)(?:-\d{4}-\d{2}-\d{2})?\.log(?:\.\d+)?$/', $basename, $matches)) {
+            return $matches[1];
+        }
+
+        return 'unknown';
     }
 
     /**
@@ -299,6 +401,11 @@ class LogCacheService extends Component
     private function _getLinePattern(string $logFile): string
     {
         if (str_contains($logFile, 'phperrors')) {
+            return '/^\[.*\]/';
+        }
+
+        $sample = @file_get_contents($logFile, false, null, 0, 500);
+        if (is_string($sample) && LoggingLibrary::detectLogFormat($sample) === 'php') {
             return '/^\[.*\]/';
         }
 
@@ -316,7 +423,7 @@ class LogCacheService extends Component
     {
         $size = @filesize($logFile);
         $mtime = @filemtime($logFile);
-        return md5($logFile . ':' . $size . ':' . $mtime);
+        return md5(self::PARSER_CACHE_VERSION . ':' . $logFile . ':' . $size . ':' . $mtime);
     }
 
     /**

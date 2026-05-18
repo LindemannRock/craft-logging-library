@@ -52,6 +52,7 @@ return [
     'Level' => 'Level',
     'Source' => 'Source',
     'User' => 'User',
+    'User #{id}' => 'User #{id}',
     'Message' => 'Message',
 
     // Table empty
@@ -76,6 +77,7 @@ return [
     'files' => 'files',
     'Current File' => 'Current File',
     'Entries' => 'Entries',
+    'Refresh Cache' => 'Refresh Cache',
     'Download File' => 'Download File',
     'Log Location' => 'Log Location',
 
@@ -85,6 +87,8 @@ return [
     // Controller messages
     'Settings saved.' => 'Settings saved.',
     'Could not save settings.' => 'Could not save settings.',
+    'Log cache refreshed.' => 'Log cache refreshed.',
+    'Failed to refresh log cache.' => 'Failed to refresh log cache.',
 
     // Validation messages
     'Found {count, number} {count, plural, =1{error} other{errors}}' => 'Found {count, number} {count, plural, =1{error} other{errors}}',

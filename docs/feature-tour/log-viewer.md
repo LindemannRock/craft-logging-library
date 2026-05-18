@@ -14,7 +14,9 @@ When a plugin calls `LoggingLibrary::configure()` with `'enableLogViewer' => tru
 - **Sorting** — sort by timestamp, level, user, category, or message
 - **Pagination** — configurable entries per page (default: 50)
 - **Download** — download the raw log file (permission-gated)
+- **Refresh Cache** — clear the parsed cache for the selected log file from the sidebar
 - **Context Expansion** — click to view JSON context data inline
+- **Consolidated Sources** — the standalone All Logs view groups Craft system logs and plugin logs in the source filter
 - **Smart Columns** — columns with no variance (e.g., all entries from the same user) are automatically hidden
 
 ## Enabling the Viewer
@@ -50,6 +52,8 @@ When `viewSystemLogsPermissions` is empty, any logged-in user can view logs. Whe
 | Filter | Options | Description |
 |--------|---------|-------------|
 | Level | All Levels, Error, Warning, Info, Debug | Filter entries by log level |
+| Source | All Sources, System, Plugins | Filter the standalone All Logs view by log source |
+| Category | Categories found in selected Craft channel files | Filter web, queue, and console files by parsed log category, such as `application`, plugin handles, or class names |
 | Search | Free text | Case-insensitive search across message and context |
 | Sort | timestamp, level, user, category, message | Column to sort by |
 | Direction | asc, desc | Sort direction (default: desc — newest first) |
@@ -71,6 +75,8 @@ Plugin log files follow this format:
 | Category | Plugin handle |
 | Message | The log message |
 | Context | Optional JSON data (appended after the message) |
+
+The consolidated viewer also recognizes Craft web/queue logs and common third-party plugin log lines that use a single bracketed level, for example `YYYY-MM-DD HH:MM:SS [INFO] Message`. Multi-line entries keep the first line in the table and show the remaining content in the expandable context row.
 
 ## Limitations
 
