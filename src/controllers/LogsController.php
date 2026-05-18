@@ -505,13 +505,6 @@ class LogsController extends Controller
     private function _buildSourceGroups(array $logFiles, array $sources): array
     {
         $systemSources = ['web' => true, 'console' => true, 'queue' => true, 'php-errors' => true];
-        $systemColors = [
-            'web' => '#3b82f6',
-            'queue' => '#8b5cf6',
-            'console' => '#14b8a6',
-            'php-errors' => '#ef4444',
-        ];
-        $pluginColor = '#64748b';
 
         $groups = [
             'all' => [
@@ -540,14 +533,15 @@ class LogsController extends Controller
             }
 
             $seen[$source] = true;
+            $isSystem = isset($systemSources[$source]);
             $option = [
                 'value' => $source,
                 'label' => $sources[$source] ?? ucwords(str_replace('-', ' ', $source)),
-                'statusColor' => $systemColors[$source] ?? $pluginColor,
+                'colorKey' => $isSystem ? $source : 'plugin',
                 'extraParams' => ['file' => '', 'category' => 'all'],
             ];
 
-            if (isset($systemSources[$source])) {
+            if ($isSystem) {
                 $groups['system']['options'][] = $option;
             } else {
                 $groups['plugins']['options'][] = $option;
