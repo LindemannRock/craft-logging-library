@@ -25,6 +25,7 @@ return [
     // Permissions
     'View all system logs' => 'すべてのシステムログを表示する',
     'Download all system logs' => 'すべてのシステムログをダウンロードする',
+    'Clear cache' => 'キャッシュを削除する',
     'Manage settings' => '設定を管理する',
 
     // Log levels
@@ -83,6 +84,7 @@ return [
 
     // Common
     'Save Settings' => '設定を保存',
+    '{displayName} caches' => '{displayName} のキャッシュ',
 
     // Controller messages
     'Settings saved.' => '設定を保存しました。',

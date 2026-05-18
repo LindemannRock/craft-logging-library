@@ -25,6 +25,7 @@ return [
     // Permissions
     'View all system logs' => 'Consulter tous les journaux système',
     'Download all system logs' => 'Télécharger tous les journaux système',
+    'Clear cache' => 'Vider le cache',
     'Manage settings' => 'Gérer les paramètres',
 
     // Log levels
@@ -83,6 +84,7 @@ return [
 
     // Common
     'Save Settings' => 'Enregistrer les paramètres',
+    '{displayName} caches' => 'Caches {displayName}',
 
     // Controller messages
     'Settings saved.' => 'Paramètres enregistrés.',

@@ -25,6 +25,7 @@ return [
     // Permissions
     'View all system logs' => 'Visa alla systemloggar',
     'Download all system logs' => 'Ladda ner alla systemloggar',
+    'Clear cache' => 'Rensa cache',
     'Manage settings' => 'Hantera inställningar',
 
     // Log levels
@@ -83,6 +84,7 @@ return [
 
     // Common
     'Save Settings' => 'Spara inställningar',
+    '{displayName} caches' => '{displayName}-cacher',
 
     // Controller messages
     'Settings saved.' => 'Inställningar sparade.',

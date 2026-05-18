@@ -25,6 +25,7 @@ return [
     // Permissions
     'View all system logs' => 'Ver todos os registros do sistema',
     'Download all system logs' => 'Transferir todos os registros do sistema',
+    'Clear cache' => 'Limpar cache',
     'Manage settings' => 'Gerir definições',
 
     // Log levels
@@ -83,6 +84,7 @@ return [
 
     // Common
     'Save Settings' => 'Salvar configurações',
+    '{displayName} caches' => 'Caches de {displayName}',
 
     // Controller messages
     'Settings saved.' => 'Configurações salvas.',

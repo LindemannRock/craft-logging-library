@@ -25,6 +25,7 @@ return [
     // Permissions
     'View all system logs' => 'Vis alle systemlogger',
     'Download all system logs' => 'Last ned alle systemlogger',
+    'Clear cache' => 'Fjern cache',
     'Manage settings' => 'Administrer innstillinger',
 
     // Log levels
@@ -83,6 +84,7 @@ return [
 
     // Common
     'Save Settings' => 'Lagre innstillinger',
+    '{displayName} caches' => '{displayName}-cacher',
 
     // Controller messages
     'Settings saved.' => 'Innstillinger lagret.',

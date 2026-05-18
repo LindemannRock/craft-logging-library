@@ -25,6 +25,7 @@ return [
     // Permissions
     'View all system logs' => 'Alle systeemlogboeken bekijken',
     'Download all system logs' => 'Alle systeemlogboeken downloaden',
+    'Clear cache' => 'Cache wissen',
     'Manage settings' => 'Instellingen beheren',
 
     // Log levels
@@ -83,6 +84,7 @@ return [
 
     // Common
     'Save Settings' => 'Instellingen opslaan',
+    '{displayName} caches' => '{displayName} caches',
 
     // Controller messages
     'Settings saved.' => 'Instellingen opgeslagen.',

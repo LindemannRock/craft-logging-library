@@ -25,6 +25,7 @@ return [
     // Permissions
     'View all system logs' => 'عرض جميع سجلات النظام',
     'Download all system logs' => 'تنزيل جميع سجلات النظام',
+    'Clear cache' => 'مسح Cache',
     'Manage settings' => 'إدارة الإعدادات',
 
     // Log levels
@@ -83,6 +84,7 @@ return [
 
     // Common
     'Save Settings' => 'حفظ الإعدادات',
+    '{displayName} caches' => 'Caches الخاصة بـ {displayName}',
 
     // Controller messages
     'Settings saved.' => 'تم حفظ الإعدادات.',
