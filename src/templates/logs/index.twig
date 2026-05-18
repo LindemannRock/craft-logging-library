@@ -178,6 +178,7 @@
             ? 'No log files found. Log files are created when plugin activities occur.'|t('logging-library')
             : 'No log entries found for the selected filters.'|t('logging-library'),
         expandable: true,
+        rowClassKey: 'levelClass',
     },
     pagination: {
         page: pagination.currentPage,
@@ -187,7 +188,6 @@
     },
     checkboxes: false,
     rowActions: false,
-    rowClassKey: 'levelClass',
 } %}
 
 
