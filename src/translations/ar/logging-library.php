@@ -120,7 +120,5 @@ return [
 
     // Settings: Interface
     'Interface Settings' => 'إعدادات الواجهة',
-    'Items Per Page' => 'العناصر في الصفحة',
     'Number of log entries to display per page in the log viewers' => 'عدد إدخالات السجل المراد عرضها في كل صفحة في عارضات السجلات',
-    'This is being overridden by the <code>itemsPerPage</code> setting in <code>config/logging-library.php</code>.' => 'يتم تجاوز هذا الإعداد بواسطة الإعداد <code>itemsPerPage</code> في <code>config/logging-library.php</code>.',
 ];

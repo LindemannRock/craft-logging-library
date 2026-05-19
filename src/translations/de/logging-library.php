@@ -120,7 +120,5 @@ return [
 
     // Settings: Interface
     'Interface Settings' => 'Oberflächeneinstellungen',
-    'Items Per Page' => 'Einträge pro Seite',
     'Number of log entries to display per page in the log viewers' => 'Anzahl der Protokolleinträge, die pro Seite in den Protokoll-Ansichten angezeigt werden',
-    'This is being overridden by the <code>itemsPerPage</code> setting in <code>config/logging-library.php</code>.' => 'Dies wird durch die Einstellung <code>itemsPerPage</code> in <code>config/logging-library.php</code> überschrieben.',
 ];

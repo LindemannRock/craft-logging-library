@@ -120,7 +120,5 @@ return [
 
     // Settings: Interface
     'Interface Settings' => 'Impostazioni dell\'interfaccia',
-    'Items Per Page' => 'Elementi per pagina',
     'Number of log entries to display per page in the log viewers' => 'Numero di voci di log da visualizzare per pagina nei visualizzatori di log',
-    'This is being overridden by the <code>itemsPerPage</code> setting in <code>config/logging-library.php</code>.' => 'Questa impostazione viene sovrascritta dall\'impostazione <code>itemsPerPage</code> in <code>config/logging-library.php</code>.',
 ];

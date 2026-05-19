@@ -120,7 +120,5 @@ return [
 
     // Settings: Interface
     'Interface Settings' => 'インターフェース設定',
-    'Items Per Page' => '1 ページあたりの件数',
     'Number of log entries to display per page in the log viewers' => 'ログビューアーで 1 ページに表示するログエントリの件数',
-    'This is being overridden by the <code>itemsPerPage</code> setting in <code>config/logging-library.php</code>.' => 'この設定は <code>config/logging-library.php</code> の <code>itemsPerPage</code> 設定によって上書きされています。',
 ];

@@ -120,7 +120,5 @@ return [
 
     // Settings: Interface
     'Interface Settings' => 'Gränssnittsinställningar',
-    'Items Per Page' => 'Objekt per sida',
     'Number of log entries to display per page in the log viewers' => 'Antal loggposter som ska visas per sida i loggvisarna',
-    'This is being overridden by the <code>itemsPerPage</code> setting in <code>config/logging-library.php</code>.' => 'Detta åsidosätts av inställningen <code>itemsPerPage</code> i <code>config/logging-library.php</code>.',
 ];

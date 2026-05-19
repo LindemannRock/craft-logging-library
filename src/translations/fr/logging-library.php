@@ -120,7 +120,5 @@ return [
 
     // Settings: Interface
     'Interface Settings' => 'Paramètres d\'interface',
-    'Items Per Page' => 'Éléments par page',
     'Number of log entries to display per page in the log viewers' => 'Nombre d\'entrées de journal à afficher par page dans les visionneuses de journaux',
-    'This is being overridden by the <code>itemsPerPage</code> setting in <code>config/logging-library.php</code>.' => 'Ce paramètre est remplacé par le paramètre <code>itemsPerPage</code> dans <code>config/logging-library.php</code>.',
 ];

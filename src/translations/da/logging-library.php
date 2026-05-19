@@ -120,7 +120,5 @@ return [
 
     // Settings: Interface
     'Interface Settings' => 'Grænsefladeindstillinger',
-    'Items Per Page' => 'Elementer pr. side',
     'Number of log entries to display per page in the log viewers' => 'Antal logposter der skal vises pr. side i logviserne',
-    'This is being overridden by the <code>itemsPerPage</code> setting in <code>config/logging-library.php</code>.' => 'Dette tilsidesættes af indstillingen <code>itemsPerPage</code> i <code>config/logging-library.php</code>.',
 ];
