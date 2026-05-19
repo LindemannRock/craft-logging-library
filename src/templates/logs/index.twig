@@ -196,7 +196,7 @@
    ============================================================================ #}
 
 {% block beforeTable %}
-    {% include 'lindemannrock-base/_partials/log-level-row-styles' only %}
+    {% include 'lindemannrock-base/_partials/styles-log-level-rows' only %}
 
     <style>
         table#lr-data-table {
@@ -237,7 +237,7 @@
     {# Level — `canonicalLevel` and `levelClass` are precomputed in the
        controller (LogsController::_getLogPageFromFile). `levelClass` is
        applied to the parent <tr> via `tableConfig.rowClassKey` and drives
-       row-tint CSS in `lindemannrock-base/_partials/log-level-row-styles`. #}
+       row-tint CSS in `lindemannrock-base/_partials/styles-log-level-rows`. #}
     {% set levelValue = item.level ?: 'unknown' %}
     {% set canonicalLevel = item.canonicalLevel ?? '' %}
     {% set isCanonical = canonicalLevel != '' %}
