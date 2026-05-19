@@ -12,6 +12,7 @@ use Craft;
 use craft\base\Model;
 use lindemannrock\base\traits\DateFormatSettingsTrait;
 use lindemannrock\base\traits\ItemsPerPageSettingsTrait;
+use lindemannrock\base\traits\PluginNameSettingsTrait;
 use lindemannrock\base\traits\SettingsConfigTrait;
 use lindemannrock\base\traits\SettingsDisplayNameTrait;
 use lindemannrock\base\traits\SettingsPersistenceTrait;
@@ -26,6 +27,7 @@ class Settings extends Model
 {
     use DateFormatSettingsTrait;
     use ItemsPerPageSettingsTrait;
+    use PluginNameSettingsTrait;
     use SettingsConfigTrait;
     use SettingsDisplayNameTrait;
     use SettingsPersistenceTrait;
@@ -135,13 +137,11 @@ class Settings extends Model
     public function rules(): array
     {
         return array_merge([
-            [['pluginName'], 'required'],
-            [['pluginName'], 'string', 'max' => 255],
             [['showCpSection'], 'boolean'],
             [['showCpSection'], 'default', 'value' => true],
             [['forceEnableLogViewer'], 'boolean'],
             [['forceEnableLogViewer'], 'default', 'value' => false],
-        ], $this->itemsPerPageSettingsRules(), $this->dateFormatSettingsRules());
+        ], $this->pluginNameSettingsRules(), $this->itemsPerPageSettingsRules(), $this->dateFormatSettingsRules());
     }
 
     /**
@@ -150,9 +150,8 @@ class Settings extends Model
     public function attributeLabels(): array
     {
         return array_merge([
-            'pluginName' => Craft::t('logging-library', 'Plugin Name'),
             'showCpSection' => Craft::t('logging-library', 'Show Main Menu'),
             'forceEnableLogViewer' => Craft::t('logging-library', 'Force Enable Log Viewers'),
-        ], $this->itemsPerPageSettingsLabel(), $this->dateFormatSettingsLabels());
+        ], $this->pluginNameSettingsLabel(), $this->itemsPerPageSettingsLabel(), $this->dateFormatSettingsLabels());
     }
 }
