@@ -33,19 +33,10 @@
 
         <h2 class="first">{{ "General Settings"|t('logging-library') }}</h2>
 
-        {{ forms.textField({
-            label: 'Plugin Name'|t('logging-library'),
-            instructions: 'The name of the plugin as it appears in the Control Panel menu'|t('logging-library'),
-            id: 'pluginName',
-            name: 'settings[pluginName]',
-            value: settings.pluginName,
-            required: true,
-            errors: settings.getErrors('pluginName'),
-            disabled: settings.isOverriddenByConfig('pluginName'),
-            warning: settings.isOverriddenByConfig('pluginName')
-                ? "This is being overridden by the <code>pluginName</code> setting in <code>config/logging-library.php</code>."|t('logging-library')|raw
-                : null,
-        }) }}
+        {% include 'lindemannrock-base/_partials/field-plugin-name' with {
+            settings: settings,
+            pluginHandle: 'logging-library',
+        } only %}
 
         {% if settings.edgeEnvironmentDetected %}
             {{ forms.lightswitchField({
