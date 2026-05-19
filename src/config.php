@@ -17,7 +17,7 @@ return [
         'pluginName' => 'Logging Library',
 
         // Number of log entries shown per page in the full log viewer (10–500)
-        'itemsPerPage' => 50,
+        'itemsPerPage' => 100,
 
         // Show this plugin in the main control panel navigation
         'showCpSection' => true,
