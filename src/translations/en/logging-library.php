@@ -104,9 +104,6 @@ return [
 
     // Settings: General
     'General Settings' => 'General Settings',
-    'Plugin Name' => 'Plugin Name',
-    'The name of the plugin as it appears in the Control Panel menu' => 'The name of the plugin as it appears in the Control Panel menu',
-    'This is being overridden by the <code>pluginName</code> setting in <code>config/logging-library.php</code>.' => 'This is being overridden by the <code>pluginName</code> setting in <code>config/logging-library.php</code>.',
     'Force Enable Log Viewers' => 'Force Enable Log Viewers',
     'Force-enable file-based log viewers even when an edge or ephemeral environment is detected. This affects Logging Library and every plugin&apos;s dedicated Logs section.' => 'Force-enable file-based log viewers even when an edge or ephemeral environment is detected. This affects Logging Library and every plugin&apos;s dedicated Logs section.',
     'This is being overridden by the <code>forceEnableLogViewer</code> setting in <code>config/logging-library.php</code>.' => 'This is being overridden by the <code>forceEnableLogViewer</code> setting in <code>config/logging-library.php</code>.',

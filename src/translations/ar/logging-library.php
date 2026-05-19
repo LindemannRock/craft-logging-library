@@ -104,9 +104,6 @@ return [
 
     // Settings: General
     'General Settings' => 'الإعدادات العامة',
-    'Plugin Name' => 'اسم الإضافة',
-    'The name of the plugin as it appears in the Control Panel menu' => 'اسم الإضافة كما يظهر في قائمة لوحة التحكم',
-    'This is being overridden by the <code>pluginName</code> setting in <code>config/logging-library.php</code>.' => 'يتم تجاوز هذا الإعداد بواسطة الإعداد <code>pluginName</code> في <code>config/logging-library.php</code>.',
     'Force Enable Log Viewers' => 'فرض تفعيل عارضات السجلات',
     'Force-enable file-based log viewers even when an edge or ephemeral environment is detected. This affects Logging Library and every plugin&apos;s dedicated Logs section.' => 'فرض تفعيل عارضات السجلات المستندة إلى الملفات حتى عند اكتشاف بيئة edge أو مؤقتة. يؤثر هذا على Logging Library وقسم السجلات المخصص لكل إضافة.',
     'This is being overridden by the <code>forceEnableLogViewer</code> setting in <code>config/logging-library.php</code>.' => 'يتم تجاوز هذا الإعداد بواسطة الإعداد <code>forceEnableLogViewer</code> في <code>config/logging-library.php</code>.',

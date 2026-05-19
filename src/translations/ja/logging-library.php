@@ -104,9 +104,6 @@ return [
 
     // Settings: General
     'General Settings' => '一般設定',
-    'Plugin Name' => 'プラグイン名',
-    'The name of the plugin as it appears in the Control Panel menu' => 'コントロールパネルのメニューに表示されるプラグインの名前',
-    'This is being overridden by the <code>pluginName</code> setting in <code>config/logging-library.php</code>.' => 'この設定は <code>config/logging-library.php</code> の <code>pluginName</code> 設定によって上書きされています。',
     'Force Enable Log Viewers' => 'ログビューアーを強制有効化',
     'Force-enable file-based log viewers even when an edge or ephemeral environment is detected. This affects Logging Library and every plugin&apos;s dedicated Logs section.' => 'エッジ環境またはエフェメラル環境が検出された場合でも、ファイルベースのログビューアーを強制的に有効にします。これは Logging Library およびすべてのプラグインの専用 Logs セクションに影響します。',
     'This is being overridden by the <code>forceEnableLogViewer</code> setting in <code>config/logging-library.php</code>.' => 'この設定は <code>config/logging-library.php</code> の <code>forceEnableLogViewer</code> 設定によって上書きされています。',

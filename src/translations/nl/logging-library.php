@@ -104,9 +104,6 @@ return [
 
     // Settings: General
     'General Settings' => 'Algemene instellingen',
-    'Plugin Name' => 'Pluginnaam',
-    'The name of the plugin as it appears in the Control Panel menu' => 'De naam van de plugin zoals die wordt weergegeven in het Control Panel-menu',
-    'This is being overridden by the <code>pluginName</code> setting in <code>config/logging-library.php</code>.' => 'Dit wordt overschreven door de instelling <code>pluginName</code> in <code>config/logging-library.php</code>.',
     'Force Enable Log Viewers' => 'Logviewers geforceerd inschakelen',
     'Force-enable file-based log viewers even when an edge or ephemeral environment is detected. This affects Logging Library and every plugin&apos;s dedicated Logs section.' => 'Bestandsgebaseerde logviewers geforceerd inschakelen, ook wanneer een edge- of vluchtige omgeving wordt gedetecteerd. Dit is van toepassing op Logging Library en het toegewezen loggedeelte van elke plugin.',
     'This is being overridden by the <code>forceEnableLogViewer</code> setting in <code>config/logging-library.php</code>.' => 'Dit wordt overschreven door de instelling <code>forceEnableLogViewer</code> in <code>config/logging-library.php</code>.',
