@@ -11,6 +11,7 @@ namespace lindemannrock\logginglibrary\models;
 use Craft;
 use craft\base\Model;
 use lindemannrock\base\traits\DateFormatSettingsTrait;
+use lindemannrock\base\traits\ItemsPerPageSettingsTrait;
 use lindemannrock\base\traits\SettingsConfigTrait;
 use lindemannrock\base\traits\SettingsDisplayNameTrait;
 use lindemannrock\base\traits\SettingsPersistenceTrait;
@@ -24,6 +25,7 @@ use lindemannrock\logginglibrary\LoggingLibrary;
 class Settings extends Model
 {
     use DateFormatSettingsTrait;
+    use ItemsPerPageSettingsTrait;
     use SettingsConfigTrait;
     use SettingsDisplayNameTrait;
     use SettingsPersistenceTrait;
@@ -32,11 +34,6 @@ class Settings extends Model
      * @var string Plugin display name shown in the control panel
      */
     public string $pluginName = 'Logging Library';
-
-    /**
-     * @var int Number of log entries to show per page
-     */
-    public int $itemsPerPage = 50;
 
     /**
      * @var bool Whether to show Logging Library in the main control panel menu
@@ -140,13 +137,11 @@ class Settings extends Model
         return array_merge([
             [['pluginName'], 'required'],
             [['pluginName'], 'string', 'max' => 255],
-            [['itemsPerPage'], 'integer', 'min' => 10, 'max' => 500],
-            [['itemsPerPage'], 'default', 'value' => 50],
             [['showCpSection'], 'boolean'],
             [['showCpSection'], 'default', 'value' => true],
             [['forceEnableLogViewer'], 'boolean'],
             [['forceEnableLogViewer'], 'default', 'value' => false],
-        ], $this->dateFormatSettingsRules());
+        ], $this->itemsPerPageSettingsRules(), $this->dateFormatSettingsRules());
     }
 
     /**
@@ -156,9 +151,8 @@ class Settings extends Model
     {
         return array_merge([
             'pluginName' => Craft::t('logging-library', 'Plugin Name'),
-            'itemsPerPage' => Craft::t('logging-library', 'Items Per Page'),
             'showCpSection' => Craft::t('logging-library', 'Show Main Menu'),
             'forceEnableLogViewer' => Craft::t('logging-library', 'Force Enable Log Viewers'),
-        ], $this->dateFormatSettingsLabels());
+        ], $this->itemsPerPageSettingsLabel(), $this->dateFormatSettingsLabels());
     }
 }

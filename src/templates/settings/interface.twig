@@ -28,22 +28,11 @@
 
         <h2 class="first">{{ "Interface Settings"|t('logging-library') }}</h2>
 
-        {{ forms.textField({
-            label: 'Items Per Page'|t('logging-library'),
+        {% include 'lindemannrock-base/_partials/items-per-page-field' with {
+            settings: settings,
+            pluginHandle: 'logging-library',
             instructions: 'Number of log entries to display per page in the log viewers'|t('logging-library'),
-            id: 'itemsPerPage',
-            name: 'settings[itemsPerPage]',
-            type: 'number',
-            value: settings.itemsPerPage,
-            min: 10,
-            max: 500,
-            required: true,
-            errors: settings.getErrors('itemsPerPage'),
-            disabled: settings.isOverriddenByConfig('itemsPerPage'),
-            warning: settings.isOverriddenByConfig('itemsPerPage')
-                ? "This is being overridden by the <code>itemsPerPage</code> setting in <code>config/logging-library.php</code>."|t('logging-library')|raw
-                : null,
-        }) }}
+        } only %}
 
         <hr>
 
