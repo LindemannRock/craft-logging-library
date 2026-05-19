@@ -28,7 +28,7 @@ class Install extends Migration
             $this->createTable('{{%logginglibrary_settings}}', [
                 'id' => $this->primaryKey(),
                 'pluginName' => $this->string(255)->notNull()->defaultValue('Logging Library'),
-                'itemsPerPage' => $this->integer()->notNull()->defaultValue(50),
+                'itemsPerPage' => $this->integer()->notNull()->defaultValue(100),
                 'showCpSection' => $this->boolean()->notNull()->defaultValue(true),
                 'forceEnableLogViewer' => $this->boolean()->notNull()->defaultValue(false),
                 'timeFormat' => $this->string(2)->null(),
@@ -40,7 +40,7 @@ class Install extends Migration
 
             $this->insert('{{%logginglibrary_settings}}', [
                 'pluginName' => 'Logging Library',
-                'itemsPerPage' => 50,
+                'itemsPerPage' => 100,
                 'showCpSection' => true,
                 'forceEnableLogViewer' => false,
                 'timeFormat' => null,
