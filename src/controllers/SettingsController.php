@@ -84,6 +84,17 @@ class SettingsController extends Controller
                 $value = $normalized;
             }
 
+            // Multi-state selects (e.g. "Use global default" = '') need '' → null
+            // so the property holds null, not a coerced false / 0. Without this,
+            // PHP coerces empty strings to the property's typed default on assign,
+            // which prevents the cascade from falling through.
+            if ($value === '') {
+                $type = (new \ReflectionProperty($settings, $key))->getType();
+                if ($type instanceof \ReflectionNamedType && $type->allowsNull()) {
+                    $value = null;
+                }
+            }
+
             $settings->$key = $value;
         }
 

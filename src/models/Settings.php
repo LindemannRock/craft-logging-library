@@ -10,6 +10,7 @@ namespace lindemannrock\logginglibrary\models;
 
 use Craft;
 use craft\base\Model;
+use lindemannrock\base\traits\DateFormatSettingsTrait;
 use lindemannrock\base\traits\SettingsConfigTrait;
 use lindemannrock\base\traits\SettingsDisplayNameTrait;
 use lindemannrock\base\traits\SettingsPersistenceTrait;
@@ -22,6 +23,7 @@ use lindemannrock\logginglibrary\LoggingLibrary;
  */
 class Settings extends Model
 {
+    use DateFormatSettingsTrait;
     use SettingsConfigTrait;
     use SettingsDisplayNameTrait;
     use SettingsPersistenceTrait;
@@ -75,7 +77,19 @@ class Settings extends Model
      */
     protected static function booleanFields(): array
     {
-        return ['showCpSection', 'forceEnableLogViewer'];
+        return ['showCpSection', 'forceEnableLogViewer', 'showSeconds'];
+    }
+
+    /**
+     * `DateFormatSettingsTrait` declares five properties, but Logging Library
+     * only consumes `timeFormat` and `showSeconds` (the log viewer's timestamp
+     * column uses `|lrTime`, which honors only those two). The other three
+     * stay null on the model and are not persisted — no DB columns exist for
+     * them on this plugin's settings table.
+     */
+    protected static function excludeFromSave(): array
+    {
+        return ['monthFormat', 'dateOrder', 'dateSeparator'];
     }
 
     /**
@@ -123,7 +137,7 @@ class Settings extends Model
      */
     public function rules(): array
     {
-        return [
+        return array_merge([
             [['pluginName'], 'required'],
             [['pluginName'], 'string', 'max' => 255],
             [['itemsPerPage'], 'integer', 'min' => 10, 'max' => 500],
@@ -132,7 +146,7 @@ class Settings extends Model
             [['showCpSection'], 'default', 'value' => true],
             [['forceEnableLogViewer'], 'boolean'],
             [['forceEnableLogViewer'], 'default', 'value' => false],
-        ];
+        ], $this->dateFormatSettingsRules());
     }
 
     /**
@@ -140,11 +154,11 @@ class Settings extends Model
      */
     public function attributeLabels(): array
     {
-        return [
+        return array_merge([
             'pluginName' => Craft::t('logging-library', 'Plugin Name'),
             'itemsPerPage' => Craft::t('logging-library', 'Items Per Page'),
             'showCpSection' => Craft::t('logging-library', 'Show Main Menu'),
             'forceEnableLogViewer' => Craft::t('logging-library', 'Force Enable Log Viewers'),
-        ];
+        ], $this->dateFormatSettingsLabels());
     }
 }

@@ -45,5 +45,15 @@
                 : null,
         }) }}
 
+        <hr>
+
+        {% include 'lindemannrock-base/_partials/base-overrides' with {
+            settings: settings,
+            pluginHandle: 'logging-library',
+            sections: {
+                dateFormat: { fields: ['timeFormat', 'showSeconds'] },
+            },
+        } only %}
+
     {% include 'lindemannrock-base/_components/plugin-credit' %}
 {% endblock %}

@@ -49,7 +49,7 @@ class LoggingLibrary extends Plugin
     /**
      * @var string Plugin schema version for migrations
      */
-    public string $schemaVersion = '1.0.3';
+    public string $schemaVersion = '1.0.4';
 
     /**
      * @var bool Whether the plugin registers a control panel section
