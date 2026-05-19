@@ -117,5 +117,4 @@ return [
 
     // Settings: Interface
     'Interface Settings' => 'Configuración de interfaz',
-    'Number of log entries to display per page in the log viewers' => 'Número de entradas de registro que se mostrarán por página en los visores de registros',
 ];

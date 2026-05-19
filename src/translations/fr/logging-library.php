@@ -117,5 +117,4 @@ return [
 
     // Settings: Interface
     'Interface Settings' => 'Paramètres d\'interface',
-    'Number of log entries to display per page in the log viewers' => 'Nombre d\'entrées de journal à afficher par page dans les visionneuses de journaux',
 ];

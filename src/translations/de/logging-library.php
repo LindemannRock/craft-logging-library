@@ -117,5 +117,4 @@ return [
 
     // Settings: Interface
     'Interface Settings' => 'Oberflächeneinstellungen',
-    'Number of log entries to display per page in the log viewers' => 'Anzahl der Protokolleinträge, die pro Seite in den Protokoll-Ansichten angezeigt werden',
 ];

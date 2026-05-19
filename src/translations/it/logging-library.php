@@ -117,5 +117,4 @@ return [
 
     // Settings: Interface
     'Interface Settings' => 'Impostazioni dell\'interfaccia',
-    'Number of log entries to display per page in the log viewers' => 'Numero di voci di log da visualizzare per pagina nei visualizzatori di log',
 ];

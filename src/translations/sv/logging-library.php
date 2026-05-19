@@ -117,5 +117,4 @@ return [
 
     // Settings: Interface
     'Interface Settings' => 'Gränssnittsinställningar',
-    'Number of log entries to display per page in the log viewers' => 'Antal loggposter som ska visas per sida i loggvisarna',
 ];

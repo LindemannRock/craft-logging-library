@@ -117,5 +117,4 @@ return [
 
     // Settings: Interface
     'Interface Settings' => 'インターフェース設定',
-    'Number of log entries to display per page in the log viewers' => 'ログビューアーで 1 ページに表示するログエントリの件数',
 ];

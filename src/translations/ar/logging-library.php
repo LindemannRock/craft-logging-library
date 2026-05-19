@@ -117,5 +117,4 @@ return [
 
     // Settings: Interface
     'Interface Settings' => 'إعدادات الواجهة',
-    'Number of log entries to display per page in the log viewers' => 'عدد إدخالات السجل المراد عرضها في كل صفحة في عارضات السجلات',
 ];

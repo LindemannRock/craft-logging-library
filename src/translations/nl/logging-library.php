@@ -117,5 +117,4 @@ return [
 
     // Settings: Interface
     'Interface Settings' => 'Interface-instellingen',
-    'Number of log entries to display per page in the log viewers' => 'Aantal logvermeldingen dat per pagina wordt weergegeven in de logviewers',
 ];

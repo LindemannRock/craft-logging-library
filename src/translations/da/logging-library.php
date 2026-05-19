@@ -117,5 +117,4 @@ return [
 
     // Settings: Interface
     'Interface Settings' => 'Grænsefladeindstillinger',
-    'Number of log entries to display per page in the log viewers' => 'Antal logposter der skal vises pr. side i logviserne',
 ];
