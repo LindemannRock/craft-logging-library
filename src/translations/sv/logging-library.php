@@ -28,6 +28,10 @@ return [
     'Clear cache' => 'Rensa cache',
     'Manage settings' => 'Hantera inställningar',
 
+    // Common
+    'Save Settings' => 'Spara inställningar',
+    '{displayName} caches' => '{displayName}-cacher',
+
     // Log levels
     'All Levels' => 'Alla nivåer',
     'Error' => 'Fel',
@@ -81,10 +85,6 @@ return [
     'Refresh Cache' => 'Uppdatera cache',
     'Download File' => 'Ladda ner fil',
     'Log Location' => 'Loggplats',
-
-    // Common
-    'Save Settings' => 'Spara inställningar',
-    '{displayName} caches' => '{displayName}-cacher',
 
     // Controller messages
     'Settings saved.' => 'Inställningar sparade.',

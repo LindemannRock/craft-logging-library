@@ -28,6 +28,10 @@ return [
     'Clear cache' => 'Vider le cache',
     'Manage settings' => 'Gérer les paramètres',
 
+    // Common
+    'Save Settings' => 'Enregistrer les paramètres',
+    '{displayName} caches' => 'Caches {displayName}',
+
     // Log levels
     'All Levels' => 'Tous les niveaux',
     'Error' => 'Erreur',
@@ -81,10 +85,6 @@ return [
     'Refresh Cache' => 'Actualiser le cache',
     'Download File' => 'Télécharger le fichier',
     'Log Location' => 'Emplacement du journal',
-
-    // Common
-    'Save Settings' => 'Enregistrer les paramètres',
-    '{displayName} caches' => 'Caches {displayName}',
 
     // Controller messages
     'Settings saved.' => 'Paramètres enregistrés.',

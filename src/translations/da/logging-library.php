@@ -28,6 +28,10 @@ return [
     'Clear cache' => 'Ryd cache',
     'Manage settings' => 'Administrer indstillinger',
 
+    // Common
+    'Save Settings' => 'Gem indstillinger',
+    '{displayName} caches' => '{displayName}-caches',
+
     // Log levels
     'All Levels' => 'Alle niveauer',
     'Error' => 'Fejl',
@@ -82,13 +86,9 @@ return [
     'Download File' => 'Download fil',
     'Log Location' => 'Logplacering',
 
-    // Common
-    'Save Settings' => 'Gem indstillinger',
-    '{displayName} caches' => '{displayName}-caches',
-
     // Controller messages
     'Settings saved.' => 'Indstillinger gemt.',
-    'Could not save settings.' => 'Indstillinger kunne ikke gemmes.',
+    'Could not save settings.' => 'Kunne ikke gemme indstillingerne.',
     'Log cache refreshed.' => 'Log-cache opdateret.',
     'Failed to refresh log cache.' => 'Log-cache kunne ikke opdateres.',
     'Plugin logging not configured' => 'Plugin-logning er ikke konfigureret',
@@ -116,5 +116,5 @@ return [
     'This is being overridden by the <code>showCpSection</code> setting in <code>config/logging-library.php</code>.' => 'Dette tilsidesættes af indstillingen <code>showCpSection</code> i <code>config/logging-library.php</code>.',
 
     // Settings: Interface
-    'Interface Settings' => 'Grænsefladeindstillinger',
+    'Interface Settings' => 'Brugerflade-indstillinger',
 ];

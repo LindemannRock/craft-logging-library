@@ -28,6 +28,10 @@ return [
     'Clear cache' => 'Svuota cache',
     'Manage settings' => 'Gestisci impostazioni',
 
+    // Common
+    'Save Settings' => 'Salva impostazioni',
+    '{displayName} caches' => 'Cache di {displayName}',
+
     // Log levels
     'All Levels' => 'Tutti i livelli',
     'Error' => 'Errore',
@@ -51,7 +55,7 @@ return [
     // Table
     'Time' => 'Ora',
     'Level' => 'Livello',
-    'Source' => 'Fonte',
+    'Source' => 'Sorgente',
     'User' => 'Utente',
     'User #{id}' => 'Utente #{id}',
     'Message' => 'Messaggio',
@@ -81,10 +85,6 @@ return [
     'Refresh Cache' => 'Aggiorna cache',
     'Download File' => 'Scarica file',
     'Log Location' => 'Posizione del log',
-
-    // Common
-    'Save Settings' => 'Salva impostazioni',
-    '{displayName} caches' => 'Cache di {displayName}',
 
     // Controller messages
     'Settings saved.' => 'Impostazioni salvate.',
@@ -116,5 +116,5 @@ return [
     'This is being overridden by the <code>showCpSection</code> setting in <code>config/logging-library.php</code>.' => 'Questa impostazione viene sovrascritta dall\'impostazione <code>showCpSection</code> in <code>config/logging-library.php</code>.',
 
     // Settings: Interface
-    'Interface Settings' => 'Impostazioni dell\'interfaccia',
+    'Interface Settings' => 'Impostazioni interfaccia',
 ];

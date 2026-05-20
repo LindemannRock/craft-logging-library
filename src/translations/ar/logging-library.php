@@ -28,6 +28,10 @@ return [
     'Clear cache' => 'مسح Cache',
     'Manage settings' => 'إدارة الإعدادات',
 
+    // Common
+    'Save Settings' => 'حفظ الإعدادات',
+    '{displayName} caches' => 'Caches الخاصة بـ {displayName}',
+
     // Log levels
     'All Levels' => 'جميع المستويات',
     'Error' => 'خطأ',
@@ -81,10 +85,6 @@ return [
     'Refresh Cache' => 'تحديث Cache',
     'Download File' => 'تنزيل الملف',
     'Log Location' => 'موقع السجل',
-
-    // Common
-    'Save Settings' => 'حفظ الإعدادات',
-    '{displayName} caches' => 'Caches الخاصة بـ {displayName}',
 
     // Controller messages
     'Settings saved.' => 'تم حفظ الإعدادات.',

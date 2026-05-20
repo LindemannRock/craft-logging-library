@@ -28,6 +28,10 @@ return [
     'Clear cache' => 'Fjern cache',
     'Manage settings' => 'Administrer innstillinger',
 
+    // Common
+    'Save Settings' => 'Lagre innstillinger',
+    '{displayName} caches' => '{displayName}-cacher',
+
     // Log levels
     'All Levels' => 'Alle nivåer',
     'Error' => 'Feil',
@@ -82,13 +86,9 @@ return [
     'Download File' => 'Last ned fil',
     'Log Location' => 'Loggplassering',
 
-    // Common
-    'Save Settings' => 'Lagre innstillinger',
-    '{displayName} caches' => '{displayName}-cacher',
-
     // Controller messages
     'Settings saved.' => 'Innstillinger lagret.',
-    'Could not save settings.' => 'Kunne ikke lagre innstillinger.',
+    'Could not save settings.' => 'Kunne ikke lagre innstillingene.',
     'Log cache refreshed.' => 'Logg-cache oppdatert.',
     'Failed to refresh log cache.' => 'Kunne ikke oppdatere logg-cache.',
     'Plugin logging not configured' => 'Plugin-logging er ikke konfigurert',

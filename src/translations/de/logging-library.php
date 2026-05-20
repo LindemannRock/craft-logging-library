@@ -28,6 +28,10 @@ return [
     'Clear cache' => 'Cache leeren',
     'Manage settings' => 'Einstellungen verwalten',
 
+    // Common
+    'Save Settings' => 'Einstellungen speichern',
+    '{displayName} caches' => '{displayName} Caches',
+
     // Log levels
     'All Levels' => 'Alle Stufen',
     'Error' => 'Fehler',
@@ -82,10 +86,6 @@ return [
     'Download File' => 'Datei herunterladen',
     'Log Location' => 'Protokollspeicherort',
 
-    // Common
-    'Save Settings' => 'Einstellungen speichern',
-    '{displayName} caches' => '{displayName} Caches',
-
     // Controller messages
     'Settings saved.' => 'Einstellungen gespeichert.',
     'Could not save settings.' => 'Einstellungen konnten nicht gespeichert werden.',
@@ -116,5 +116,5 @@ return [
     'This is being overridden by the <code>showCpSection</code> setting in <code>config/logging-library.php</code>.' => 'Dies wird durch die Einstellung <code>showCpSection</code> in <code>config/logging-library.php</code> überschrieben.',
 
     // Settings: Interface
-    'Interface Settings' => 'Oberflächeneinstellungen',
+    'Interface Settings' => 'Oberflächen-Einstellungen',
 ];

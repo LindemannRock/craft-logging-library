@@ -28,6 +28,10 @@ return [
     'Clear cache' => 'Vaciar caché',
     'Manage settings' => 'Gestionar configuración',
 
+    // Common
+    'Save Settings' => 'Guardar configuración',
+    '{displayName} caches' => 'Cachés de {displayName}',
+
     // Log levels
     'All Levels' => 'Todos los niveles',
     'Error' => 'Error',
@@ -51,7 +55,7 @@ return [
     // Table
     'Time' => 'Hora',
     'Level' => 'Nivel',
-    'Source' => 'Fuente',
+    'Source' => 'Origen',
     'User' => 'Usuario',
     'User #{id}' => 'Usuario #{id}',
     'Message' => 'Mensaje',
@@ -81,10 +85,6 @@ return [
     'Refresh Cache' => 'Actualizar caché',
     'Download File' => 'Descargar archivo',
     'Log Location' => 'Ubicación del registro',
-
-    // Common
-    'Save Settings' => 'Guardar configuración',
-    '{displayName} caches' => 'Cachés de {displayName}',
 
     // Controller messages
     'Settings saved.' => 'Configuración guardada.',

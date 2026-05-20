@@ -28,6 +28,10 @@ return [
     'Clear cache' => 'キャッシュを削除する',
     'Manage settings' => '設定を管理する',
 
+    // Common
+    'Save Settings' => '設定を保存する',
+    '{displayName} caches' => '{displayName} のキャッシュ',
+
     // Log levels
     'All Levels' => 'すべてのレベル',
     'Error' => 'エラー',
@@ -81,10 +85,6 @@ return [
     'Refresh Cache' => 'キャッシュを更新',
     'Download File' => 'ファイルをダウンロード',
     'Log Location' => 'ログの場所',
-
-    // Common
-    'Save Settings' => '設定を保存',
-    '{displayName} caches' => '{displayName} のキャッシュ',
 
     // Controller messages
     'Settings saved.' => '設定を保存しました。',

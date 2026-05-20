@@ -28,6 +28,10 @@ return [
     'Clear cache' => 'Cache wissen',
     'Manage settings' => 'Instellingen beheren',
 
+    // Common
+    'Save Settings' => 'Instellingen opslaan',
+    '{displayName} caches' => '{displayName} caches',
+
     // Log levels
     'All Levels' => 'Alle niveaus',
     'Error' => 'Fout',
@@ -81,10 +85,6 @@ return [
     'Refresh Cache' => 'Cache vernieuwen',
     'Download File' => 'Bestand downloaden',
     'Log Location' => 'Loglocatie',
-
-    // Common
-    'Save Settings' => 'Instellingen opslaan',
-    '{displayName} caches' => '{displayName} caches',
 
     // Controller messages
     'Settings saved.' => 'Instellingen opgeslagen.',

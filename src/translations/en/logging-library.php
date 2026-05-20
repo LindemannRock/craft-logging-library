@@ -28,6 +28,10 @@ return [
     'Clear cache' => 'Clear cache',
     'Manage settings' => 'Manage settings',
 
+    // Common
+    'Save Settings' => 'Save Settings',
+    '{displayName} caches' => '{displayName} caches',
+
     // Log levels
     'All Levels' => 'All Levels',
     'Error' => 'Error',
@@ -81,10 +85,6 @@ return [
     'Refresh Cache' => 'Refresh Cache',
     'Download File' => 'Download File',
     'Log Location' => 'Log Location',
-
-    // Common
-    'Save Settings' => 'Save Settings',
-    '{displayName} caches' => '{displayName} caches',
 
     // Controller messages
     'Settings saved.' => 'Settings saved.',
