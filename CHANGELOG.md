@@ -1,5 +1,56 @@
 # Changelog
 
+## [5.9.0](https://github.com/LindemannRock/craft-logging-library/compare/v5.8.3...v5.9.0) (2026-05-22)
+
+
+### Added
+
+* add [@since](https://github.com/since) annotations for new methods in LoggingLibrary ([5bba9f3](https://github.com/LindemannRock/craft-logging-library/commit/5bba9f3428b9e421bfb230cc71c14973e08513f0))
+* add act-static-analysis script for CI integration ([85521cc](https://github.com/LindemannRock/craft-logging-library/commit/85521cc8d83d6cdae9392c3e544c80204aeae7cd))
+* add CI scripts for PHPStan and ECS checks ([e368277](https://github.com/LindemannRock/craft-logging-library/commit/e36827723606bab68e44bade61c9859f5adf17c7))
+* add clear cache permission and update cache options label ([b65746c](https://github.com/LindemannRock/craft-logging-library/commit/b65746c36c377cb49289ee34862548bf83dbb4e3))
+* add pre-commit hook for ECS and PHPStan code quality checks ([1d60b6d](https://github.com/LindemannRock/craft-logging-library/commit/1d60b6d92c3494c9a6b5bbf768833e9b2db44ea9))
+* **config:** update items per page setting to 100 for log viewer ([79223c8](https://github.com/LindemannRock/craft-logging-library/commit/79223c80caf27d64c4d2a1a5d1c082f7587a19f1))
+* **i18n:** add 'Open Settings' translation to multiple languages ([b24cc3e](https://github.com/LindemannRock/craft-logging-library/commit/b24cc3e3b1f86c0e435e0cc26b096bdebac15628))
+* **i18n:** add common translation keys for multiple languages ([fd72941](https://github.com/LindemannRock/craft-logging-library/commit/fd72941c683c6a2106d4f7ea2f0c6df556524ffb))
+* **i18n:** add new log-related messages in multiple languages ([06f8b45](https://github.com/LindemannRock/craft-logging-library/commit/06f8b45c6d5724348bff3e4d574fcd0dad68aa50))
+* **i18n:** add permission translations for multiple languages ([4920cf2](https://github.com/LindemannRock/craft-logging-library/commit/4920cf2b7b032165140cf67511d24afcabd7d1ee))
+* **i18n:** add translation issue template for reporting language problems ([afe85a6](https://github.com/LindemannRock/craft-logging-library/commit/afe85a6ed2d99ac9562a94be5ae96276d7688312))
+* **i18n:** add translations for 'Clear cache' and related cache strings ([9def6cd](https://github.com/LindemannRock/craft-logging-library/commit/9def6cd0cf562b946ed9ec7135128a380e75e00c))
+* **i18n:** add user-related messages and cache refresh notifications in multiple languages ([e37dfe7](https://github.com/LindemannRock/craft-logging-library/commit/e37dfe702977b0ae9353323e8c80ec9f155e0bba))
+* **logging:** add attribute labels for plugin settings ([351e62b](https://github.com/LindemannRock/craft-logging-library/commit/351e62b6a79d23bbe119a0af712ecea41197c9fc))
+* **logging:** add newline sanitization to log messages to prevent log injection ([6f2aef7](https://github.com/LindemannRock/craft-logging-library/commit/6f2aef74111602ccc8a2c2424337dff86ebd4df4))
+* **logs:** add canonical log level classification for improved styling ([70e6499](https://github.com/LindemannRock/craft-logging-library/commit/70e64996af2a66a1060cf0b325ba8f215b3da607))
+* **logs:** add row class key for log level styling and enhance refresh cache button with loading state ([c39b2da](https://github.com/LindemannRock/craft-logging-library/commit/c39b2dabeb21c79df747c333135084c07890c421))
+* **logs:** add rowClassKey for log level styling in log entries ([52bb2f1](https://github.com/LindemannRock/craft-logging-library/commit/52bb2f14c788666e0e21291ee2ae8d7cb700c87d))
+* **logs:** add stable sorting for log entries with tiebreaker ([e8266ab](https://github.com/LindemannRock/craft-logging-library/commit/e8266abda16a6922b1bb0192797fc3f677755db1))
+* **logs:** enhance log parsing and categorization for various formats ([3cfd164](https://github.com/LindemannRock/craft-logging-library/commit/3cfd16426ba696444bccc96f1178b04f7c861cb8))
+* **migrations:** change itemsPerPage default from 50 to 100 ([ee77117](https://github.com/LindemannRock/craft-logging-library/commit/ee7711798110bc3f7ea774a7a241d395ce7a1251))
+* **settings:** add date format settings to plugin configuration ([ad90bd0](https://github.com/LindemannRock/craft-logging-library/commit/ad90bd0910e22a8fbeec395c253870d8864f487f))
+* **settings:** integrate items per page settings into interface template ([eeaa4d5](https://github.com/LindemannRock/craft-logging-library/commit/eeaa4d56d099e3c48dc76cce142b6673d127eea6))
+* **settings:** integrate plugin name settings into model rules and labels ([080875d](https://github.com/LindemannRock/craft-logging-library/commit/080875d4c3b3102dbe73720d9f0b657863675c87))
+* **tests:** add integration tests for log file handling and format detection ([3b3356e](https://github.com/LindemannRock/craft-logging-library/commit/3b3356e6c1660605eccd27517a82d447a820c54b))
+
+
+### Fixed
+
+* correct path for PHPStan configuration inclusion ([928f952](https://github.com/LindemannRock/craft-logging-library/commit/928f95215a81861deca6effdcbd0b57832473c07))
+* correct PHPStan output handling in pre-commit hook ([1bb77f3](https://github.com/LindemannRock/craft-logging-library/commit/1bb77f3cdf124c61a4c38e8332bddf0cf353ca47))
+* **i18n:** remove 'Items Per Page' string from translations ([4befe13](https://github.com/LindemannRock/craft-logging-library/commit/4befe13a558a441c5276abf0f7dcb9b5d4770996))
+* **i18n:** remove deprecated plugin name translations from multiple locales ([3f0ba56](https://github.com/LindemannRock/craft-logging-library/commit/3f0ba5665dfcfbd6f93d139b33ebf8cea1a4b90b))
+* **i18n:** remove redundant log entry display translation strings ([e138233](https://github.com/LindemannRock/craft-logging-library/commit/e138233e0d279ebdbb6063a686fd5d3e717cd2b9))
+* **logging:** allow null plugin handle in log method signature ([52426c1](https://github.com/LindemannRock/craft-logging-library/commit/52426c1923e05cd162ae2eaaa4fb3780c3dafe99))
+* **logging:** allow rotated log file variants in filename validation ([aefd169](https://github.com/LindemannRock/craft-logging-library/commit/aefd169976cd59d560845b2498da9e57c9476974))
+* **logging:** ensure cache file array is initialized to avoid null errors ([870d493](https://github.com/LindemannRock/craft-logging-library/commit/870d493f3b189f5be4fdb53abd62ee8750e07f4a))
+* **logging:** ensure log file arrays are initialized to avoid null errors ([46ad3f1](https://github.com/LindemannRock/craft-logging-library/commit/46ad3f15da6751c199871ceddca9b3f8ffb46a07))
+* **logging:** ensure log files array is initialized to avoid null errors ([305952f](https://github.com/LindemannRock/craft-logging-library/commit/305952f3ef83f484ace70848d5b5e686ce739dae))
+* **logging:** replace hardcoded error messages with translatable strings ([cfde7dc](https://github.com/LindemannRock/craft-logging-library/commit/cfde7dcbe07b36d092b64cf2645bdae63f130f23))
+* **logging:** sanitize log messages to prevent log injection attacks ([6123e59](https://github.com/LindemannRock/craft-logging-library/commit/6123e5958fd7fee11a6441f6d622164b8df62e6f))
+* **logs:** escape log message and context to prevent XSS vulnerabilities ([d4a2068](https://github.com/LindemannRock/craft-logging-library/commit/d4a206897b14d2bdb9dd698d61d28ff63ddce825))
+* update [@since](https://github.com/since) annotations for log-related methods ([11f9a12](https://github.com/LindemannRock/craft-logging-library/commit/11f9a1283e9718d1aa8276db8c718a4d07961020))
+* update plugin schema version to 1.0.3 ([c668cfa](https://github.com/LindemannRock/craft-logging-library/commit/c668cfa4779c4e93e9cd2dac4ccc961cf1096a35))
+* update plugin schema version to 1.0.5 ([1078562](https://github.com/LindemannRock/craft-logging-library/commit/107856219855077b46a606164ec814f4d1a0c6c6))
+
 ## [5.8.3](https://github.com/LindemannRock/craft-logging-library/compare/v5.8.2...v5.8.3) (2026-05-06)
 
 
