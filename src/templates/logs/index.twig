@@ -231,7 +231,7 @@
 {% block tableRow %}
     {# Timestamp #}
     <td class="nowrap code">
-        <time datetime="{{ item.timestamp|lrToApiString }}">{{ item.timestamp|lrTime('short', null, false) }}</time>
+        <time datetime="{{ item.timestamp|lrToApiString }}">{{ item.timestamp|lrTime('cascade', null, false) }}</time>
     </td>
 
     {# Level — `canonicalLevel` and `levelClass` are precomputed in the
