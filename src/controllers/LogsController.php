@@ -5,7 +5,7 @@
  * Generic controller for viewing plugin logs
  *
  * @link      https://lindemannrock.com
- * @copyright Copyright (c) 2025 LindemannRock
+ * @copyright Copyright (c) 2025-2026 LindemannRock
  */
 
 namespace lindemannrock\logginglibrary\controllers;
@@ -114,14 +114,41 @@ class LogsController extends Controller
             $logMenuLabel = null;
         }
 
-        // Get filter parameters
-        $level = trim($request->getParam('level', 'all'));
-        $category = trim($request->getParam('category', 'all'));
-        $source = trim($request->getParam('source', 'all')); // New: source/category filter
-        $search = trim($request->getParam('search', ''));
-        $sort = trim($request->getParam('sort', 'timestamp'));
-        $dir = trim($request->getParam('dir', 'desc'));
-        $page = (int) trim($request->getParam('page', 1));
+        // ---- Param parsing + allowlist validation -------------------------
+        // Every parameter that controls filtering or sorting goes through an
+        // explicit allowlist. Off-list values snap back to the default. The
+        // service layer also validates `sort`/`category` defensively, but the
+        // controller is the primary gate.
+
+        $level = (string) $request->getParam('level', 'all');
+        $validLevels = ['all', 'error', 'warning', 'info', 'debug', 'unknown'];
+        if (!in_array($level, $validLevels, true)) {
+            $level = 'all';
+        }
+
+        // `category` and `source` have dynamic value spaces (built from the log
+        // files actually present on disk). `category` is validated by
+        // LogCacheService::getLogPage() against the indexed counts; `source` is
+        // validated below once $sources has been built. Both default to 'all'.
+        $category = (string) $request->getParam('category', 'all');
+        $source = (string) $request->getParam('source', 'all');
+
+        // 64-char defensive clamp on free-text search. Keeps a runaway payload
+        // (URL of any length) from reaching the LIKE comparison.
+        $search = trim((string) $request->getParam('search', ''));
+        if (mb_strlen($search) > 64) {
+            $search = mb_substr($search, 0, 64);
+        }
+
+        $validSortFields = ['timestamp', 'level', 'category', 'user', 'message'];
+        $sort = (string) $request->getParam('sort', 'timestamp');
+        if (!in_array($sort, $validSortFields, true)) {
+            $sort = 'timestamp';
+        }
+        $dir = strtolower((string) $request->getParam('dir', 'desc')) === 'asc' ? 'asc' : 'desc';
+
+        $page = max(1, (int) $request->getParam('page', 1));
+        $limit = max(1, (int) $limit);
 
         // Get available log files
         if ($isStandalone) {
@@ -130,6 +157,13 @@ class LogsController extends Controller
             // Extract unique sources for filter dropdown
             $sources = $this->_extractSources($allLogFiles);
             $sourceGroups = $this->_buildSourceGroups($allLogFiles, $sources);
+
+            // Snap unknown source values back to 'all'. $sources only has keys
+            // for sources actually present on disk this request, so this also
+            // handles stale URL params pointing at sources that no longer exist.
+            if (!isset($sources[$source])) {
+                $source = 'all';
+            }
 
             // Filter files by selected source
             if ($source !== 'all') {
