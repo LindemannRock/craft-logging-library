@@ -294,7 +294,6 @@ class LoggingLibrary extends Plugin
             'pluginName' => ucfirst($handle),
             'logLevel' => 'info', // Options: 'debug', 'info', 'warning', 'error'
             'retention' => 30,
-            'maxFileSize' => 10240, // 10MB
             'enableLogViewer' => $logViewersAvailable, // Auto-disable on edge platforms unless force-enabled
             'viewSystemLogsPermissions' => [], // Permissions required to view system logs
             'downloadSystemLogsPermissions' => [], // Permissions required to download system logs
