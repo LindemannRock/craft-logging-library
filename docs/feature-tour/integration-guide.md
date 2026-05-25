@@ -24,7 +24,6 @@ class YourPlugin extends Plugin
             'pluginHandle' => $this->handle,
             'pluginName' => $settings->pluginName ?? $this->name,
             'logLevel' => 'info',
-            'enableLogViewer' => true,
             'itemsPerPage' => $settings->itemsPerPage ?? 50,
             'viewSystemLogsPermissions' => ['yourPlugin:viewLogs'],
             'downloadSystemLogsPermissions' => ['yourPlugin:downloadLogs'],
@@ -34,7 +33,7 @@ class YourPlugin extends Plugin
 ```
 
 > [!NOTE]
-> When `enableLogViewer` is `true`, `configure()` automatically registers the CP routes for your plugin's log viewer (`your-plugin/logs`, `your-plugin/logs/system`, and `your-plugin/logs/system/download`). You do not need to register these routes manually.
+> By default, `configure()` enables the file-based log viewer and automatically registers the CP routes (`your-plugin/logs`, `your-plugin/logs/system`, and `your-plugin/logs/system/download`) unless edge/ephemeral hosting is detected. You do not need to register these routes manually.
 
 > [!WARNING]
 > Do not log messages inside `init()` — it runs on every request and will flood your log files.

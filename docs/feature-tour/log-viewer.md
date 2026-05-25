@@ -4,7 +4,7 @@ The built-in log viewer provides a web interface for browsing, filtering, search
 
 ## How It Works
 
-When a plugin calls `LoggingLibrary::configure()` with `'enableLogViewer' => true`, the log viewer becomes available at `your-plugin/logs/system`. CP routes are registered automatically — no manual route registration is needed. The viewer reads parsed log entries from the [cache](caching.md) and renders them in a paginated table.
+When a plugin calls `LoggingLibrary::configure()`, the log viewer becomes available at `your-plugin/logs/system` unless the viewer is explicitly disabled or the environment is detected as edge/ephemeral. CP routes are registered automatically when the viewer is enabled — no manual route registration is needed. The viewer reads parsed log entries from the [cache](caching.md) and renders them in a paginated table.
 
 ## Features
 
@@ -31,12 +31,11 @@ Two things are required for the log viewer to work:
 ```php
 LoggingLibrary::configure([
     'pluginHandle' => $this->handle,
-    'enableLogViewer' => true,
     // ...
 ]);
 ```
 
-When `enableLogViewer` is `true`, `configure()` automatically registers the CP routes for your plugin's log viewer — no manual route registration needed.
+Omit `enableLogViewer` to use the default behavior: enabled on normal file-backed environments and disabled on detected edge/ephemeral platforms. Set `enableLogViewer` explicitly when you want to force-enable or force-disable the viewer for that plugin.
 
 ### 2. Set Permissions (Optional)
 

@@ -18,18 +18,18 @@
 
 ## Log viewer shows "Plugin logging not configured"
 
-1. Ensure `LoggingLibrary::configure()` is called with `'enableLogViewer' => true`
+1. Ensure `LoggingLibrary::configure()` is called for the plugin
 2. Verify `configure()` runs during your plugin's `init()` before you try to access the log viewer
 3. Confirm the route you are opening matches the same plugin handle passed as `pluginHandle`
 
-**Why:** The controller extracts the plugin handle from the URL and looks up its config. If `configure()` wasn't called, or the URL handle does not match the configured handle, it can't find the config. When `enableLogViewer` is true, Logging Library registers the CP routes automatically.
+**Why:** The controller extracts the plugin handle from the URL and looks up its config. If `configure()` wasn't called, or the URL handle does not match the configured handle, it can't find the config. When the viewer is enabled, Logging Library registers the CP routes automatically.
 
 ## Log viewer shows "Log viewer is disabled for this plugin"
 
 1. Check if `enableLogViewer` is explicitly set to `false` in your `configure()` call
 2. Check if you're running on an edge/CDN platform (Servd) — the viewer is auto-disabled
 
-**Fix:** Set `'enableLogViewer' => true` explicitly to override edge detection. See [Edge Detection](../feature-tour/edge-detection.md).
+**Fix:** Set `'enableLogViewer' => true` for that plugin, or enable `forceEnableLogViewer` globally in Logging Library settings/config if persistent log storage is available. See [Edge Detection](../feature-tour/edge-detection.md).
 
 ## Permission denied when viewing logs
 

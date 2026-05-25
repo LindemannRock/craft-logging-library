@@ -26,7 +26,6 @@ class YourPlugin extends Plugin
             'pluginHandle' => $this->handle,
             'pluginName' => $this->name,
             'logLevel' => 'info',
-            'enableLogViewer' => true,
             'viewSystemLogsPermissions' => ['yourPlugin:viewLogs'],
             'downloadSystemLogsPermissions' => ['yourPlugin:downloadLogs'],
         ]);
@@ -45,6 +44,8 @@ $this->logInfo('Export completed', ['count' => 42]);
 ## 4. Verify It Works
 
 Navigate to **Logging Library → All Logs** in the Control Panel. If the Logging Library CP section has been hidden in plugin settings, open the standalone viewer directly at `/admin/logging-library/logs/system` instead. Select today's log file for your plugin — you should see the log entry you just created.
+
+The file-based viewer is enabled by default on normal file-backed environments. On detected edge/ephemeral platforms such as Servd, it is hidden unless you explicitly force-enable it.
 
 ## What's Next
 

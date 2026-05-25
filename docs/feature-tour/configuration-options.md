@@ -24,11 +24,12 @@ LoggingLibrary::configure([
     'pluginHandle' => $this->handle,
     'pluginName' => $this->name,
     'logLevel' => 'info',
-    'enableLogViewer' => true,
     'viewSystemLogsPermissions' => ['yourPlugin:viewLogs'],
     'downloadSystemLogsPermissions' => ['yourPlugin:downloadLogs'],
 ]);
 ```
+
+Omit `enableLogViewer` to use automatic edge-platform detection. Set it explicitly only when you want to force-enable or force-disable the viewer for a plugin.
 
 ## Log Levels
 
@@ -70,5 +71,7 @@ LoggingLibrary::configure([
     'enableLogViewer' => false, // Force disable regardless of platform
 ]);
 ```
+
+The Logging Library settings screen also includes `forceEnableLogViewer`, which globally force-enables the standalone All Logs viewer and every plugin's file-based Logs section when edge detection would normally hide them.
 
 See [Edge Detection](edge-detection.md) for details on supported platforms.

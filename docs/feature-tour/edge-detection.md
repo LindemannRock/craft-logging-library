@@ -22,11 +22,13 @@ Only verified platforms are included. Additional platforms will be added after r
 
 When `enableLogViewer` is not explicitly set in the `configure()` call, the library checks for known environment variables. If a match is found, `enableLogViewer` defaults to `false`.
 
+When a file-based viewer is disabled, Logging Library hides the related CP navigation and controller actions return a 404 for direct viewer URLs. Logging still works normally — only the file-based web viewer is unavailable.
+
 Logging itself still works normally — messages are routed through Craft's PSR-3 system and appear in the platform's native log dashboard.
 
 ## Manual Override
 
-You can always override the auto-detection:
+You can override auto-detection per plugin:
 
 ```php
 // Force disable (any platform)
@@ -41,6 +43,18 @@ LoggingLibrary::configure([
     'enableLogViewer' => true,
 ]);
 ```
+
+You can also force-enable all file-based viewers globally from the Logging Library settings screen, or in `config/logging-library.php`:
+
+```php
+return [
+    '*' => [
+        'forceEnableLogViewer' => true,
+    ],
+];
+```
+
+Use the global override only when the environment has persistent storage available for `storage/logs/`.
 
 ## Custom Platform Detection
 
