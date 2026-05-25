@@ -21,7 +21,7 @@ This plugin is currently in active development and provided under the MIT Licens
 - **Control Panel Section** — access the standalone viewer from **Logging Library → All Logs** when the CP section is enabled
 - **LoggingTrait** — drop-in trait with `logInfo()`, `logWarning()`, `logError()`, `logDebug()`
 - **LoggingService API** — direct logging, log statistics, recent entries, and cleanup
-- **High Performance Caching** — handle 40,000+ entries instantly with ArrayQuery and file-based caching
+- **High Performance Caching** — indexed file-based cache for large log viewer pages, with ArrayQuery compatibility for API callers
 - **Multi-Format Parsing** — automatically detects plugin, Craft CMS, and PHP error log formats
 - **Edge Detection** — auto-disables log viewer on edge/CDN platforms like Servd
 - **Monolog Integration** — uses Craft 5's Monolog system with proper PSR-3 standards
