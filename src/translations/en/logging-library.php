@@ -83,6 +83,7 @@ return [
     'Current File' => 'Current File',
     'Entries' => 'Entries',
     'Refresh Cache' => 'Refresh Cache',
+    'Loading' => 'Loading',
     'Download File' => 'Download File',
     'Log Location' => 'Log Location',
 

@@ -83,6 +83,7 @@ return [
     'Current File' => 'الملف الحالي',
     'Entries' => 'الإدخالات',
     'Refresh Cache' => 'تحديث Cache',
+    'Loading' => 'جار التحميل',
     'Download File' => 'تنزيل الملف',
     'Log Location' => 'موقع السجل',
 

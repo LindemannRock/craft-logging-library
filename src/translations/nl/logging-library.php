@@ -83,6 +83,7 @@ return [
     'Current File' => 'Huidig bestand',
     'Entries' => 'Vermeldingen',
     'Refresh Cache' => 'Cache vernieuwen',
+    'Loading' => 'Laden',
     'Download File' => 'Bestand downloaden',
     'Log Location' => 'Loglocatie',
 

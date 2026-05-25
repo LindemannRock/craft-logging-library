@@ -83,6 +83,7 @@ return [
     'Current File' => 'Archivo actual',
     'Entries' => 'Entradas',
     'Refresh Cache' => 'Actualizar caché',
+    'Loading' => 'Cargando',
     'Download File' => 'Descargar archivo',
     'Log Location' => 'Ubicación del registro',
 

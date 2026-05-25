@@ -83,6 +83,7 @@ return [
     'Current File' => '現在のファイル',
     'Entries' => 'エントリ',
     'Refresh Cache' => 'キャッシュを更新',
+    'Loading' => 'ロードしています',
     'Download File' => 'ファイルをダウンロード',
     'Log Location' => 'ログの場所',
 

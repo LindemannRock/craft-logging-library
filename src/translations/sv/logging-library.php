@@ -83,6 +83,7 @@ return [
     'Current File' => 'Aktuell fil',
     'Entries' => 'Poster',
     'Refresh Cache' => 'Uppdatera cache',
+    'Loading' => 'Läser in',
     'Download File' => 'Ladda ner fil',
     'Log Location' => 'Loggplats',
 

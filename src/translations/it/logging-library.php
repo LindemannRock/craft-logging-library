@@ -83,6 +83,7 @@ return [
     'Current File' => 'File attuale',
     'Entries' => 'Voci',
     'Refresh Cache' => 'Aggiorna cache',
+    'Loading' => 'Caricamento',
     'Download File' => 'Scarica file',
     'Log Location' => 'Posizione del log',
 
