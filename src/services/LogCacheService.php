@@ -25,7 +25,7 @@ use yii2mod\query\ArrayQuery;
  */
 class LogCacheService extends Component
 {
-    private const PARSER_CACHE_VERSION = '2026-05-17-php-location-context-split';
+    private const PARSER_CACHE_VERSION = '2026-05-25-php-timestamp-normalization';
 
     /**
      * Get logs from file as ArrayQuery (with caching)
@@ -257,6 +257,7 @@ class LogCacheService extends Component
                 }
 
                 if ($format === 'php') {
+                    $datetime = $this->_normalizePhpErrorTimestamp($datetime);
                     $level = $this->_normalizePhpErrorLevel($level);
                     [$message, $context] = $this->_splitPhpErrorContext($message, $context);
                 }
@@ -269,7 +270,7 @@ class LogCacheService extends Component
                 }
 
                 $logs[$key] = [
-                    'timestamp' => $matches['datetime'] ?? null,  // Use 'timestamp' to match template expectations
+                    'timestamp' => $datetime,  // Use 'timestamp' to match template expectations
                     'user' => $matches['user'] ?? 'System',
                     'level' => $level,
                     'channel' => $matches['channel'] ?? null,
@@ -341,6 +342,21 @@ class LogCacheService extends Component
         }
 
         return 'unknown';
+    }
+
+    /**
+     * Convert PHP error timestamps like `17-May-2026 19:46:49 UTC` into the
+     * canonical sortable format used by Craft/plugin logs.
+     */
+    private function _normalizePhpErrorTimestamp(string $datetime): string
+    {
+        $date = \DateTimeImmutable::createFromFormat('d-M-Y H:i:s T', $datetime);
+
+        if ($date === false) {
+            return $datetime;
+        }
+
+        return $date->format('Y-m-d H:i:s');
     }
 
     /**
