@@ -10,7 +10,6 @@ These options are passed to `LoggingLibrary::configure()` as an associative arra
 | `pluginName` | `string` | ucfirst of handle | Display name shown in the log viewer header |
 | `logLevel` | `string` | `'info'` | Minimum log level: `'debug'`, `'info'`, `'warning'`, `'error'` |
 | `retention` | `int` | `30` | Days to keep log files when using `LoggingService::cleanupOldLogs()` |
-| `maxFileSize` | `int` | `10240` | Maximum log file size in KB (10 MB default) |
 | `enableLogViewer` | `bool` | auto | Enable the web log viewer. Auto-disabled on detected edge platforms |
 | `viewSystemLogsPermissions` | `array` | `[]` | Permission strings required to view system logs. Empty = no restriction |
 | `downloadSystemLogsPermissions` | `array` | `[]` | Permission strings required to download log files. Empty = download hidden |
