@@ -36,10 +36,8 @@ return [
         //   4. Hardcoded defaults                          — final fallback
         // Leave commented out to fall through to layers 2-4.
 
-        // Date/time formatting overrides
-        // Only timeFormat and showSeconds affect Logging Library's UI (the log viewer's
-        // timestamp column). The other DateFormatSettingsTrait properties exist on the
-        // model but are not surfaced in this plugin's CP or persisted to DB.
+        // Time formatting overrides for Logging Library.
+        // Full dates shown for undated files, such as phperrors.log, use Base date settings.
         // 'timeFormat'  => '24',      // '12' (AM/PM) or '24' (military)
         // 'showSeconds' => false,
     ],
