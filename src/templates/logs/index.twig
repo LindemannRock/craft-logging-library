@@ -70,6 +70,8 @@
 {# In standalone mode, files have a `filename` key; in plugin mode they have `date`. Guard both accesses against the other mode + null `selectedFile`. #}
 {% set selectedStandaloneFile = (isStandalone and selectedFile and selectedFile.filename is defined) ? selectedFile.filename : '' %}
 {% set selectedPluginDate = (not isStandalone and selectedFile and selectedFile.date is defined) ? selectedFile.date : '' %}
+{% set showDateInTimeColumn = selectedFile and ((selectedFile.date ?? '') in ['current', 'unknown']) %}
+{% set timestampColumnWidth = showDateInTimeColumn ? '220px' : '140px' %}
 
 {% set standaloneFilters = [
     {
@@ -162,13 +164,13 @@
     },
     table: {
         columns: (isStandalone and supportsCategoryFilter) ? [
-            {key: 'timestamp', label: 'Time'|t('logging-library'), sortable: true, width: '140px'},
+            {key: 'timestamp', label: 'Time'|t('logging-library'), sortable: true, width: timestampColumnWidth},
             {key: 'level', label: 'Level'|t('logging-library'), sortable: true, width: '80px'},
             {key: 'category', label: 'Source'|t('logging-library'), sortable: true},
             {key: 'user', label: 'User'|t('logging-library'), sortable: true, width: '100px'},
             {key: 'message', label: 'Message'|t('logging-library'), sortable: true},
         ] : [
-            {key: 'timestamp', label: 'Time'|t('logging-library'), sortable: true, width: '140px'},
+            {key: 'timestamp', label: 'Time'|t('logging-library'), sortable: true, width: timestampColumnWidth},
             {key: 'level', label: 'Level'|t('logging-library'), sortable: true, width: '80px'},
             {key: 'user', label: 'User'|t('logging-library'), sortable: true, width: '100px'},
             {key: 'message', label: 'Message'|t('logging-library'), sortable: true},
@@ -231,7 +233,9 @@
 {% block tableRow %}
     {# Timestamp #}
     <td class="nowrap code">
-        <time datetime="{{ item.timestamp|lrToApiString }}">{{ item.timestamp|lrTime('cascade', null, false) }}</time>
+        <time datetime="{{ item.timestamp|lrToApiString }}">
+            {{ showDateInTimeColumn ? item.timestamp|lrDatetime('cascade', null, true, false) : item.timestamp|lrTime('cascade', null, false) }}
+        </time>
     </td>
 
     {# Level — `canonicalLevel` and `levelClass` are precomputed in the
@@ -446,5 +450,3 @@
         </div>
     </div>
 {% endblock %}
-
-
