@@ -15,7 +15,6 @@ use craft\web\Controller;
 use lindemannrock\base\helpers\CpNavHelper;
 use lindemannrock\logginglibrary\LoggingLibrary;
 use lindemannrock\logginglibrary\models\Settings;
-use lindemannrock\logginglibrary\services\LogCacheService;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
@@ -610,113 +609,15 @@ class LogsController extends Controller
             ];
         }
 
-        $logs = LoggingLibrary::getInstance()->logCache->getLogs($filePath)->all();
-
-        if ($level !== 'all') {
-            $logs = array_values(array_filter($logs, fn($log) => ($log['level'] ?? '') === $level));
-        }
-
-        if ($search) {
-            $logs = array_values(array_filter($logs, function($log) use ($search) {
-                return stripos($log['message'] ?? '', $search) !== false ||
-                       stripos($log['context'] ?? '', $search) !== false ||
-                       stripos($log['category'] ?? '', $search) !== false;
-            }));
-        }
-
-        $categoryCounts = $this->_countCategories($logs);
-        if ($category !== 'all' && !isset($categoryCounts[$category])) {
-            $category = 'all';
-        }
-
-        if ($category !== 'all') {
-            $logs = array_values(array_filter($logs, fn($log) => ($log['category'] ?? '') === $category));
-        }
-
-        $totalCount = count($logs);
-
-        // Apply sorting with stable parse-order tiebreaker (same-second entries
-        // reverse correctly when dir=desc — see LogCacheService::sortLogs)
-        $logs = LogCacheService::sortLogs($logs, $sort, $dir);
-
-        $offset = max(0, ($page - 1) * $limit);
-        $entries = array_slice($logs, $offset, $limit);
-
-        foreach ($entries as $index => &$log) {
-            $log['lineNumber'] = $offset + $index + 1;
-
-            // Canonicalize the level so the template and the row-tint CSS share a single value.
-            // Computed in PHP (per page) instead of Twig (per render) so large pages avoid the
-            // overhead of per-row :has() selector matching in the browser.
-            $levelLower = strtolower((string)($log['level'] ?? ''));
-            $canonical = '';
-            if ($levelLower !== '') {
-                if (
-                    str_contains($levelLower, 'fatal')
-                    || str_contains($levelLower, 'parse')
-                    || str_contains($levelLower, 'recoverable')
-                    || str_contains($levelLower, 'error')
-                ) {
-                    $canonical = 'error';
-                } elseif (str_contains($levelLower, 'warning')) {
-                    $canonical = 'warning';
-                } elseif (
-                    str_contains($levelLower, 'notice')
-                    || str_contains($levelLower, 'deprecated')
-                    || str_contains($levelLower, 'strict')
-                ) {
-                    $canonical = 'info';
-                } elseif (in_array($levelLower, ['debug', 'info'], true)) {
-                    $canonical = $levelLower;
-                }
-            }
-            $log['canonicalLevel'] = $canonical;
-            $log['levelClass'] = $canonical !== '' ? 'lr-level-' . $canonical : '';
-        }
-        unset($log);
-
-        return [
-            'entries' => $entries,
-            'total' => $totalCount,
-            'category' => $category,
-            'categoryOptions' => $this->_buildCategoryOptions($categoryCounts),
-        ];
-    }
-
-    private function _countCategories(array $logs): array
-    {
-        $counts = [];
-        foreach ($logs as $log) {
-            $category = (string)($log['category'] ?? '');
-            if ($category === '') {
-                continue;
-            }
-
-            $counts[$category] = ($counts[$category] ?? 0) + 1;
-        }
-
-        ksort($counts, SORT_NATURAL | SORT_FLAG_CASE);
-        return $counts;
-    }
-
-    private function _buildCategoryOptions(array $categoryCounts): array
-    {
-        $formatter = Craft::$app->getFormatter();
-
-        $options = [[
-            'value' => 'all',
-            'label' => Craft::t('logging-library', 'Source'),
-            'extra' => '(' . $formatter->asInteger(array_sum($categoryCounts)) . ')',
-        ]];
-
-        foreach ($categoryCounts as $category => $count) {
-            $options[] = [
-                'value' => $category,
-                'label' => $category,
-                'extra' => '(' . $formatter->asInteger($count) . ')',
-            ];
-        }
-
-        return $options;
+        return LoggingLibrary::getInstance()->logCache->getLogPage(
+            $filePath,
+            $level,
+            $category,
+            $search,
+            $sort,
+            $dir,
+            $page,
+            $limit
+        );
     }
 }
