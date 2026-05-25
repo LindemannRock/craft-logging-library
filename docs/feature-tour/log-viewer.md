@@ -20,6 +20,8 @@ When a plugin calls `LoggingLibrary::configure()` with `'enableLogViewer' => tru
 - **Adaptive Timestamps** — dated log files show time-only rows, while undated/current files such as `phperrors.log` show full date and time
 - **Smart Columns** — columns with no variance (e.g., all entries from the same user) are automatically hidden
 
+Full dates shown for undated/current files use the shared date settings from `config/lindemannrock-base.php`; Logging Library's own settings only expose time format and seconds controls.
+
 ## Enabling the Viewer
 
 Two things are required for the log viewer to work:

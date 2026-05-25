@@ -1,13 +1,15 @@
 # Caching
 
-Logging Library uses file-based caching to parse log files once and serve subsequent requests instantly. This is handled by the `LogCacheService`.
+Logging Library uses file-based caching to parse log files once and serve subsequent requests efficiently. This is handled by the `LogCacheService`.
 
 ## How It Works
 
-1. **First load** — the service reads and parses the entire log file line by line, building a structured array of entries
-2. **Cache write** — the parsed array is JSON-encoded and written to a `.cache` file in `storage/runtime/logging-library/cache/logs/`
-3. **Subsequent loads** — the service reads from the cache file instead of re-parsing the log
-4. **Querying** — cached entries are loaded into an `ArrayQuery` instance, which provides SQL-like filtering (`WHERE`, `ORDER BY`, `LIMIT`, `OFFSET`)
+1. **First CP load** — the service streams the selected log file line by line and writes parsed entries into an indexed SQLite cache
+2. **Indexed queries** — the log viewer applies level/category/search filters, sorting, counts, and pagination in SQLite
+3. **Subsequent CP loads** — the viewer reads only the requested page from the indexed cache instead of loading the full log into PHP memory
+4. **ArrayQuery compatibility** — the public `getLogs()` API still provides the legacy JSON/ArrayQuery cache for callers that need the full parsed array
+
+The indexed cache requires PHP's PDO SQLite driver. If PDO SQLite is unavailable, the viewer falls back to the legacy JSON/ArrayQuery cache so the interface still works, but large files will use more PHP memory.
 
 ## Cache Invalidation
 
@@ -29,11 +31,12 @@ The `LogCacheService` provides a `getCacheStats()` method that returns:
 
 ## Performance
 
-The caching layer handles large log files efficiently:
+The CP log viewer is optimized for large files:
 
-- **40,000+ entries** can be parsed, cached, and queried with no noticeable delay
-- First-load parsing streams the file line by line to avoid loading the entire file into memory
-- ArrayQuery filtering is performed in-memory on the cached data — no file I/O on subsequent page loads
+- First-load parsing streams the file line by line to avoid loading the entire raw log into memory
+- Filtering, sorting, category counts, and pagination run against the indexed cache
+- Page requests load only the rows needed for the current page
+- The legacy `getLogs()` ArrayQuery API loads the full parsed log and should not be used for very large files
 
 ## Cache Location
 
@@ -43,4 +46,4 @@ Cache files are stored at:
 storage/runtime/logging-library/cache/logs/
 ```
 
-Each cache file is named by its MD5 key with a `.cache` extension. You can safely delete these files — they will be regenerated on the next request.
+Indexed CP-viewer cache files use the `.sqlite` extension. Legacy ArrayQuery cache files use the `.cache` extension. You can safely delete these files — they will be regenerated on the next request.
