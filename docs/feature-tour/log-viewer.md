@@ -17,6 +17,7 @@ When a plugin calls `LoggingLibrary::configure()` with `'enableLogViewer' => tru
 - **Refresh Cache** — clear the parsed cache for the selected log file from the sidebar
 - **Context Expansion** — click to view JSON context data inline
 - **Consolidated Sources** — the standalone All Logs view groups Craft system logs and plugin logs in the source filter
+- **Adaptive Timestamps** — dated log files show time-only rows, while undated/current files such as `phperrors.log` show full date and time
 - **Smart Columns** — columns with no variance (e.g., all entries from the same user) are automatically hidden
 
 ## Enabling the Viewer
