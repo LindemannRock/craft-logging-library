@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace lindemannrock\logginglibrary\tests\Integration;
 
 use lindemannrock\logginglibrary\LoggingLibrary;
+use lindemannrock\logginglibrary\services\LogCacheService;
 use lindemannrock\logginglibrary\tests\TestCase;
 
 /**
@@ -79,10 +80,34 @@ final class LogParsingTest extends TestCase
         $logs = LoggingLibrary::getInstance()->logCache->getLogs($path)->all();
 
         self::assertCount(1, $logs);
+        self::assertSame('2026-05-17 19:46:49', $logs[0]['timestamp']);
         self::assertSame('error', $logs[0]['level']);
         self::assertSame('php-errors', $logs[0]['category']);
         self::assertSame('Access level problem', $logs[0]['message']);
         self::assertSame('in /var/www/html/plugin.php on line 42', $logs[0]['context']);
+    }
+
+    public function testPhpErrorTimestampsSortChronologicallyAcrossMonths(): void
+    {
+        $path = $this->seedLogFile(
+            self::TEST_HANDLE_PREFIX . 'phperrors.log',
+            "[30-Apr-2026 19:46:49 UTC] PHP Fatal error: April error\n" .
+            "[23-May-2026 09:52:47 UTC] PHP Fatal error: May error\n",
+        );
+
+        $logs = LoggingLibrary::getInstance()->logCache->getLogs($path)->all();
+
+        self::assertSame(
+            ['2026-04-30 19:46:49', '2026-05-23 09:52:47'],
+            array_column($logs, 'timestamp'),
+        );
+
+        $sorted = LogCacheService::sortLogs($logs, 'timestamp', 'desc');
+
+        self::assertSame(
+            ['May error', 'April error'],
+            array_column($sorted, 'message'),
+        );
     }
 
     public function testPhpStackTraceIsMovedToContext(): void
