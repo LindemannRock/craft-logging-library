@@ -80,11 +80,7 @@ class Settings extends Model
     }
 
     /**
-     * `DateFormatSettingsTrait` declares five properties, but Logging Library
-     * only consumes `timeFormat` and `showSeconds` (the log viewer's timestamp
-     * column uses `|lrTime`, which honors only those two). The other three
-     * stay null on the model and are not persisted — no DB columns exist for
-     * them on this plugin's settings table.
+     * Only these date-format fields have columns in this plugin's settings table.
      */
     protected static function excludeFromSave(): array
     {
