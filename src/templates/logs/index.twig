@@ -71,7 +71,6 @@
 {% set selectedStandaloneFile = (isStandalone and selectedFile and selectedFile.filename is defined) ? selectedFile.filename : '' %}
 {% set selectedPluginDate = (not isStandalone and selectedFile and selectedFile.date is defined) ? selectedFile.date : '' %}
 {% set showDateInTimeColumn = selectedFile and ((selectedFile.date ?? '') in ['current', 'unknown']) %}
-{% set timestampColumnWidth = showDateInTimeColumn ? '220px' : '140px' %}
 
 {% set standaloneFilters = [
     {
@@ -164,15 +163,15 @@
     },
     table: {
         columns: (isStandalone and supportsCategoryFilter) ? [
-            {key: 'timestamp', label: 'Time'|t('logging-library'), sortable: true, width: timestampColumnWidth},
-            {key: 'level', label: 'Level'|t('logging-library'), sortable: true, width: '80px'},
+            {key: 'timestamp', label: 'Time'|t('logging-library'), sortable: true},
+            {key: 'level', label: 'Level'|t('logging-library'), sortable: true},
             {key: 'category', label: 'Source'|t('logging-library'), sortable: true},
-            {key: 'user', label: 'User'|t('logging-library'), sortable: true, width: '100px'},
+            {key: 'user', label: 'User'|t('logging-library'), sortable: true},
             {key: 'message', label: 'Message'|t('logging-library'), sortable: true},
         ] : [
-            {key: 'timestamp', label: 'Time'|t('logging-library'), sortable: true, width: timestampColumnWidth},
-            {key: 'level', label: 'Level'|t('logging-library'), sortable: true, width: '80px'},
-            {key: 'user', label: 'User'|t('logging-library'), sortable: true, width: '100px'},
+            {key: 'timestamp', label: 'Time'|t('logging-library'), sortable: true},
+            {key: 'level', label: 'Level'|t('logging-library'), sortable: true},
+            {key: 'user', label: 'User'|t('logging-library'), sortable: true},
             {key: 'message', label: 'Message'|t('logging-library'), sortable: true},
         ],
         items: logEntries,
@@ -201,9 +200,6 @@
     {% include 'lindemannrock-base/_partials/styles-log-level-rows' only %}
 
     <style>
-        table#lr-data-table {
-            table-layout: fixed;
-        }
         .lr-log-pre {
             margin: 0;
             font-family: Monaco, 'Courier New', monospace;
