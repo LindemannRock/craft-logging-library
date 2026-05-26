@@ -29,7 +29,6 @@ return [
     'Manage settings' => 'Manage settings',
 
     // Common
-    'Save Settings' => 'Save Settings',
     '{displayName} caches' => '{displayName} caches',
 
     // Log levels
@@ -67,10 +66,6 @@ return [
     // Pagination
     'entry' => 'entry',
     'entries' => 'entries',
-
-    // Row detail
-    'Context' => 'Context',
-    'No context data available.' => 'No context data available.',
 
     // Sidebar
     'Current Level' => 'Current Level',

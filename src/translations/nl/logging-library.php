@@ -29,7 +29,6 @@ return [
     'Manage settings' => 'Instellingen beheren',
 
     // Common
-    'Save Settings' => 'Instellingen opslaan',
     '{displayName} caches' => '{displayName} caches',
 
     // Log levels
@@ -67,10 +66,6 @@ return [
     // Pagination
     'entry' => 'vermelding',
     'entries' => 'vermeldingen',
-
-    // Row detail
-    'Context' => 'Context',
-    'No context data available.' => 'Geen contextgegevens beschikbaar.',
 
     // Sidebar
     'Current Level' => 'Huidig niveau',

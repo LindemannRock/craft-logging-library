@@ -29,7 +29,6 @@ return [
     'Manage settings' => 'Administrer indstillinger',
 
     // Common
-    'Save Settings' => 'Gem indstillinger',
     '{displayName} caches' => '{displayName}-caches',
 
     // Log levels
@@ -67,10 +66,6 @@ return [
     // Pagination
     'entry' => 'post',
     'entries' => 'poster',
-
-    // Row detail
-    'Context' => 'Kontekst',
-    'No context data available.' => 'Ingen kontekstdata tilgængelig.',
 
     // Sidebar
     'Current Level' => 'Nuværende niveau',

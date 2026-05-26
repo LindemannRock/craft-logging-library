@@ -29,7 +29,6 @@ return [
     'Manage settings' => '設定を管理する',
 
     // Common
-    'Save Settings' => '設定を保存する',
     '{displayName} caches' => '{displayName} のキャッシュ',
 
     // Log levels
@@ -67,10 +66,6 @@ return [
     // Pagination
     'entry' => 'エントリ',
     'entries' => 'エントリ',
-
-    // Row detail
-    'Context' => 'コンテキスト',
-    'No context data available.' => 'コンテキストデータがありません。',
 
     // Sidebar
     'Current Level' => '現在のレベル',

@@ -29,7 +29,6 @@ return [
     'Manage settings' => 'Hantera inställningar',
 
     // Common
-    'Save Settings' => 'Spara inställningar',
     '{displayName} caches' => '{displayName}-cacher',
 
     // Log levels
@@ -67,10 +66,6 @@ return [
     // Pagination
     'entry' => 'post',
     'entries' => 'poster',
-
-    // Row detail
-    'Context' => 'Kontext',
-    'No context data available.' => 'Ingen kontextdata tillgänglig.',
 
     // Sidebar
     'Current Level' => 'Aktuell nivå',

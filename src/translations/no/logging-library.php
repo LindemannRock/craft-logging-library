@@ -29,7 +29,6 @@ return [
     'Manage settings' => 'Administrer innstillinger',
 
     // Common
-    'Save Settings' => 'Lagre innstillinger',
     '{displayName} caches' => '{displayName}-cacher',
 
     // Log levels
@@ -67,10 +66,6 @@ return [
     // Pagination
     'entry' => 'oppføring',
     'entries' => 'oppføringer',
-
-    // Row detail
-    'Context' => 'Kontekst',
-    'No context data available.' => 'Ingen kontekstdata tilgjengelig.',
 
     // Sidebar
     'Current Level' => 'Gjeldende nivå',

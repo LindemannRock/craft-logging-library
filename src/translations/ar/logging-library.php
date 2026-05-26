@@ -29,7 +29,6 @@ return [
     'Manage settings' => 'إدارة الإعدادات',
 
     // Common
-    'Save Settings' => 'حفظ الإعدادات',
     '{displayName} caches' => 'Caches الخاصة بـ {displayName}',
 
     // Log levels
@@ -67,10 +66,6 @@ return [
     // Pagination
     'entry' => 'إدخال',
     'entries' => 'إدخالات',
-
-    // Row detail
-    'Context' => 'السياق',
-    'No context data available.' => 'لا تتوفر بيانات سياقية.',
 
     // Sidebar
     'Current Level' => 'المستوى الحالي',
