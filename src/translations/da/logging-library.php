@@ -31,6 +31,36 @@ return [
     // Common
     '{displayName} caches' => '{displayName}-caches',
 
+    // Controller messages
+    'Settings saved.' => 'Indstillinger gemt.',
+    'Could not save settings.' => 'Kunne ikke gemme indstillingerne.',
+    'Log cache refreshed.' => 'Log-cache opdateret.',
+    'Failed to refresh log cache.' => 'Log-cache kunne ikke opdateres.',
+    'Plugin logging not configured' => 'Plugin-logning er ikke konfigureret',
+    'Log viewer is disabled for this plugin' => 'Logviseren er deaktiveret for dette plugin',
+    'Log viewer is disabled for this environment' => 'Logviseren er deaktiveret for dette miljø',
+    'Log file not found' => 'Logfilen blev ikke fundet',
+    'Unable to determine plugin handle from URL' => 'Plugin-handle kunne ikke bestemmes ud fra URL',
+    'User does not have permission to view logs' => 'Brugeren har ikke tilladelse til at vise logfiler',
+
+    // Validation messages
+    'Found {count, number} {count, plural, =1{error} other{errors}}' => '{count, number} {count, plural, =1{fejl} other{fejl}} fundet',
+    'Value must be a whole number.' => 'Værdien skal være et helt tal.',
+
+    // Settings: General
+    'General Settings' => 'Generelle indstillinger',
+    'Force Enable Log Viewers' => 'Tving aktivering af logvisere',
+    'Force-enable file-based log viewers even when an edge or ephemeral environment is detected. This affects Logging Library and every plugin&apos;s dedicated Logs section.' => 'Tving aktivering af filbaserede logvisere, selv når et edge- eller flygtigt miljø registreres. Dette påvirker Logging Library og hvert plugins dedikerede Logfiler-sektion.',
+    'Logging Library detected an edge or ephemeral environment, so file-based log viewers are hidden for the standalone <strong>All Logs</strong> view and for every plugin&apos;s dedicated <strong>Logs</strong> section. The main menu viewer is unavailable until you enable this override. Use your hosting platform&apos;s native logs, or enable the override if persistent storage is available.' => 'Logging Library registrerede et edge- eller flygtigt miljø, så filbaserede logvisere er skjult for den selvstændige <strong>Alle logfiler</strong>-visning og for hvert plugins dedikerede <strong>Logfiler</strong>-sektion. Hovedmenuviseren er ikke tilgængelig, før du aktiverer denne tilsidesættelse. Brug din hostingplatforms native logfiler, eller aktiver tilsidesættelsen, hvis vedvarende lagring er tilgængelig.',
+    'Logging Library detected an edge or ephemeral environment, but file-based log viewers are being force-enabled. This override affects the standalone <strong>All Logs</strong> view and every plugin&apos;s dedicated <strong>Logs</strong> section.' => 'Logging Library registrerede et edge- eller flygtigt miljø, men filbaserede logvisere aktiveres med tvang. Denne tilsidesættelse påvirker den selvstændige <strong>Alle logfiler</strong>-visning og hvert plugins dedikerede <strong>Logfiler</strong>-sektion.',
+    'Logging Library adds a consolidated <strong>All Logs</strong> view to the main Control Panel menu. Individual plugins still keep their own dedicated <strong>Logs</strong> sections.' => 'Logging Library tilføjer en samlet <strong>Alle logfiler</strong>-visning til kontrolpanelets hovedmenu. Individuelle plugins beholder stadig deres egne dedikerede <strong>Logfiler</strong>-sektioner.',
+    'The consolidated <strong>All Logs</strong> view is hidden from the main Control Panel menu. Individual plugins still keep their own dedicated <strong>Logs</strong> sections.' => 'Den samlede <strong>Alle logfiler</strong>-visning er skjult fra kontrolpanelets hovedmenu. Individuelle plugins beholder stadig deres egne dedikerede <strong>Logfiler</strong>-sektioner.',
+    'Show Main Menu' => 'Vis hovedmenu',
+    'Show Logging Library in the main Control Panel navigation as a consolidated All Logs view when file-based log viewers are available.' => 'Vis Logging Library i kontrolpanelets hovednavigation som en samlet Alle logfiler-visning, når filbaserede logvisere er tilgængelige.',
+
+    // Settings: Interface
+    'Interface Settings' => 'Brugerflade-indstillinger',
+
     // Log levels
     'All Levels' => 'Alle niveauer',
     'Error' => 'Fejl',
@@ -82,38 +112,7 @@ return [
     'Download File' => 'Download fil',
     'Log Location' => 'Logplacering',
 
-    // Controller messages
-    'Settings saved.' => 'Indstillinger gemt.',
-    'Could not save settings.' => 'Kunne ikke gemme indstillingerne.',
-    'Log cache refreshed.' => 'Log-cache opdateret.',
-    'Failed to refresh log cache.' => 'Log-cache kunne ikke opdateres.',
-    'Plugin logging not configured' => 'Plugin-logning er ikke konfigureret',
-    'Log viewer is disabled for this plugin' => 'Logviseren er deaktiveret for dette plugin',
-    'Log viewer is disabled for this environment' => 'Logviseren er deaktiveret for dette miljø',
-    'Log file not found' => 'Logfilen blev ikke fundet',
-    'Unable to determine plugin handle from URL' => 'Plugin-handle kunne ikke bestemmes ud fra URL',
-    'User does not have permission to view logs' => 'Brugeren har ikke tilladelse til at vise logfiler',
-
-    // Validation messages
-    'Found {count, number} {count, plural, =1{error} other{errors}}' => '{count, number} {count, plural, =1{fejl} other{fejl}} fundet',
-    'Value must be a whole number.' => 'Værdien skal være et helt tal.',
-
-    // Settings: General
-    'General Settings' => 'Generelle indstillinger',
-    'Force Enable Log Viewers' => 'Tving aktivering af logvisere',
-    'Force-enable file-based log viewers even when an edge or ephemeral environment is detected. This affects Logging Library and every plugin&apos;s dedicated Logs section.' => 'Tving aktivering af filbaserede logvisere, selv når et edge- eller flygtigt miljø registreres. Dette påvirker Logging Library og hvert plugins dedikerede Logfiler-sektion.',
-    'Logging Library detected an edge or ephemeral environment, so file-based log viewers are hidden for the standalone <strong>All Logs</strong> view and for every plugin&apos;s dedicated <strong>Logs</strong> section. The main menu viewer is unavailable until you enable this override. Use your hosting platform&apos;s native logs, or enable the override if persistent storage is available.' => 'Logging Library registrerede et edge- eller flygtigt miljø, så filbaserede logvisere er skjult for den selvstændige <strong>Alle logfiler</strong>-visning og for hvert plugins dedikerede <strong>Logfiler</strong>-sektion. Hovedmenuviseren er ikke tilgængelig, før du aktiverer denne tilsidesættelse. Brug din hostingplatforms native logfiler, eller aktiver tilsidesættelsen, hvis vedvarende lagring er tilgængelig.',
-    'Logging Library detected an edge or ephemeral environment, but file-based log viewers are being force-enabled. This override affects the standalone <strong>All Logs</strong> view and every plugin&apos;s dedicated <strong>Logs</strong> section.' => 'Logging Library registrerede et edge- eller flygtigt miljø, men filbaserede logvisere aktiveres med tvang. Denne tilsidesættelse påvirker den selvstændige <strong>Alle logfiler</strong>-visning og hvert plugins dedikerede <strong>Logfiler</strong>-sektion.',
-    'Logging Library adds a consolidated <strong>All Logs</strong> view to the main Control Panel menu. Individual plugins still keep their own dedicated <strong>Logs</strong> sections.' => 'Logging Library tilføjer en samlet <strong>Alle logfiler</strong>-visning til kontrolpanelets hovedmenu. Individuelle plugins beholder stadig deres egne dedikerede <strong>Logfiler</strong>-sektioner.',
-    'The consolidated <strong>All Logs</strong> view is hidden from the main Control Panel menu. Individual plugins still keep their own dedicated <strong>Logs</strong> sections.' => 'Den samlede <strong>Alle logfiler</strong>-visning er skjult fra kontrolpanelets hovedmenu. Individuelle plugins beholder stadig deres egne dedikerede <strong>Logfiler</strong>-sektioner.',
-    'Show Main Menu' => 'Vis hovedmenu',
-    'Show Logging Library in the main Control Panel navigation as a consolidated All Logs view when file-based log viewers are available.' => 'Vis Logging Library i kontrolpanelets hovednavigation som en samlet Alle logfiler-visning, når filbaserede logvisere er tilgængelige.',
-
-    // Settings: Interface
-    'Interface Settings' => 'Brugerflade-indstillinger',
-
     // Config overrides
     'This is being overridden by the <code>forceEnableLogViewer</code> setting in <code>config/logging-library.php</code>.' => 'Dette tilsidesættes af indstillingen <code>forceEnableLogViewer</code> i <code>config/logging-library.php</code>.',
     'This is being overridden by the <code>showCpSection</code> setting in <code>config/logging-library.php</code>.' => 'Dette tilsidesættes af indstillingen <code>showCpSection</code> i <code>config/logging-library.php</code>.',
-
 ];

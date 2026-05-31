@@ -31,6 +31,36 @@ return [
     // Common
     '{displayName} caches' => 'Caches {displayName}',
 
+    // Controller messages
+    'Settings saved.' => 'Paramètres enregistrés.',
+    'Could not save settings.' => 'Impossible d\'enregistrer les paramètres.',
+    'Log cache refreshed.' => 'Cache des journaux actualisé.',
+    'Failed to refresh log cache.' => 'Échec de l\'actualisation du cache des journaux.',
+    'Plugin logging not configured' => 'Journalisation du plugin non configurée',
+    'Log viewer is disabled for this plugin' => 'La visionneuse de journaux est désactivée pour ce plugin',
+    'Log viewer is disabled for this environment' => 'La visionneuse de journaux est désactivée pour cet environnement',
+    'Log file not found' => 'Fichier journal introuvable',
+    'Unable to determine plugin handle from URL' => 'Impossible de déterminer l\'identifiant du plugin depuis l\'URL',
+    'User does not have permission to view logs' => 'L\'utilisateur n\'a pas la permission de consulter les journaux',
+
+    // Validation messages
+    'Found {count, number} {count, plural, =1{error} other{errors}}' => '{count, number} {count, plural, =1{erreur trouvée} other{erreurs trouvées}}',
+    'Value must be a whole number.' => 'La valeur doit être un nombre entier.',
+
+    // Settings: General
+    'General Settings' => 'Paramètres généraux',
+    'Force Enable Log Viewers' => 'Forcer l\'activation des visionneuses de journaux',
+    'Force-enable file-based log viewers even when an edge or ephemeral environment is detected. This affects Logging Library and every plugin&apos;s dedicated Logs section.' => 'Forcer l\'activation des visionneuses de journaux basées sur des fichiers même lorsqu\'un environnement edge ou éphémère est détecté. Cela affecte Logging Library et la section Journaux dédiée de chaque plugin.',
+    'Logging Library detected an edge or ephemeral environment, so file-based log viewers are hidden for the standalone <strong>All Logs</strong> view and for every plugin&apos;s dedicated <strong>Logs</strong> section. The main menu viewer is unavailable until you enable this override. Use your hosting platform&apos;s native logs, or enable the override if persistent storage is available.' => 'Logging Library a détecté un environnement edge ou éphémère. Les visionneuses de journaux basées sur des fichiers sont donc masquées pour la vue autonome <strong>Tous les journaux</strong> et pour la section <strong>Journaux</strong> dédiée de chaque plugin. La visionneuse du menu principal n\'est pas disponible tant que vous n\'activez pas ce remplacement. Utilisez les journaux natifs de votre plateforme d\'hébergement ou activez le remplacement si un stockage persistant est disponible.',
+    'Logging Library detected an edge or ephemeral environment, but file-based log viewers are being force-enabled. This override affects the standalone <strong>All Logs</strong> view and every plugin&apos;s dedicated <strong>Logs</strong> section.' => 'Logging Library a détecté un environnement edge ou éphémère, mais les visionneuses de journaux basées sur des fichiers sont activées de force. Ce remplacement affecte la vue autonome <strong>Tous les journaux</strong> et la section <strong>Journaux</strong> dédiée de chaque plugin.',
+    'Logging Library adds a consolidated <strong>All Logs</strong> view to the main Control Panel menu. Individual plugins still keep their own dedicated <strong>Logs</strong> sections.' => 'Logging Library ajoute une vue consolidée <strong>Tous les journaux</strong> au menu principal du panneau de contrôle. Les plugins individuels conservent leurs propres sections <strong>Journaux</strong> dédiées.',
+    'The consolidated <strong>All Logs</strong> view is hidden from the main Control Panel menu. Individual plugins still keep their own dedicated <strong>Logs</strong> sections.' => 'La vue consolidée <strong>Tous les journaux</strong> est masquée dans le menu principal du panneau de contrôle. Les plugins individuels conservent leurs propres sections <strong>Journaux</strong> dédiées.',
+    'Show Main Menu' => 'Afficher le menu principal',
+    'Show Logging Library in the main Control Panel navigation as a consolidated All Logs view when file-based log viewers are available.' => 'Afficher Logging Library dans la navigation principale du panneau de contrôle sous forme de vue consolidée Tous les journaux lorsque des visionneuses de journaux basées sur des fichiers sont disponibles.',
+
+    // Settings: Interface
+    'Interface Settings' => 'Paramètres d\'interface',
+
     // Log levels
     'All Levels' => 'Tous les niveaux',
     'Error' => 'Erreur',
@@ -82,38 +112,7 @@ return [
     'Download File' => 'Télécharger le fichier',
     'Log Location' => 'Emplacement du journal',
 
-    // Controller messages
-    'Settings saved.' => 'Paramètres enregistrés.',
-    'Could not save settings.' => 'Impossible d\'enregistrer les paramètres.',
-    'Log cache refreshed.' => 'Cache des journaux actualisé.',
-    'Failed to refresh log cache.' => 'Échec de l\'actualisation du cache des journaux.',
-    'Plugin logging not configured' => 'Journalisation du plugin non configurée',
-    'Log viewer is disabled for this plugin' => 'La visionneuse de journaux est désactivée pour ce plugin',
-    'Log viewer is disabled for this environment' => 'La visionneuse de journaux est désactivée pour cet environnement',
-    'Log file not found' => 'Fichier journal introuvable',
-    'Unable to determine plugin handle from URL' => 'Impossible de déterminer l\'identifiant du plugin depuis l\'URL',
-    'User does not have permission to view logs' => 'L\'utilisateur n\'a pas la permission de consulter les journaux',
-
-    // Validation messages
-    'Found {count, number} {count, plural, =1{error} other{errors}}' => '{count, number} {count, plural, =1{erreur trouvée} other{erreurs trouvées}}',
-    'Value must be a whole number.' => 'La valeur doit être un nombre entier.',
-
-    // Settings: General
-    'General Settings' => 'Paramètres généraux',
-    'Force Enable Log Viewers' => 'Forcer l\'activation des visionneuses de journaux',
-    'Force-enable file-based log viewers even when an edge or ephemeral environment is detected. This affects Logging Library and every plugin&apos;s dedicated Logs section.' => 'Forcer l\'activation des visionneuses de journaux basées sur des fichiers même lorsqu\'un environnement edge ou éphémère est détecté. Cela affecte Logging Library et la section Journaux dédiée de chaque plugin.',
-    'Logging Library detected an edge or ephemeral environment, so file-based log viewers are hidden for the standalone <strong>All Logs</strong> view and for every plugin&apos;s dedicated <strong>Logs</strong> section. The main menu viewer is unavailable until you enable this override. Use your hosting platform&apos;s native logs, or enable the override if persistent storage is available.' => 'Logging Library a détecté un environnement edge ou éphémère. Les visionneuses de journaux basées sur des fichiers sont donc masquées pour la vue autonome <strong>Tous les journaux</strong> et pour la section <strong>Journaux</strong> dédiée de chaque plugin. La visionneuse du menu principal n\'est pas disponible tant que vous n\'activez pas ce remplacement. Utilisez les journaux natifs de votre plateforme d\'hébergement ou activez le remplacement si un stockage persistant est disponible.',
-    'Logging Library detected an edge or ephemeral environment, but file-based log viewers are being force-enabled. This override affects the standalone <strong>All Logs</strong> view and every plugin&apos;s dedicated <strong>Logs</strong> section.' => 'Logging Library a détecté un environnement edge ou éphémère, mais les visionneuses de journaux basées sur des fichiers sont activées de force. Ce remplacement affecte la vue autonome <strong>Tous les journaux</strong> et la section <strong>Journaux</strong> dédiée de chaque plugin.',
-    'Logging Library adds a consolidated <strong>All Logs</strong> view to the main Control Panel menu. Individual plugins still keep their own dedicated <strong>Logs</strong> sections.' => 'Logging Library ajoute une vue consolidée <strong>Tous les journaux</strong> au menu principal du panneau de contrôle. Les plugins individuels conservent leurs propres sections <strong>Journaux</strong> dédiées.',
-    'The consolidated <strong>All Logs</strong> view is hidden from the main Control Panel menu. Individual plugins still keep their own dedicated <strong>Logs</strong> sections.' => 'La vue consolidée <strong>Tous les journaux</strong> est masquée dans le menu principal du panneau de contrôle. Les plugins individuels conservent leurs propres sections <strong>Journaux</strong> dédiées.',
-    'Show Main Menu' => 'Afficher le menu principal',
-    'Show Logging Library in the main Control Panel navigation as a consolidated All Logs view when file-based log viewers are available.' => 'Afficher Logging Library dans la navigation principale du panneau de contrôle sous forme de vue consolidée Tous les journaux lorsque des visionneuses de journaux basées sur des fichiers sont disponibles.',
-
-    // Settings: Interface
-    'Interface Settings' => 'Paramètres d\'interface',
-
     // Config overrides
     'This is being overridden by the <code>forceEnableLogViewer</code> setting in <code>config/logging-library.php</code>.' => 'Ce paramètre est remplacé par le paramètre <code>forceEnableLogViewer</code> dans <code>config/logging-library.php</code>.',
     'This is being overridden by the <code>showCpSection</code> setting in <code>config/logging-library.php</code>.' => 'Ce paramètre est remplacé par le paramètre <code>showCpSection</code> dans <code>config/logging-library.php</code>.',
-
 ];

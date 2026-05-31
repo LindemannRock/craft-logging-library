@@ -31,6 +31,36 @@ return [
     // Common
     '{displayName} caches' => '{displayName} caches',
 
+    // Controller messages
+    'Settings saved.' => 'Settings saved.',
+    'Could not save settings.' => 'Could not save settings.',
+    'Log cache refreshed.' => 'Log cache refreshed.',
+    'Failed to refresh log cache.' => 'Failed to refresh log cache.',
+    'Plugin logging not configured' => 'Plugin logging not configured',
+    'Log viewer is disabled for this plugin' => 'Log viewer is disabled for this plugin',
+    'Log viewer is disabled for this environment' => 'Log viewer is disabled for this environment',
+    'Log file not found' => 'Log file not found',
+    'Unable to determine plugin handle from URL' => 'Unable to determine plugin handle from URL',
+    'User does not have permission to view logs' => 'User does not have permission to view logs',
+
+    // Validation messages
+    'Found {count, number} {count, plural, =1{error} other{errors}}' => 'Found {count, number} {count, plural, =1{error} other{errors}}',
+    'Value must be a whole number.' => 'Value must be a whole number.',
+
+    // Settings: General
+    'General Settings' => 'General Settings',
+    'Force Enable Log Viewers' => 'Force Enable Log Viewers',
+    'Force-enable file-based log viewers even when an edge or ephemeral environment is detected. This affects Logging Library and every plugin&apos;s dedicated Logs section.' => 'Force-enable file-based log viewers even when an edge or ephemeral environment is detected. This affects Logging Library and every plugin&apos;s dedicated Logs section.',
+    'Logging Library detected an edge or ephemeral environment, so file-based log viewers are hidden for the standalone <strong>All Logs</strong> view and for every plugin&apos;s dedicated <strong>Logs</strong> section. The main menu viewer is unavailable until you enable this override. Use your hosting platform&apos;s native logs, or enable the override if persistent storage is available.' => 'Logging Library detected an edge or ephemeral environment, so file-based log viewers are hidden for the standalone <strong>All Logs</strong> view and for every plugin&apos;s dedicated <strong>Logs</strong> section. The main menu viewer is unavailable until you enable this override. Use your hosting platform&apos;s native logs, or enable the override if persistent storage is available.',
+    'Logging Library detected an edge or ephemeral environment, but file-based log viewers are being force-enabled. This override affects the standalone <strong>All Logs</strong> view and every plugin&apos;s dedicated <strong>Logs</strong> section.' => 'Logging Library detected an edge or ephemeral environment, but file-based log viewers are being force-enabled. This override affects the standalone <strong>All Logs</strong> view and every plugin&apos;s dedicated <strong>Logs</strong> section.',
+    'Logging Library adds a consolidated <strong>All Logs</strong> view to the main Control Panel menu. Individual plugins still keep their own dedicated <strong>Logs</strong> sections.' => 'Logging Library adds a consolidated <strong>All Logs</strong> view to the main Control Panel menu. Individual plugins still keep their own dedicated <strong>Logs</strong> sections.',
+    'The consolidated <strong>All Logs</strong> view is hidden from the main Control Panel menu. Individual plugins still keep their own dedicated <strong>Logs</strong> sections.' => 'The consolidated <strong>All Logs</strong> view is hidden from the main Control Panel menu. Individual plugins still keep their own dedicated <strong>Logs</strong> sections.',
+    'Show Main Menu' => 'Show Main Menu',
+    'Show Logging Library in the main Control Panel navigation as a consolidated All Logs view when file-based log viewers are available.' => 'Show Logging Library in the main Control Panel navigation as a consolidated All Logs view when file-based log viewers are available.',
+
+    // Settings: Interface
+    'Interface Settings' => 'Interface Settings',
+
     // Log levels
     'All Levels' => 'All Levels',
     'Error' => 'Error',
@@ -82,38 +112,7 @@ return [
     'Download File' => 'Download File',
     'Log Location' => 'Log Location',
 
-    // Controller messages
-    'Settings saved.' => 'Settings saved.',
-    'Could not save settings.' => 'Could not save settings.',
-    'Log cache refreshed.' => 'Log cache refreshed.',
-    'Failed to refresh log cache.' => 'Failed to refresh log cache.',
-    'Plugin logging not configured' => 'Plugin logging not configured',
-    'Log viewer is disabled for this plugin' => 'Log viewer is disabled for this plugin',
-    'Log viewer is disabled for this environment' => 'Log viewer is disabled for this environment',
-    'Log file not found' => 'Log file not found',
-    'Unable to determine plugin handle from URL' => 'Unable to determine plugin handle from URL',
-    'User does not have permission to view logs' => 'User does not have permission to view logs',
-
-    // Validation messages
-    'Found {count, number} {count, plural, =1{error} other{errors}}' => 'Found {count, number} {count, plural, =1{error} other{errors}}',
-    'Value must be a whole number.' => 'Value must be a whole number.',
-
-    // Settings: General
-    'General Settings' => 'General Settings',
-    'Force Enable Log Viewers' => 'Force Enable Log Viewers',
-    'Force-enable file-based log viewers even when an edge or ephemeral environment is detected. This affects Logging Library and every plugin&apos;s dedicated Logs section.' => 'Force-enable file-based log viewers even when an edge or ephemeral environment is detected. This affects Logging Library and every plugin&apos;s dedicated Logs section.',
-    'Logging Library detected an edge or ephemeral environment, so file-based log viewers are hidden for the standalone <strong>All Logs</strong> view and for every plugin&apos;s dedicated <strong>Logs</strong> section. The main menu viewer is unavailable until you enable this override. Use your hosting platform&apos;s native logs, or enable the override if persistent storage is available.' => 'Logging Library detected an edge or ephemeral environment, so file-based log viewers are hidden for the standalone <strong>All Logs</strong> view and for every plugin&apos;s dedicated <strong>Logs</strong> section. The main menu viewer is unavailable until you enable this override. Use your hosting platform&apos;s native logs, or enable the override if persistent storage is available.',
-    'Logging Library detected an edge or ephemeral environment, but file-based log viewers are being force-enabled. This override affects the standalone <strong>All Logs</strong> view and every plugin&apos;s dedicated <strong>Logs</strong> section.' => 'Logging Library detected an edge or ephemeral environment, but file-based log viewers are being force-enabled. This override affects the standalone <strong>All Logs</strong> view and every plugin&apos;s dedicated <strong>Logs</strong> section.',
-    'Logging Library adds a consolidated <strong>All Logs</strong> view to the main Control Panel menu. Individual plugins still keep their own dedicated <strong>Logs</strong> sections.' => 'Logging Library adds a consolidated <strong>All Logs</strong> view to the main Control Panel menu. Individual plugins still keep their own dedicated <strong>Logs</strong> sections.',
-    'The consolidated <strong>All Logs</strong> view is hidden from the main Control Panel menu. Individual plugins still keep their own dedicated <strong>Logs</strong> sections.' => 'The consolidated <strong>All Logs</strong> view is hidden from the main Control Panel menu. Individual plugins still keep their own dedicated <strong>Logs</strong> sections.',
-    'Show Main Menu' => 'Show Main Menu',
-    'Show Logging Library in the main Control Panel navigation as a consolidated All Logs view when file-based log viewers are available.' => 'Show Logging Library in the main Control Panel navigation as a consolidated All Logs view when file-based log viewers are available.',
-
-    // Settings: Interface
-    'Interface Settings' => 'Interface Settings',
-
     // Config overrides
     'This is being overridden by the <code>forceEnableLogViewer</code> setting in <code>config/logging-library.php</code>.' => 'This is being overridden by the <code>forceEnableLogViewer</code> setting in <code>config/logging-library.php</code>.',
     'This is being overridden by the <code>showCpSection</code> setting in <code>config/logging-library.php</code>.' => 'This is being overridden by the <code>showCpSection</code> setting in <code>config/logging-library.php</code>.',
-
 ];

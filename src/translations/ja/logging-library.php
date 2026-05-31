@@ -31,6 +31,36 @@ return [
     // Common
     '{displayName} caches' => '{displayName} のキャッシュ',
 
+    // Controller messages
+    'Settings saved.' => '設定を保存しました。',
+    'Could not save settings.' => '設定を保存できませんでした。',
+    'Log cache refreshed.' => 'ログキャッシュを更新しました。',
+    'Failed to refresh log cache.' => 'ログキャッシュを更新できませんでした。',
+    'Plugin logging not configured' => 'プラグインのログ機能が設定されていません',
+    'Log viewer is disabled for this plugin' => 'このプラグインではログビューアーが無効になっています',
+    'Log viewer is disabled for this environment' => 'この環境ではログビューアーが無効になっています',
+    'Log file not found' => 'ログファイルが見つかりません',
+    'Unable to determine plugin handle from URL' => 'URL からプラグイン Handle を特定できません',
+    'User does not have permission to view logs' => 'ユーザーにログを表示する権限がありません',
+
+    // Validation messages
+    'Found {count, number} {count, plural, =1{error} other{errors}}' => '{count, number} 件の{count, plural, =1{エラー} other{エラー}}が見つかりました',
+    'Value must be a whole number.' => '値は整数である必要があります。',
+
+    // Settings: General
+    'General Settings' => '一般設定',
+    'Force Enable Log Viewers' => 'ログビューアーを強制有効化',
+    'Force-enable file-based log viewers even when an edge or ephemeral environment is detected. This affects Logging Library and every plugin&apos;s dedicated Logs section.' => 'エッジ環境またはエフェメラル環境が検出された場合でも、ファイルベースのログビューアーを強制的に有効にします。これは Logging Library およびすべてのプラグインの専用 Logs セクションに影響します。',
+    'Logging Library detected an edge or ephemeral environment, so file-based log viewers are hidden for the standalone <strong>All Logs</strong> view and for every plugin&apos;s dedicated <strong>Logs</strong> section. The main menu viewer is unavailable until you enable this override. Use your hosting platform&apos;s native logs, or enable the override if persistent storage is available.' => 'Logging Library がエッジ環境またはエフェメラル環境を検出したため、ファイルベースのログビューアーはスタンドアロンの <strong>すべてのログ</strong> ビューおよびすべてのプラグインの専用 <strong>ログ</strong> セクションで非表示になっています。このオーバーライドを有効にするまで、メインメニューのビューアーは使用できません。ホスティングプラットフォームのネイティブログを使用するか、永続ストレージが利用可能な場合はオーバーライドを有効にしてください。',
+    'Logging Library detected an edge or ephemeral environment, but file-based log viewers are being force-enabled. This override affects the standalone <strong>All Logs</strong> view and every plugin&apos;s dedicated <strong>Logs</strong> section.' => 'Logging Library がエッジ環境またはエフェメラル環境を検出しましたが、ファイルベースのログビューアーは強制的に有効化されています。このオーバーライドはスタンドアロンの <strong>すべてのログ</strong> ビューおよびすべてのプラグインの専用 <strong>ログ</strong> セクションに影響します。',
+    'Logging Library adds a consolidated <strong>All Logs</strong> view to the main Control Panel menu. Individual plugins still keep their own dedicated <strong>Logs</strong> sections.' => 'Logging Library はコントロールパネルのメインメニューに統合された <strong>すべてのログ</strong> ビューを追加します。個々のプラグインは引き続き独自の専用 <strong>ログ</strong> セクションを保持します。',
+    'The consolidated <strong>All Logs</strong> view is hidden from the main Control Panel menu. Individual plugins still keep their own dedicated <strong>Logs</strong> sections.' => '統合された <strong>すべてのログ</strong> ビューはコントロールパネルのメインメニューで非表示になっています。個々のプラグインは引き続き独自の専用 <strong>ログ</strong> セクションを保持します。',
+    'Show Main Menu' => 'メインメニューを表示',
+    'Show Logging Library in the main Control Panel navigation as a consolidated All Logs view when file-based log viewers are available.' => 'ファイルベースのログビューアーが利用可能な場合に、コントロールパネルのメインナビゲーションに Logging Library を統合された すべてのログ ビューとして表示します。',
+
+    // Settings: Interface
+    'Interface Settings' => 'インターフェース設定',
+
     // Log levels
     'All Levels' => 'すべてのレベル',
     'Error' => 'エラー',
@@ -82,38 +112,7 @@ return [
     'Download File' => 'ファイルをダウンロード',
     'Log Location' => 'ログの場所',
 
-    // Controller messages
-    'Settings saved.' => '設定を保存しました。',
-    'Could not save settings.' => '設定を保存できませんでした。',
-    'Log cache refreshed.' => 'ログキャッシュを更新しました。',
-    'Failed to refresh log cache.' => 'ログキャッシュを更新できませんでした。',
-    'Plugin logging not configured' => 'プラグインのログ機能が設定されていません',
-    'Log viewer is disabled for this plugin' => 'このプラグインではログビューアーが無効になっています',
-    'Log viewer is disabled for this environment' => 'この環境ではログビューアーが無効になっています',
-    'Log file not found' => 'ログファイルが見つかりません',
-    'Unable to determine plugin handle from URL' => 'URL からプラグイン Handle を特定できません',
-    'User does not have permission to view logs' => 'ユーザーにログを表示する権限がありません',
-
-    // Validation messages
-    'Found {count, number} {count, plural, =1{error} other{errors}}' => '{count, number} 件の{count, plural, =1{エラー} other{エラー}}が見つかりました',
-    'Value must be a whole number.' => '値は整数である必要があります。',
-
-    // Settings: General
-    'General Settings' => '一般設定',
-    'Force Enable Log Viewers' => 'ログビューアーを強制有効化',
-    'Force-enable file-based log viewers even when an edge or ephemeral environment is detected. This affects Logging Library and every plugin&apos;s dedicated Logs section.' => 'エッジ環境またはエフェメラル環境が検出された場合でも、ファイルベースのログビューアーを強制的に有効にします。これは Logging Library およびすべてのプラグインの専用 Logs セクションに影響します。',
-    'Logging Library detected an edge or ephemeral environment, so file-based log viewers are hidden for the standalone <strong>All Logs</strong> view and for every plugin&apos;s dedicated <strong>Logs</strong> section. The main menu viewer is unavailable until you enable this override. Use your hosting platform&apos;s native logs, or enable the override if persistent storage is available.' => 'Logging Library がエッジ環境またはエフェメラル環境を検出したため、ファイルベースのログビューアーはスタンドアロンの <strong>すべてのログ</strong> ビューおよびすべてのプラグインの専用 <strong>ログ</strong> セクションで非表示になっています。このオーバーライドを有効にするまで、メインメニューのビューアーは使用できません。ホスティングプラットフォームのネイティブログを使用するか、永続ストレージが利用可能な場合はオーバーライドを有効にしてください。',
-    'Logging Library detected an edge or ephemeral environment, but file-based log viewers are being force-enabled. This override affects the standalone <strong>All Logs</strong> view and every plugin&apos;s dedicated <strong>Logs</strong> section.' => 'Logging Library がエッジ環境またはエフェメラル環境を検出しましたが、ファイルベースのログビューアーは強制的に有効化されています。このオーバーライドはスタンドアロンの <strong>すべてのログ</strong> ビューおよびすべてのプラグインの専用 <strong>ログ</strong> セクションに影響します。',
-    'Logging Library adds a consolidated <strong>All Logs</strong> view to the main Control Panel menu. Individual plugins still keep their own dedicated <strong>Logs</strong> sections.' => 'Logging Library はコントロールパネルのメインメニューに統合された <strong>すべてのログ</strong> ビューを追加します。個々のプラグインは引き続き独自の専用 <strong>ログ</strong> セクションを保持します。',
-    'The consolidated <strong>All Logs</strong> view is hidden from the main Control Panel menu. Individual plugins still keep their own dedicated <strong>Logs</strong> sections.' => '統合された <strong>すべてのログ</strong> ビューはコントロールパネルのメインメニューで非表示になっています。個々のプラグインは引き続き独自の専用 <strong>ログ</strong> セクションを保持します。',
-    'Show Main Menu' => 'メインメニューを表示',
-    'Show Logging Library in the main Control Panel navigation as a consolidated All Logs view when file-based log viewers are available.' => 'ファイルベースのログビューアーが利用可能な場合に、コントロールパネルのメインナビゲーションに Logging Library を統合された すべてのログ ビューとして表示します。',
-
-    // Settings: Interface
-    'Interface Settings' => 'インターフェース設定',
-
     // Config overrides
     'This is being overridden by the <code>forceEnableLogViewer</code> setting in <code>config/logging-library.php</code>.' => 'この設定は <code>config/logging-library.php</code> の <code>forceEnableLogViewer</code> 設定によって上書きされています。',
     'This is being overridden by the <code>showCpSection</code> setting in <code>config/logging-library.php</code>.' => 'この設定は <code>config/logging-library.php</code> の <code>showCpSection</code> 設定によって上書きされています。',
-
 ];
