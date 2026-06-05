@@ -45,7 +45,6 @@ return [
 
     // Validation messages
     'Found {count, number} {count, plural, =1{error} other{errors}}' => '{count, number} 件の{count, plural, =1{エラー} other{エラー}}が見つかりました',
-    'Value must be a whole number.' => '値は整数である必要があります。',
 
     // Settings: General
     'General Settings' => '一般設定',
@@ -106,7 +105,7 @@ return [
     'file' => 'ファイル',
     'files' => 'ファイル',
     'Current File' => '現在のファイル',
-    'Entries' => 'エントリ',
+    'Log entries' => 'ログエントリ',
     'Refresh Cache' => 'キャッシュを更新',
     'Loading' => 'ロードしています',
     'Download File' => 'ファイルをダウンロード',

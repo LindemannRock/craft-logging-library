@@ -39,6 +39,12 @@
 
 **Why:** When `viewSystemLogsPermissions` is set, the controller requires the user to have at least one of the listed permissions. Admins are always allowed.
 
+## Settings save shows a validation error
+
+Numeric settings such as Items Per Page must be whole numbers within the allowed range. If a value is invalid, Logging Library keeps you on the same settings page and shows the field error inline.
+
+When a setting is overridden in `config/logging-library.php`, the Control Panel field is skipped during save. Change the config file value instead.
+
 ## Cache not updating after new log entries
 
 1. Check that the log file has actually changed — new entries increase the file size

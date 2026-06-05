@@ -10,6 +10,7 @@ namespace lindemannrock\logginglibrary\controllers;
 
 use Craft;
 use craft\web\Controller;
+use lindemannrock\base\helpers\SettingsPostHelper;
 use lindemannrock\logginglibrary\LoggingLibrary;
 use lindemannrock\logginglibrary\models\Settings;
 use yii\web\Response;
@@ -68,59 +69,23 @@ class SettingsController extends Controller
 
         $settings = Settings::loadFromDatabase();
         $settingsData = $this->request->getBodyParam('settings', []);
-        $integerAssignmentErrors = [];
-
-        foreach ($settingsData as $key => $value) {
-            if ($settings->isOverriddenByConfig($key) || !property_exists($settings, $key)) {
-                continue;
-            }
-
-            if ($key === 'itemsPerPage') {
-                $normalized = $this->_normalizeIntegerSettingValue($value);
-                if ($normalized === null) {
-                    $integerAssignmentErrors[$key] = Craft::t('logging-library', 'Value must be a whole number.');
-                    continue;
-                }
-                $value = $normalized;
-            }
-
-            // Multi-state selects (e.g. "Use global default" = '') need '' → null
-            // so the property holds null, not a coerced false / 0. Without this,
-            // PHP coerces empty strings to the property's typed default on assign,
-            // which prevents the cascade from falling through.
-            if ($value === '') {
-                $type = (new \ReflectionProperty($settings, $key))->getType();
-                if ($type instanceof \ReflectionNamedType && $type->allowsNull()) {
-                    $value = null;
-                }
-            }
-
-            $settings->$key = $value;
-        }
-
         $section = $this->_validSettingsSection($this->request->getBodyParam('section', 'general'));
         if ($section === 'interface' && !$settings->getStandaloneViewerAvailable()) {
             return $this->redirect('logging-library/settings/general');
         }
 
-        $attributesToValidate = match ($section) {
-            'general' => ['pluginName', 'showCpSection', 'forceEnableLogViewer'],
-            'interface' => ['itemsPerPage'],
-            default => ['pluginName'],
-        };
-        $attributesToValidate = array_values(array_filter(
-            $attributesToValidate,
-            fn(string $attribute): bool => !$settings->isOverriddenByConfig($attribute),
-        ));
+        $result = SettingsPostHelper::apply(
+            model: $settings,
+            postedValues: is_array($settingsData) ? $settingsData : [],
+            allowedAttributes: $this->_validationAttributesForSection($section),
+            isOverridden: fn(string $attribute): bool => $settings->isOverriddenByConfig($attribute),
+        );
+
+        $attributesToValidate = $result->attributesToValidate;
 
         $isValid = $settings->validate($attributesToValidate);
-        foreach ($integerAssignmentErrors as $attribute => $message) {
-            if (in_array($attribute, $attributesToValidate, true)) {
-                $settings->addError($attribute, $message);
-            }
-        }
 
-        if (!$isValid || $settings->hasErrors()) {
+        if (!$isValid || $result->hasErrors || $settings->hasErrors()) {
             Craft::$app->getSession()->setError(Craft::t('logging-library', 'Could not save settings.'));
 
             return $this->renderTemplate("logging-library/settings/{$section}", [
@@ -139,26 +104,17 @@ class SettingsController extends Controller
     }
 
     /**
-     * Normalize an integer setting from posted form input.
+     * Get validation attributes for a settings section.
+     *
+     * @return array<string>
      */
-    private function _normalizeIntegerSettingValue(mixed $value): ?int
+    private function _validationAttributesForSection(string $section): array
     {
-        if (is_int($value)) {
-            return $value;
-        }
-
-        if (is_string($value)) {
-            $value = trim($value);
-            if ($value === '') {
-                return null;
-            }
-        }
-
-        if (filter_var($value, FILTER_VALIDATE_INT) === false) {
-            return null;
-        }
-
-        return (int)$value;
+        return match ($section) {
+            'general' => ['pluginName', 'showCpSection', 'forceEnableLogViewer'],
+            'interface' => ['itemsPerPage', 'timeFormat', 'showSeconds'],
+            default => ['pluginName'],
+        };
     }
 
     /**

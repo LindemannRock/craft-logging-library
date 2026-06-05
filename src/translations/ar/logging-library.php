@@ -45,7 +45,6 @@ return [
 
     // Validation messages
     'Found {count, number} {count, plural, =1{error} other{errors}}' => 'تم العثور على {count, number} {count, plural, =1{خطأ} other{أخطاء}}',
-    'Value must be a whole number.' => 'يجب أن تكون القيمة عدداً صحيحاً.',
 
     // Settings: General
     'General Settings' => 'الإعدادات العامة',
@@ -106,7 +105,7 @@ return [
     'file' => 'ملف',
     'files' => 'ملفات',
     'Current File' => 'الملف الحالي',
-    'Entries' => 'الإدخالات',
+    'Log entries' => 'إدخالات السجل',
     'Refresh Cache' => 'تحديث Cache',
     'Loading' => 'جار التحميل',
     'Download File' => 'تنزيل الملف',

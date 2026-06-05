@@ -45,7 +45,6 @@ return [
 
     // Validation messages
     'Found {count, number} {count, plural, =1{error} other{errors}}' => 'Found {count, number} {count, plural, =1{error} other{errors}}',
-    'Value must be a whole number.' => 'Value must be a whole number.',
 
     // Settings: General
     'General Settings' => 'General Settings',
@@ -106,7 +105,7 @@ return [
     'file' => 'file',
     'files' => 'files',
     'Current File' => 'Current File',
-    'Entries' => 'Entries',
+    'Log entries' => 'Log entries',
     'Refresh Cache' => 'Refresh Cache',
     'Loading' => 'Loading',
     'Download File' => 'Download File',

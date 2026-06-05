@@ -45,7 +45,6 @@ return [
 
     // Validation messages
     'Found {count, number} {count, plural, =1{error} other{errors}}' => '{count, number} {count, plural, =1{erreur trouvée} other{erreurs trouvées}}',
-    'Value must be a whole number.' => 'La valeur doit être un nombre entier.',
 
     // Settings: General
     'General Settings' => 'Paramètres généraux',
@@ -106,7 +105,7 @@ return [
     'file' => 'fichier',
     'files' => 'fichiers',
     'Current File' => 'Fichier actuel',
-    'Entries' => 'Entrées',
+    'Log entries' => 'Entrées de journal',
     'Refresh Cache' => 'Actualiser le cache',
     'Loading' => 'Chargement',
     'Download File' => 'Télécharger le fichier',

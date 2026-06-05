@@ -45,7 +45,6 @@ return [
 
     // Validation messages
     'Found {count, number} {count, plural, =1{error} other{errors}}' => '{count, number} {count, plural, =1{fel} other{fel}} hittades',
-    'Value must be a whole number.' => 'Värdet måste vara ett heltal.',
 
     // Settings: General
     'General Settings' => 'Allmänna inställningar',
@@ -106,7 +105,7 @@ return [
     'file' => 'fil',
     'files' => 'filer',
     'Current File' => 'Aktuell fil',
-    'Entries' => 'Poster',
+    'Log entries' => 'Loggposter',
     'Refresh Cache' => 'Uppdatera cache',
     'Loading' => 'Läser in',
     'Download File' => 'Ladda ner fil',

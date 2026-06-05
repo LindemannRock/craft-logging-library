@@ -45,7 +45,6 @@ return [
 
     // Validation messages
     'Found {count, number} {count, plural, =1{error} other{errors}}' => '{count, number} {count, plural, =1{fejl} other{fejl}} fundet',
-    'Value must be a whole number.' => 'Værdien skal være et helt tal.',
 
     // Settings: General
     'General Settings' => 'Generelle indstillinger',
@@ -106,7 +105,7 @@ return [
     'file' => 'fil',
     'files' => 'filer',
     'Current File' => 'Nuværende fil',
-    'Entries' => 'Poster',
+    'Log entries' => 'Logposter',
     'Refresh Cache' => 'Opdater cache',
     'Loading' => 'Indlæser',
     'Download File' => 'Download fil',
