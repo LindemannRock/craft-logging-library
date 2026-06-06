@@ -32,14 +32,6 @@ abstract class TestCase extends IntegrationTestCase
 {
     protected const TEST_HANDLE_PREFIX = 'lglib-test-';
 
-    /**
-     * Full paths of log files seeded by the current test, unlinked in
-     * `cleanupExternalState()`.
-     *
-     * @var list<string>
-     */
-    private array $seededLogFiles = [];
-
     protected function setUp(): void
     {
         parent::setUp();
@@ -51,13 +43,6 @@ abstract class TestCase extends IntegrationTestCase
 
     protected function cleanupExternalState(): void
     {
-        foreach ($this->seededLogFiles as $path) {
-            if (file_exists($path)) {
-                @unlink($path);
-            }
-        }
-        $this->seededLogFiles = [];
-
         // Catch anything created via filename patterns we forgot to record.
         $this->purgeStaleSeededFiles();
     }
@@ -70,7 +55,7 @@ abstract class TestCase extends IntegrationTestCase
     {
         $path = Craft::$app->getPath()->getLogPath() . '/' . $filename;
         file_put_contents($path, $content);
-        $this->seededLogFiles[] = $path;
+        $this->trackTempPath($path);
         return $path;
     }
 
