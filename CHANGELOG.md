@@ -1,5 +1,25 @@
 # Changelog
 
+## [5.10.0](https://github.com/LindemannRock/craft-logging-library/compare/v5.9.0...v5.10.0) (2026-06-07)
+
+
+### Added
+
+* **i18n:** add loading message translations ([cfd4997](https://github.com/LindemannRock/craft-logging-library/commit/cfd4997f5abfd1440de672b89177316fe1d2db9c))
+* **i18n:** add new controller messages and validation settings ([dafb444](https://github.com/LindemannRock/craft-logging-library/commit/dafb4449ae52611b35f65520520763a951400d95))
+* **logs:** adjust timestamp column width based on selected file type ([e015b85](https://github.com/LindemannRock/craft-logging-library/commit/e015b850509838144a599f026bebc440056204cd))
+* **tests:** add LogIndexedCacheTest for SQLite-backed log caching ([cb87cf2](https://github.com/LindemannRock/craft-logging-library/commit/cb87cf29cb5391d601eb21411c976b230e63799c))
+* **tests:** add timestamp assertions and sorting for PHP error logs ([f8199c0](https://github.com/LindemannRock/craft-logging-library/commit/f8199c0a8f1f1d50fc729c4c703bf77ccf77d876))
+
+
+### Fixed
+
+* correct copyright year in LogsController and enhance parameter validation ([1405eea](https://github.com/LindemannRock/craft-logging-library/commit/1405eea614e461643512c537adc3a8898276a7a9))
+* correct loading message translation in log viewer ([42be275](https://github.com/LindemannRock/craft-logging-library/commit/42be27506a035c0ed8a4707b1979f3b84b7b991e))
+* **i18n:** correct log translations from "logs" to "registos" ([e832c10](https://github.com/LindemannRock/craft-logging-library/commit/e832c103bb562cfe3a1071f75f0d2bef44d54fd1))
+* **logs:** change timestamp format to use 'cascade' instead of 'short' ([7038076](https://github.com/LindemannRock/craft-logging-library/commit/7038076f5aa846fd4bcf945e8bbaa49a9c754522))
+* normalize PHP error timestamps to canonical format ([516d80d](https://github.com/LindemannRock/craft-logging-library/commit/516d80d1af7419f616bcbde24bff78dcf5ff1145))
+
 ## [5.9.0](https://github.com/LindemannRock/craft-logging-library/compare/v5.8.3...v5.9.0) - 2026-05-22
 
 
