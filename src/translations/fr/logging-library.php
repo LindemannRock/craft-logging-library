@@ -23,7 +23,7 @@ return [
     'Interface' => 'Interface',
 
     // Permissions
-    'View all system logs' => 'Consulter tous les journaux système',
+    'View all system logs' => 'Afficher tous les journaux système',
     'Download all system logs' => 'Télécharger tous les journaux système',
     'Clear cache' => 'Vider le cache',
     'Manage settings' => 'Gérer les paramètres',
