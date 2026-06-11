@@ -90,7 +90,7 @@ return [
 
     // Table empty
     'No log files found. Log files are created when plugin activities occur.' => 'Nenhum ficheiro de log encontrado. Os ficheiros de log são criados quando ocorrem atividades do plugin.',
-    'No log entries found for the selected filters.' => 'Nenhuma entrada de log encontrada para os filtros selecionados.',
+    'No log entries found for the selected filters.' => 'Nenhuma entrada de registo encontrada para os filtros selecionados.',
 
     // Pagination
     'entry' => 'entrada',
@@ -98,7 +98,7 @@ return [
 
     // Sidebar
     'Current Level' => 'Nível atual',
-    'Current log level' => 'Nível de log atual',
+    'Current log level' => 'Nível de registo atual',
     'Retention' => 'Retenção',
     'days' => 'dias',
     'Available Logs' => 'Registos disponíveis',

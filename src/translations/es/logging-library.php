@@ -68,7 +68,7 @@ return [
     'Debug' => 'Debug',
 
     // Log sources
-    'All Sources' => 'Todas las fuentes',
+    'All Sources' => 'Todos los orígenes',
     'Web' => 'Web',
     'Console' => 'Consola',
     'Queue' => 'Queue',
