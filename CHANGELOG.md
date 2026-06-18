@@ -1,5 +1,15 @@
 # Changelog
 
+## [5.10.1](https://github.com/LindemannRock/craft-logging-library/compare/v5.10.0...v5.10.1) - 2026-06-18
+
+
+### Fixed
+
+* **i18n:** correct French translation for viewing system logs ([53c9fa7](https://github.com/LindemannRock/craft-logging-library/commit/53c9fa71a6da461531a02ea599972e613ccd5532))
+* **i18n:** correct Spanish translations for log viewer messages and settings ([790309d](https://github.com/LindemannRock/craft-logging-library/commit/790309d06f2e24ae5bfe3bf118b96753a04c77ae))
+* **i18n:** correct Spanish, Italian, and Portuguese translations for "All Sources" and "Current log level" ([ccbf747](https://github.com/LindemannRock/craft-logging-library/commit/ccbf7472ddcdf181c4497c405191f13048e22839))
+* **i18n:** remove language notes for Arabic and Japanese translations ([0804f44](https://github.com/LindemannRock/craft-logging-library/commit/0804f44c47faf9c3e0306a8cc3d2dfe7691e3986))
+
 ## [5.10.0](https://github.com/LindemannRock/craft-logging-library/compare/v5.9.0...v5.10.0) - 2026-06-07
 
 
