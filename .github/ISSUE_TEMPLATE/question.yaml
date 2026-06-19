@@ -1,13 +1,13 @@
 name: Question
-description: "Ask a question about the Logging Library. Not for bug reports."
-labels: 'question'
+description: "Ask a question about Logging Library. Not for bug reports."
+labels: ['type: question', 'status: needs triage']
 body:
   - type: markdown
     attributes:
       value: |
         Before asking, please check:
 
-          - I've searched the [documentation](https://github.com/LindemannRock/craft-logging-library/blob/main/README.md).
+          - I've searched the [documentation](https://github.com/LindemannRock/craft-logging-library/tree/main/docs).
           - I've searched [open and closed issues](https://github.com/LindemannRock/craft-logging-library/issues?q=is%3Aissue).
           - This is not a bug report — just a general question.
 
