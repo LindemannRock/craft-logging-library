@@ -1,7 +1,9 @@
+![Logging Library](docs/images/hero.webp)
+
 # Logging Library for Craft CMS
 
 [![Latest Version](https://img.shields.io/packagist/v/lindemannrock/craft-logging-library.svg)](https://packagist.org/packages/lindemannrock/craft-logging-library)
-[![Craft CMS](https://img.shields.io/badge/Craft%20CMS-5.0%2B-orange.svg)](https://craftcms.com/)
+[![Craft CMS](https://img.shields.io/badge/Craft%20CMS-5.10%2B-orange.svg)](https://craftcms.com/)
 [![PHP](https://img.shields.io/badge/PHP-8.2%2B-blue.svg)](https://php.net/)
 [![License](https://img.shields.io/packagist/l/lindemannrock/craft-logging-library.svg)](LICENSE)
 
@@ -29,7 +31,7 @@ This plugin is currently in active development and provided under the MIT Licens
 
 ## Requirements
 
-- Craft CMS 5.0+
+- Craft CMS 5.10+
 - PHP 8.2+
 
 ## Installation
