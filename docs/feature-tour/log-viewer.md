@@ -2,6 +2,8 @@
 
 The built-in log viewer provides a web interface for browsing, filtering, searching, and downloading log files — directly within each plugin's Control Panel section.
 
+![Built-in log viewer inside a plugin's CP section, showing the level filter, search box, and a sortable table of log entries](images/log-viewer-cp.webp)
+
 ## How It Works
 
 When a plugin calls `LoggingLibrary::configure()`, the log viewer becomes available at `your-plugin/logs/system` unless the viewer is explicitly disabled or the environment is detected as edge/ephemeral. CP routes are registered automatically when the viewer is enabled — no manual route registration is needed. The viewer reads parsed log entries from the [cache](caching.md) and renders them in a paginated table.
@@ -12,7 +14,7 @@ When a plugin calls `LoggingLibrary::configure()`, the log viewer becomes availa
 - **Level Filtering** — filter by Error, Warning, Info, or Debug
 - **Full-Text Search** — search across messages and context data
 - **Sorting** — sort by timestamp, level, user, category, or message
-- **Pagination** — configurable entries per page (default: 50)
+- **Pagination** — configurable entries per page. Per-plugin viewers default to 50 (set via `configure()`); the standalone All Logs viewer uses the **Items Per Page** setting on the Interface settings page (default 100)
 - **Download** — download the raw log file (permission-gated)
 - **Refresh Cache** — clear the parsed cache for the selected log file from the sidebar
 - **Context Expansion** — click to view JSON context data inline

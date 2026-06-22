@@ -2,13 +2,18 @@
 
 The standalone viewer provides a centralized interface for browsing all log files in `storage/logs/` — plugin logs, Craft logs, and PHP error logs — from a single page.
 
+![Standalone All Logs viewer showing the source sidebar and a paginated, filterable table of log entries](images/standalone-viewer-all-logs.webp)
+
 ## Accessing the Viewer
 
-Once Logging Library is installed, the standalone viewer is available at:
+When it's surfaced in the main navigation, the standalone viewer lives at **Control Panel → Logging Library → All Logs**.
 
-1. **Control Panel → Logging Library → All Logs**
+The main-menu item appears only when **both** of these are true:
 
-If the Logging Library CP section has been hidden in plugin settings, the standalone viewer is no longer exposed in the main navigation. It remains available at `/admin/logging-library/logs/system`.
+- **Show Main Menu** is on in [Settings → General](settings.md), and
+- a file-based viewer is available — i.e. you're not on a detected edge/ephemeral environment, or you've turned on **Force Enable Log Viewers** to override it (see [Edge Detection](edge-detection.md)).
+
+If **Show Main Menu** is off, the main **Logging Library** item opens to Settings instead, and the viewer is no longer linked from the navigation — but the page itself remains reachable at `/admin/logging-library/logs/system` for anyone with the `loggingLibrary:viewAllLogs` permission. On an edge/ephemeral environment with no override, file-based viewers are hidden entirely.
 
 ## Source Filtering
 

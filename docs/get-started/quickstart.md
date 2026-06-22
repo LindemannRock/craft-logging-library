@@ -45,7 +45,9 @@ $this->logInfo('Export completed', ['count' => 42]);
 
 Navigate to **Logging Library → All Logs** in the Control Panel. If the Logging Library CP section has been hidden in plugin settings, open the standalone viewer directly at `/admin/logging-library/logs/system` instead. Select today's log file for your plugin — you should see the log entry you just created.
 
-The file-based viewer is enabled by default on normal file-backed environments. On detected edge/ephemeral platforms such as Servd, it is hidden unless you explicitly force-enable it.
+![Standalone All Logs viewer with today's plugin log file selected, showing the message just logged](images/quickstart-verify.webp)
+
+The file-based viewer is enabled by default on normal file-backed environments. On detected edge/ephemeral platforms such as Servd, it is hidden unless you explicitly [force-enable it](../feature-tour/settings.md).
 
 ## What's Next
 

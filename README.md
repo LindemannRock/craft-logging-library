@@ -21,6 +21,7 @@ This plugin is currently in active development and provided under the MIT Licens
 - **Built-in Log Viewer** — web interface for viewing, filtering, searching, and downloading logs
 - **Standalone System Log Viewer** — browse all Craft, plugin, and PHP logs from one interface
 - **Control Panel Section** — access the standalone viewer from **Logging Library → All Logs** when the CP section is enabled
+- **Control Panel Settings** — display name, menu visibility, entries-per-page, and timestamp format, all overridable from `config/logging-library.php`
 - **LoggingTrait** — drop-in trait with `logInfo()`, `logWarning()`, `logError()`, `logDebug()`
 - **LoggingService API** — direct logging, log statistics, recent entries, and cleanup
 - **High Performance Caching** — indexed file-based cache for large log viewer pages, with ArrayQuery compatibility for API callers

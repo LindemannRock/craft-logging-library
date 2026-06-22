@@ -44,7 +44,7 @@ LoggingLibrary::configure([
 ]);
 ```
 
-You can also force-enable all file-based viewers globally from the Logging Library settings screen, or in `config/logging-library.php`:
+You can also force-enable all file-based viewers globally from the [Logging Library settings screen](settings.md), or in `config/logging-library.php`:
 
 ```php
 return [
@@ -61,10 +61,38 @@ Use the global override only when the environment has persistent storage availab
 For platforms not yet supported, add your own detection:
 
 ```php
-$isCustomEdge = isset($_ENV['YOUR_PLATFORM_VAR']);
+use craft\helpers\App;
+
+$isCustomEdge = App::env('YOUR_PLATFORM_VAR') !== null;
 
 LoggingLibrary::configure([
     'pluginHandle' => $this->handle,
     'enableLogViewer' => !$isCustomEdge,
 ]);
+```
+
+## Checking Availability in Code
+
+Logging Library exposes static helpers so you can branch on the current environment without re-implementing the detection logic:
+
+```php
+use lindemannrock\logginglibrary\LoggingLibrary;
+
+// Did edge/ephemeral detection match this environment?
+LoggingLibrary::isEdgeEnvironmentDetected(): bool;
+
+// Is the global "Force Enable Log Viewers" override on?
+LoggingLibrary::isForceEnableLogViewer(): bool;
+
+// Net result — should file-based viewers be shown at all?
+// (true when not an edge environment, or when the override is on)
+LoggingLibrary::areLogViewersAvailable(): bool;
+```
+
+For example, only surface a "View logs" link when a viewer will actually be available:
+
+```php
+if (LoggingLibrary::areLogViewersAvailable()) {
+    // safe to link to the file-based viewer
+}
 ```

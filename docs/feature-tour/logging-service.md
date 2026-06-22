@@ -110,3 +110,14 @@ if (LoggingService::isConfigured('your-plugin')) {
 $level = LoggingService::getLogLevel('your-plugin');
 // Returns: 'info', 'debug', 'warning', 'error', or null if not configured
 ```
+
+### Message Sanitization @since(5.9.0)
+
+Log entries are one line each. If an attacker-controlled value reaches a log message with a raw newline in it, they could forge an extra log line — the classic log-injection attack ([CWE-117](https://cwe.mitre.org/data/definitions/117.html)). `sanitizeLogMessage()` neutralizes that by turning every `\r\n`, `\r`, or `\n` into the two-character literal `\n`, so the intent is still readable but the file always sees a single entry per emit:
+
+```php
+LoggingService::sanitizeLogMessage("line one\nline two");
+// Returns: 'line one\nline two'  (literal backslash-n, not a real newline)
+```
+
+You rarely call this yourself — it runs inside the Monolog formatter, so **every** path that writes to a Logging Library channel is already protected, including third-party code that calls `Craft::info()` / `Craft::error()` directly. It's exposed publicly for the rare case where you need the same guarantee before handing a string to another system.
