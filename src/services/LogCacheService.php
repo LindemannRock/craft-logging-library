@@ -5,7 +5,7 @@
  * Log cache service for high-performance log parsing and querying
  *
  * @link      https://lindemannrock.com
- * @copyright Copyright (c) 2025 LindemannRock
+ * @copyright Copyright (c) 2025-2026 LindemannRock
  */
 
 namespace lindemannrock\logginglibrary\services;
