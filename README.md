@@ -31,24 +31,16 @@ A reusable logging library for Craft CMS plugins that provides consistent loggin
 
 ## Installation
 
-### Via Composer
+### Composer
 
 ```bash
-composer require lindemannrock/craft-logging-library
+composer require lindemannrock/craft-logging-library && php craft plugin/install logging-library
 ```
 
-```bash
-php craft plugin/install logging-library
-```
-
-### Using DDEV
+### DDEV
 
 ```bash
-ddev composer require lindemannrock/craft-logging-library
-```
-
-```bash
-ddev craft plugin/install logging-library
+ddev composer require lindemannrock/craft-logging-library && ddev craft plugin/install logging-library
 ```
 
 ## Documentation
