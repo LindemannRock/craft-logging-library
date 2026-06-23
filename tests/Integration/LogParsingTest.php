@@ -201,4 +201,22 @@ final class LogParsingTest extends TestCase
         self::assertSame('dev: Failed to send SMS to +96597255330', $logs[0]['message']);
         self::assertSame('', $logs[0]['context']);
     }
+
+    public function testUndatedMonologSourceLogParsesLevelMessageAndContext(): void
+    {
+        $path = $this->seedLogFile(
+            self::TEST_HANDLE_PREFIX . "freeform-email.log",
+            "[2026-06-23T10:02:56.653489+01:00] notification.INFO: ExportNotifications handleNotifications - Started processing [] {\"requestId\":\"VmzbtM\"}\n",
+        );
+
+        $logs = LoggingLibrary::getInstance()->logCache->getLogs($path)->all();
+
+        self::assertCount(1, $logs);
+        self::assertSame('2026-06-23 10:02:56', $logs[0]['timestamp']);
+        self::assertSame('info', $logs[0]['level']);
+        self::assertSame('notification', $logs[0]['channel']);
+        self::assertSame(self::TEST_HANDLE_PREFIX . 'freeform-email', $logs[0]['category']);
+        self::assertSame('ExportNotifications handleNotifications - Started processing', $logs[0]['message']);
+        self::assertSame('[] {"requestId":"VmzbtM"}', $logs[0]['context']);
+    }
 }

@@ -44,6 +44,13 @@ final class LogFormatDetectionTest extends TestCase
         self::assertSame('bracket-level', LoggingLibrary::detectLogFormat($line));
     }
 
+    public function testMonologFormatIsRecognised(): void
+    {
+        $line = '[2026-06-23T10:02:56.653489+01:00] notification.INFO: ExportNotifications handleNotifications - Started processing [] {"requestId":"VmzbtM"}';
+
+        self::assertSame('monolog', LoggingLibrary::detectLogFormat($line));
+    }
+
     public function testPhpErrorFormatIsRecognised(): void
     {
         $line = '[16-May-2026 10:00:00 UTC] PHP Fatal error: Uncaught Error in foo.php';

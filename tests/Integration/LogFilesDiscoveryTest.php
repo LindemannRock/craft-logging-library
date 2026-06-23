@@ -87,4 +87,29 @@ final class LogFilesDiscoveryTest extends TestCase
         self::assertSame('2026-05-16', $entry['date']);
         self::assertSame("{$handle}-2026-05-16.log", $entry['filename']);
     }
+
+    public function testGetAllLogFilesClassifiesUndatedSourceLog(): void
+    {
+        $source = self::TEST_HANDLE_PREFIX . 'freeform-email';
+        $path = $this->seedLogFile(
+            "{$source}.log",
+            "[2026-06-23T10:02:56.653489+01:00] notification.INFO: ExportNotifications handleNotifications - Started processing [] {\"requestId\":\"VmzbtM\"}\n",
+        );
+
+        $all = LoggingLibrary::getAllLogFiles();
+
+        $byPath = [];
+        foreach ($all as $entry) {
+            $byPath[$entry['path']] = $entry;
+        }
+
+        self::assertArrayHasKey($path, $byPath, 'Undated source logs must be available in the standalone viewer');
+
+        $entry = $byPath[$path];
+        self::assertSame('plugin', $entry['type']);
+        self::assertSame($source, $entry['source']);
+        self::assertSame($source, $entry['category']);
+        self::assertSame('current', $entry['date']);
+        self::assertSame("{$source}.log", $entry['filename']);
+    }
 }

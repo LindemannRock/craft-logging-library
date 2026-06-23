@@ -27,7 +27,7 @@ use yii2mod\query\ArrayQuery;
  */
 class LogCacheService extends Component
 {
-    private const PARSER_CACHE_VERSION = '2026-05-25-php-timestamp-normalization';
+    private const PARSER_CACHE_VERSION = '2026-06-23-undated-monolog-source-logs';
     private const INDEX_SCHEMA_VERSION = 1;
 
     /**
@@ -372,6 +372,9 @@ class LogCacheService extends Component
             $datetime = $this->_normalizePhpErrorTimestamp($datetime);
             $level = $this->_normalizePhpErrorLevel($level);
             [$message, $context] = $this->_splitPhpErrorContext($message, $context);
+        } elseif ($format === 'monolog') {
+            $datetime = $this->_normalizeIsoTimestamp($datetime);
+            [$message, $context] = $this->_splitMonologContext($message, $context);
         }
 
         if ($category === '') {
@@ -417,6 +420,9 @@ class LogCacheService extends Component
         } elseif ($format === 'bracket-level') {
             // Simple plugin format used by some third-party plugins: YYYY-MM-DD HH:MM:SS [LEVEL] message
             return '/^(?P<datetime>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\s+\[(?P<level>[A-Z ]+)\]\s+(?P<message>[^\r\n]*)(?P<context>.*)?$/s';
+        } elseif ($format === 'monolog') {
+            // Monolog format: [YYYY-MM-DDTHH:MM:SS.microseconds+TZ] channel.LEVEL: message
+            return '/^\[(?P<datetime>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+\-]\d{2}:\d{2}))\]\s+(?P<channel>[a-z0-9_.\\\\-]+)\.(?P<level>[A-Z]+):\s+(?P<message>[^\r\n]*)(?P<context>.*)?$/s';
         } elseif ($format === 'php') {
             // PHP error format: [DD-MMM-YYYY HH:MM:SS Timezone] PHP Error: message
             return '/^\[(?P<datetime>.*)\] PHP\s+(?P<level>[^:]+):\s+(?P<message>[^\r\n]*)(?P<context>.*)?$/s';
@@ -467,6 +473,20 @@ class LogCacheService extends Component
     }
 
     /**
+     * Convert ISO-8601 Monolog timestamps into the viewer's canonical format.
+     */
+    private function _normalizeIsoTimestamp(string $datetime): string
+    {
+        try {
+            $date = new \DateTimeImmutable($datetime);
+        } catch (\Exception) {
+            return $datetime;
+        }
+
+        return $date->format('Y-m-d H:i:s');
+    }
+
+    /**
      * Keep PHP exception/error headlines in the table and move traces into context.
      *
      * PHP error logs often write `Stack trace:` on the same first line as the
@@ -494,6 +514,25 @@ class LogCacheService extends Component
     }
 
     /**
+     * Move Monolog's trailing context/extra payloads out of the table headline.
+     *
+     * @return array{0: string, 1: string}
+     */
+    private function _splitMonologContext(string $message, string $context): array
+    {
+        $combined = trim($message . ($context !== '' ? $context : ''));
+
+        if (preg_match('/^(?P<headline>.*?)(?:\s+(?P<payload>\[[^\r\n]*\](?:\s+\{[^\r\n]*\})?|\{[^\r\n]*\}))$/s', $combined, $matches)) {
+            return [
+                trim($matches['headline']),
+                trim($matches['payload']),
+            ];
+        }
+
+        return [trim($message), trim($context)];
+    }
+
+    /**
      * Infer a stable source category for log formats that don't carry one.
      */
     private function _inferCategoryFromFilename(string $logFile): string
@@ -509,6 +548,10 @@ class LogCacheService extends Component
         }
 
         if (preg_match('/^(web|console|queue)(?:-\d{4}-\d{2}-\d{2})?\.log(?:\.\d+)?$/', $basename, $matches)) {
+            return $matches[1];
+        }
+
+        if (preg_match('/^([a-z0-9][a-z0-9\-_]*)\.log$/', $basename, $matches)) {
             return $matches[1];
         }
 
@@ -530,6 +573,9 @@ class LogCacheService extends Component
         $sample = @file_get_contents($logFile, false, null, 0, 500);
         if (is_string($sample) && LoggingLibrary::detectLogFormat($sample) === 'php') {
             return '/^\[.*\]/';
+        }
+        if (is_string($sample) && LoggingLibrary::detectLogFormat($sample) === 'monolog') {
+            return '/^\[\d{4}-\d{2}-\d{2}T/';
         }
 
         // Default: lines starting with date

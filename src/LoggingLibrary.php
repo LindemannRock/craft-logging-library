@@ -689,6 +689,14 @@ class LoggingLibrary extends Plugin
                 $fileInfo['date'] = 'current';
                 $fileInfo['category'] = 'php-errors';
             }
+            // Undated source logs: {source}.log
+            elseif (preg_match('/^([a-z0-9][a-z0-9\-_]*)\.log$/', $basename, $matches)) {
+                $source = $matches[1];
+                $fileInfo['source'] = $source;
+                $fileInfo['type'] = 'plugin';
+                $fileInfo['date'] = 'current';
+                $fileInfo['category'] = $source;
+            }
             // Other/unknown logs
             else {
                 $fileInfo['source'] = 'other';
@@ -712,7 +720,7 @@ class LoggingLibrary extends Plugin
      * Detect log format from a log line
      *
      * @param string $line A line from the log file
-     * @return string Format type: 'plugin', 'craft', 'php', or 'unknown'
+     * @return string Format type: 'plugin', 'craft', 'bracket-level', 'monolog', 'php', or 'unknown'
      * @since 5.2.2
      */
     public static function detectLogFormat(string $line): string
@@ -734,6 +742,11 @@ class LoggingLibrary extends Plugin
         // Bracket-level format: YYYY-MM-DD HH:MM:SS [LEVEL] message
         if (preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\s+\[[A-Z ]+\]/', $line)) {
             return 'bracket-level';
+        }
+
+        // Monolog line format: [YYYY-MM-DDTHH:MM:SS.microseconds+TZ] channel.LEVEL: message
+        if (preg_match('/^\[\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+\-]\d{2}:\d{2})\]\s+[a-z0-9_.\\\\-]+\.[A-Z]+:/', $line)) {
+            return 'monolog';
         }
 
         // PHP error format: [DD-MMM-YYYY HH:MM:SS Timezone] PHP Error Type:
