@@ -1,0 +1,113 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+php <<'PHP'
+<?php
+
+require getcwd() . '/bootstrap.php';
+require CRAFT_VENDOR_PATH . '/craftcms/cms/bootstrap/console.php';
+
+use craft\base\Plugin;
+use lindemannrock\logginglibrary\LoggingLibrary;
+use lindemannrock\logginglibrary\models\Settings;
+use lindemannrock\logginglibrary\services\LoggingService;
+
+$plugins = Craft::$app->getPlugins();
+$plugin = $plugins->getPlugin('logging-library');
+
+if (!$plugin instanceof LoggingLibrary) {
+    fwrite(STDERR, "logging-library plugin instance was not loaded.\n");
+    exit(1);
+}
+
+$info = $plugins->getPluginInfo('logging-library');
+if (($info['isInstalled'] ?? false) !== true || ($info['isEnabled'] ?? false) !== true) {
+    fwrite(STDERR, "logging-library is not installed and enabled.\n");
+    exit(1);
+}
+
+$settings = $plugin->getSettings();
+if (!$settings instanceof Settings) {
+    fwrite(STDERR, "logging-library settings did not load.\n");
+    exit(1);
+}
+
+$base = Craft::$app->getModule('lindemannrock-base', false);
+if ($base === null) {
+    fwrite(STDERR, "Base module was not registered by logging-library bootstrap.\n");
+    exit(1);
+}
+
+$handle = 'compat-smoke';
+$today = date('Y-m-d');
+$logPath = Craft::$app->getPath()->getLogPath();
+if (!is_dir($logPath) && !mkdir($logPath, 0775, true) && !is_dir($logPath)) {
+    fwrite(STDERR, "Could not create log path: {$logPath}\n");
+    exit(1);
+}
+
+LoggingLibrary::configure([
+    'pluginHandle' => $handle,
+    'pluginName' => 'Compatibility Smoke',
+    'logLevel' => 'info',
+    'enableLogViewer' => true,
+]);
+
+if (!LoggingService::isConfigured($handle) || LoggingService::getLogLevel($handle) !== 'info') {
+    fwrite(STDERR, "Logging configuration was not registered.\n");
+    exit(1);
+}
+
+if (LoggingService::sanitizeLogMessage("one\ntwo\r\nthree") !== 'one\\ntwo\\nthree') {
+    fwrite(STDERR, "Log message sanitization failed.\n");
+    exit(1);
+}
+
+$fixture = $logPath . DIRECTORY_SEPARATOR . $handle . '-' . $today . '.log';
+$contents = implode("\n", [
+    "{$today} 12:00:00 [][INFO][{$handle}] Compatibility smoke info",
+    "{$today} 12:00:01 [][WARNING][{$handle}] Compatibility smoke warning",
+    '',
+]);
+
+if (file_put_contents($fixture, $contents) === false) {
+    fwrite(STDERR, "Could not write log fixture: {$fixture}\n");
+    exit(1);
+}
+
+$files = LoggingLibrary::getLogFiles($handle);
+if ($files === [] || ($files[0]['date'] ?? null) !== $today || ($files[0]['path'] ?? null) !== $fixture) {
+    fwrite(STDERR, "Log file discovery failed.\n");
+    exit(1);
+}
+
+$stats = LoggingService::getLogStats($handle);
+if (($stats['totalFiles'] ?? 0) < 1 || ($stats['levels']['info'] ?? 0) < 1 || ($stats['levels']['warning'] ?? 0) < 1) {
+    fwrite(STDERR, "Log statistics parsing failed.\n");
+    exit(1);
+}
+
+$entries = LoggingService::getRecentEntries($handle, 2);
+if (count($entries) !== 2 || ($entries[0]['message'] ?? '') !== 'Compatibility smoke warning') {
+    fwrite(STDERR, "Recent log entry parsing failed.\n");
+    exit(1);
+}
+
+$allFiles = LoggingLibrary::getAllLogFiles();
+$found = false;
+foreach ($allFiles as $file) {
+    if (($file['filename'] ?? '') === basename($fixture) && ($file['type'] ?? '') === 'plugin') {
+        $found = true;
+        break;
+    }
+}
+
+if (!$found) {
+    fwrite(STDERR, "Standalone log file discovery failed.\n");
+    exit(1);
+}
+
+@unlink($fixture);
+
+echo "Logging Library smoke test passed.\n";
+PHP
