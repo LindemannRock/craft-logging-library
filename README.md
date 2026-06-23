@@ -9,12 +9,6 @@
 
 A reusable logging library for Craft CMS plugins that provides consistent logging, dedicated log files, and a built-in log viewer interface.
 
-## Beta Notice
-
-This plugin is currently in active development and provided under the MIT License for testing purposes.
-
-**Licensing is subject to change.** We are finalizing our licensing structure and some or all features may require a paid license when officially released on the Craft Plugin Store.
-
 ## Features
 
 - **Dedicated Log Files** — each plugin gets its own daily log files in `storage/logs/`
