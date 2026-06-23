@@ -80,7 +80,7 @@ Plugin log files follow this format:
 | Message | The log message |
 | Context | Optional JSON data (appended after the message) |
 
-The consolidated viewer also recognizes Craft web/queue logs and common third-party plugin log lines that use a single bracketed level, for example `YYYY-MM-DD HH:MM:SS [INFO] Message`. Multi-line entries keep the first line in the table and show the remaining content in the expandable context row.
+The consolidated viewer also recognizes Craft web/queue logs, common third-party plugin log lines that use a single bracketed level, and Monolog's bracketed ISO-8601 format, for example `[2026-06-23T10:02:56.653489+01:00] notification.INFO: Message`. Undated source files such as `freeform-email.log` appear as their own source and use `current` in the file selector. Multi-line entries keep the first line in the table and show the remaining content in the expandable context row.
 
 ## Limitations
 

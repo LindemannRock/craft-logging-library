@@ -52,6 +52,12 @@ When a setting is overridden in `config/logging-library.php`, the Control Panel 
 
 **Why:** The cache key includes the file size and modification time. If the file hasn't been modified since the last parse, the cached version is served. In rare cases, the OS may buffer writes — clearing the cache forces a re-parse.
 
+## Undated log appears as Other or entries show Unknown
+
+Undated source logs such as `freeform-email.log` should appear as their own source in the standalone All Logs viewer. If a file still appears under **Other** or its rows show `UNKNOWN`, refresh the log cache for that file from the sidebar.
+
+**Why:** Older parser caches may have been built before undated source logs and bracketed ISO-8601 Monolog lines were recognized. Refreshing the cache forces Logging Library to re-read the file with the current parser.
+
 ## Duplicate log entries
 
 1. Check if `LoggingLibrary::configure()` is being called multiple times for the same plugin handle
