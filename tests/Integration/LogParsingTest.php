@@ -219,4 +219,18 @@ final class LogParsingTest extends TestCase
         self::assertSame('ExportNotifications handleNotifications - Started processing', $logs[0]['message']);
         self::assertSame('[] {"requestId":"VmzbtM"}', $logs[0]['context']);
     }
+
+    public function testUndatedMonologSourceLogKeepsBracketedMessageTokensInHeadline(): void
+    {
+        $path = $this->seedLogFile(
+            self::TEST_HANDLE_PREFIX . "freeform-email.log",
+            "[2026-06-23T10:02:56.653489+01:00] notification.INFO: User [admin] logged in [] []\n",
+        );
+
+        $logs = LoggingLibrary::getInstance()->logCache->getLogs($path)->all();
+
+        self::assertCount(1, $logs);
+        self::assertSame('User [admin] logged in', $logs[0]['message']);
+        self::assertSame('[] []', $logs[0]['context']);
+    }
 }

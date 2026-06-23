@@ -522,7 +522,7 @@ class LogCacheService extends Component
     {
         $combined = trim($message . ($context !== '' ? $context : ''));
 
-        if (preg_match('/^(?P<headline>.*?)(?:\s+(?P<payload>\[[^\r\n]*\](?:\s+\{[^\r\n]*\})?|\{[^\r\n]*\}))$/s', $combined, $matches)) {
+        if (preg_match('/^(?P<headline>.*?)\s+(?P<payload>(?:\[[^\r\n\]]*\]|\{[^\r\n]*\})(?:\s+(?:\[[^\r\n\]]*\]|\{[^\r\n]*\}))*)$/', $combined, $matches)) {
             return [
                 trim($matches['headline']),
                 trim($matches['payload']),
