@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.11.0](https://github.com/LindemannRock/craft-logging-library/compare/v5.10.1...v5.11.0) (2026-06-23)
+
+
+### Added
+
+* add smoke test and compatibility check scripts for Craft CMS ([b7e5026](https://github.com/LindemannRock/craft-logging-library/commit/b7e50267170d125819b8c761ba66904c1a939c95))
+
 ## [5.10.1](https://github.com/LindemannRock/craft-logging-library/compare/v5.10.0...v5.10.1) - 2026-06-18
 
 
