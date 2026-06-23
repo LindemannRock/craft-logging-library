@@ -1,5 +1,17 @@
 # Changelog
 
+## [5.12.0](https://github.com/LindemannRock/craft-logging-library/compare/v5.11.0...v5.12.0) (2026-06-23)
+
+
+### Added
+
+* **logging:** classify undated source logs and recognize Monolog format ([1053bff](https://github.com/LindemannRock/craft-logging-library/commit/1053bffd964caaea576675957c61dbb352488c87))
+
+
+### Fixed
+
+* **logging:** correct regex for log message parsing ([16a7398](https://github.com/LindemannRock/craft-logging-library/commit/16a73986d1fc802e9985885f4cd83a605c93eb70))
+
 ## [5.11.0](https://github.com/LindemannRock/craft-logging-library/compare/v5.10.1...v5.11.0) - 2026-06-23
 
 
