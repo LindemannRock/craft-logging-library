@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.13.0](https://github.com/LindemannRock/craft-logging-library/compare/v5.12.0...v5.13.0) (2026-06-24)
+
+
+### Added
+
+* **cp:** add dynamic URL for logs navigation based on mode ([8a8fd85](https://github.com/LindemannRock/craft-logging-library/commit/8a8fd85d7f12c9f370d1fbe1469786dcf3d61b13))
+
 ## [5.12.0](https://github.com/LindemannRock/craft-logging-library/compare/v5.11.0...v5.12.0) - 2026-06-23
 
 
