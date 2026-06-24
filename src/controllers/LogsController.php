@@ -197,18 +197,10 @@ class LogsController extends Controller
             $totalEntries = $logPage['total'];
             $category = $logPage['category'];
             $categoryOptions = $logPage['categoryOptions'];
-
-            // Detect which columns have variance (should be shown)
-            $columnVariance = $this->_detectColumnVariance($logEntries);
         } else {
             $logEntries = [];
             $totalEntries = 0;
             $categoryOptions = [];
-            $columnVariance = [
-                'level' => true,
-                'user' => true,
-                'category' => true,
-            ];
         }
 
         // Calculate pagination info
@@ -226,7 +218,6 @@ class LogsController extends Controller
             'sourceGroups' => $sourceGroups,
             'categoryOptions' => $categoryOptions,
             'logEntries' => $logEntries,
-            'columnVariance' => $columnVariance,
             'canDownload' => $canDownload,
             'filters' => [
                 'level' => $level,
@@ -252,40 +243,6 @@ class LogsController extends Controller
             ],
             'logConfig' => $config,
         ]);
-    }
-
-    /**
-     * Detect which columns have variance (should be shown)
-     */
-    private function _detectColumnVariance(array $logEntries): array
-    {
-        if (empty($logEntries)) {
-            return [
-                'level' => true,
-                'user' => true,
-                'category' => true,
-            ];
-        }
-
-        $uniqueValues = [
-            'level' => [],
-            'user' => [],
-            'category' => [],
-        ];
-
-        // Collect unique values for each column
-        foreach ($logEntries as $entry) {
-            $uniqueValues['level'][$entry['level'] ?? ''] = true;
-            $uniqueValues['user'][$entry['user'] ?? ''] = true;
-            $uniqueValues['category'][$entry['category'] ?? ''] = true;
-        }
-
-        // Column should be shown if it has more than 1 unique value
-        return [
-            'level' => count($uniqueValues['level']) > 1,
-            'user' => count($uniqueValues['user']) > 1,
-            'category' => count($uniqueValues['category']) > 1,
-        ];
     }
 
     /**
