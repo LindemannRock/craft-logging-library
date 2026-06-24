@@ -138,6 +138,7 @@
     page: {
         title: 'System Logs'|t('logging-library'),
         subnav: isStandalone ? 'all-logs' : 'logs',
+        url: isStandalone ? url('logging-library') : url(pluginHandle ~ '/logs'),
         crumbs: isStandalone ? [
             { label: pluginName, url: url('logging-library') },
             { label: 'All Logs'|t('logging-library'), url: url('logging-library') },
