@@ -31,6 +31,12 @@
 
 **Fix:** Set `'enableLogViewer' => true` for that plugin, or enable `forceEnableLogViewer` globally in Logging Library settings/config if persistent log storage is available. See [Edge Detection](../feature-tour/edge-detection.md).
 
+## Servd shows an empty Select File dropdown
+
+On Servd, Logging Library can only show files that exist in the current Craft `storage/logs/` path. Servd collects Craft logs centrally for its dashboard, but that hosted log feed is not imported into the Logging Library interface.
+
+**Fix:** Use Servd's **Logs** page, or Servd's Papertrail/Datadog integrations, for the complete hosted log history. Only enable **Force Enable Log Viewers** if `storage/logs/` is backed by persistent shared storage. Without that, the dropdown may be empty, stale, or limited to whichever application instance handled the request.
+
 ## Permission denied when viewing logs
 
 1. Ensure the user has the required permission (e.g., `yourPlugin:viewLogs`)

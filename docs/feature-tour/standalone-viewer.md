@@ -70,5 +70,6 @@ Admins always have access regardless of permission settings.
 ## Limitations
 
 - The standalone viewer is read-only — you cannot delete log files from the interface
+- It reads files from Craft's `storage/logs/` path only; it does not query hosted log feeds or external logging platforms
 - Files smaller than 10 bytes are automatically excluded (likely empty)
 - On edge/CDN platforms, file-based logs may not be available (see [Edge Detection](edge-detection.md))

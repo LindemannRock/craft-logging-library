@@ -26,6 +26,12 @@ When a file-based viewer is disabled, Logging Library hides the related CP navig
 
 Logging itself still works normally — messages are routed through Craft's PSR-3 system and appear in the platform's native log dashboard.
 
+## Servd Live Log Feed
+
+Servd adds its own Craft log target and collects logs centrally for the **Logs** page in the Servd dashboard. Logging Library does not query that hosted feed or import it into Craft; the built-in CP viewer only reads files that exist in the current Craft `storage/logs/` path.
+
+That distinction matters when you enable **Force Enable Log Viewers**. The override only re-enables local file reading. It does not connect to Servd, Papertrail, Datadog, or any other external log source. On Servd without persistent shared storage for `storage/logs/`, the file selector may be empty or show only partial logs from the current instance while the complete logs are still available in Servd.
+
 ## Manual Override
 
 You can override auto-detection per plugin:

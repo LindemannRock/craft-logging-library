@@ -85,5 +85,6 @@ The consolidated viewer also recognizes Craft web/queue logs, common third-party
 ## Limitations
 
 - The viewer reads from file-based logs only — it does not query a database
+- The viewer does not query hosted log feeds or external logging platforms such as Servd, Papertrail, or Datadog
 - Large files (100 MB+) may take longer on first load before the cache is built
 - On edge/CDN platforms, the viewer is automatically disabled (see [Edge Detection](edge-detection.md))

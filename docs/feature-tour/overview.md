@@ -16,6 +16,8 @@ Logging Library is a shared infrastructure plugin that provides centralized logg
 - **Edge Detection** — auto-disables file-based log viewer on edge/CDN platforms like Servd
 - **Permission-Gated Access** — granular permissions for viewing and downloading logs
 
+On edge platforms such as Servd, that support means safe detection and normal Craft log emission. It does not mean the CP viewer imports the host's centralized log feed; the viewer still reads local files from Craft's `storage/logs/` path.
+
 ## How Plugins Use It
 
 A plugin integrates Logging Library in three steps:

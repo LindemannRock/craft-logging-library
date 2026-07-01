@@ -20,9 +20,11 @@ A reusable logging library for Craft CMS plugins that provides consistent loggin
 - **LoggingService API** — direct logging, log statistics, recent entries, and cleanup
 - **High Performance Caching** — indexed file-based cache for large log viewer pages, with ArrayQuery compatibility for API callers
 - **Multi-Format Parsing** — automatically detects plugin, Craft CMS, and PHP error log formats
-- **Edge Detection** — auto-disables log viewer on edge/CDN platforms like Servd
+- **Edge Detection** — auto-disables the file-based log viewer on edge/CDN platforms like Servd
 - **Monolog Integration** — uses Craft 5's Monolog system with proper PSR-3 standards
 - **Configurable** — customizable log levels, retention, permissions, and sidebar menus
+
+On platforms like Servd, Logging Library does not import the host's centralized log feed into Craft. The CP viewer reads local `storage/logs/` files only; Servd-collected logs remain available in the Servd dashboard and any connected external logging service.
 
 ## Requirements
 

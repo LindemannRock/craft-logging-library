@@ -19,7 +19,9 @@ Go to **Logging Library → Settings** in the Control Panel. Settings open on th
 | **Show Main Menu** | Show Logging Library in the main Control Panel navigation as a consolidated **All Logs** view. Turn it off to hide the menu item while keeping each plugin's own **Logs** section. | On |
 | **Force Enable Log Viewers** | Only shown when an edge/ephemeral environment is detected. Force-enables file-based log viewers — both the standalone **All Logs** view and every plugin's dedicated **Logs** section — even though edge detection would normally hide them. | Off |
 
-**Force Enable Log Viewers** is the escape hatch for the [edge-detection](edge-detection.md) behaviour. On platforms with ephemeral storage, file-based viewers are hidden by default because logs don't survive a redeploy. If you've attached persistent storage at `storage/`, switch this on to bring the viewers back.
+**Force Enable Log Viewers** is the escape hatch for the [edge-detection](edge-detection.md) behaviour. On platforms with ephemeral storage, file-based viewers are hidden by default because logs don't survive a redeploy. If you've attached persistent shared storage at `storage/logs/`, switch this on to bring the viewers back.
+
+This setting does not import hosted logs from Servd or any external logging platform. It only tells Logging Library to try reading local files again. On Servd without shared persistent log storage, the viewer can still be empty or incomplete even though Servd is collecting the same Craft logs in its own dashboard.
 
 ## Interface
 

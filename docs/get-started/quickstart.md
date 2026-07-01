@@ -47,7 +47,7 @@ Navigate to **Logging Library → All Logs** in the Control Panel. If the Loggin
 
 ![Standalone All Logs viewer with today's plugin log file selected, showing the message just logged](images/quickstart-verify.webp)
 
-The file-based viewer is enabled by default on normal file-backed environments. On detected edge/ephemeral platforms such as Servd, it is hidden unless you explicitly [force-enable it](../feature-tour/settings.md).
+The file-based viewer is enabled by default on normal file-backed environments. On detected edge/ephemeral platforms such as Servd, it is hidden unless you explicitly [force-enable it](../feature-tour/settings.md). Force-enabling only retries local file reading; it does not connect the viewer to Servd's hosted log feed.
 
 ## What's Next
 
