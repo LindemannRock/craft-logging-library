@@ -20,6 +20,7 @@ return [
     'Settings' => 'Impostazioni',
     'System Logs' => 'Log di sistema',
     'System' => 'Sistema',
+    'Plugins' => 'Plugin',
     'General' => 'Generale',
     'Interface' => 'Interfaccia',
 
@@ -45,9 +46,6 @@ return [
     'Log file not found' => 'File di log non trovato',
     'Unable to determine plugin handle from URL' => 'Impossibile determinare l\'handle del plugin dall\'URL',
     'User does not have permission to view logs' => 'L\'utente non dispone dell\'autorizzazione per visualizzare i log',
-
-    // Validation messages
-    'Found {count, number} {count, plural, =1{error} other{errors}}' => '{count, number} {count, plural, =1{errore trovato} other{errori trovati}}',
 
     // Settings: General
     'General Settings' => 'Impostazioni generali',

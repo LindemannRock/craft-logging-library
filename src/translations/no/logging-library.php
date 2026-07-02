@@ -20,6 +20,7 @@ return [
     'Settings' => 'Innstillinger',
     'System Logs' => 'Systemlogger',
     'System' => 'System',
+    'Plugins' => 'Plugins',
     'General' => 'Generelt',
     'Interface' => 'Grensesnitt',
 
@@ -45,9 +46,6 @@ return [
     'Log file not found' => 'Loggfilen ble ikke funnet',
     'Unable to determine plugin handle from URL' => 'Plugin-handle kunne ikke bestemmes fra URL',
     'User does not have permission to view logs' => 'Brukeren har ikke tillatelse til å vise logger',
-
-    // Validation messages
-    'Found {count, number} {count, plural, =1{error} other{errors}}' => '{count, number} {count, plural, =1{feil} other{feil}} funnet',
 
     // Settings: General
     'General Settings' => 'Generelle innstillinger',

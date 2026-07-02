@@ -20,6 +20,7 @@ return [
     'Settings' => 'الإعدادات',
     'System Logs' => 'سجلات النظام',
     'System' => 'النظام',
+    'Plugins' => 'الإضافات',
     'General' => 'عام',
     'Interface' => 'الواجهة',
 
@@ -45,9 +46,6 @@ return [
     'Log file not found' => 'ملف السجل غير موجود',
     'Unable to determine plugin handle from URL' => 'تعذّر تحديد مُعرِّف الإضافة من URL',
     'User does not have permission to view logs' => 'ليس لدى المستخدم صلاحية لعرض السجلات',
-
-    // Validation messages
-    'Found {count, number} {count, plural, =1{error} other{errors}}' => 'تم العثور على {count, number} {count, plural, =1{خطأ} other{أخطاء}}',
 
     // Settings: General
     'General Settings' => 'الإعدادات العامة',

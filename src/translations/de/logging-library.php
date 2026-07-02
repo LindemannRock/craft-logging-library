@@ -20,6 +20,7 @@ return [
     'Settings' => 'Einstellungen',
     'System Logs' => 'Systemprotokolle',
     'System' => 'System',
+    'Plugins' => 'Plugins',
     'General' => 'Allgemein',
     'Interface' => 'Oberfläche',
 
@@ -45,9 +46,6 @@ return [
     'Log file not found' => 'Protokolldatei nicht gefunden',
     'Unable to determine plugin handle from URL' => 'Plugin-Handle konnte nicht aus URL ermittelt werden',
     'User does not have permission to view logs' => 'Der Benutzer hat keine Berechtigung, Protokolle anzuzeigen',
-
-    // Validation messages
-    'Found {count, number} {count, plural, =1{error} other{errors}}' => 'Es wurde {count, number} {count, plural, =1{Fehler} other{Fehler}} gefunden',
 
     // Settings: General
     'General Settings' => 'Allgemeine Einstellungen',

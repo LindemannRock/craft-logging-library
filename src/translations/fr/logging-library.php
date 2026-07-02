@@ -20,6 +20,7 @@ return [
     'Settings' => 'Paramètres',
     'System Logs' => 'Journaux système',
     'System' => 'Système',
+    'Plugins' => 'Plugins',
     'General' => 'Général',
     'Interface' => 'Interface',
 
@@ -45,9 +46,6 @@ return [
     'Log file not found' => 'Fichier journal introuvable',
     'Unable to determine plugin handle from URL' => 'Impossible de déterminer l\'identifiant du plugin depuis l\'URL',
     'User does not have permission to view logs' => 'L\'utilisateur n\'a pas la permission de consulter les journaux',
-
-    // Validation messages
-    'Found {count, number} {count, plural, =1{error} other{errors}}' => '{count, number} {count, plural, =1{erreur trouvée} other{erreurs trouvées}}',
 
     // Settings: General
     'General Settings' => 'Paramètres généraux',

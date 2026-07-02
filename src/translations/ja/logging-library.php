@@ -20,6 +20,7 @@ return [
     'Settings' => '設定',
     'System Logs' => 'システムログ',
     'System' => 'システム',
+    'Plugins' => 'プラグイン',
     'General' => '一般',
     'Interface' => 'インターフェース',
 
@@ -45,9 +46,6 @@ return [
     'Log file not found' => 'ログファイルが見つかりません',
     'Unable to determine plugin handle from URL' => 'URL からプラグイン Handle を特定できません',
     'User does not have permission to view logs' => 'ユーザーにログを表示する権限がありません',
-
-    // Validation messages
-    'Found {count, number} {count, plural, =1{error} other{errors}}' => '{count, number} 件の{count, plural, =1{エラー} other{エラー}}が見つかりました',
 
     // Settings: General
     'General Settings' => '一般設定',

@@ -20,6 +20,7 @@ return [
     'Settings' => 'Settings',
     'System Logs' => 'System Logs',
     'System' => 'System',
+    'Plugins' => 'Plugins',
     'General' => 'General',
     'Interface' => 'Interface',
 
@@ -45,9 +46,6 @@ return [
     'Log file not found' => 'Log file not found',
     'Unable to determine plugin handle from URL' => 'Unable to determine plugin handle from URL',
     'User does not have permission to view logs' => 'User does not have permission to view logs',
-
-    // Validation messages
-    'Found {count, number} {count, plural, =1{error} other{errors}}' => 'Found {count, number} {count, plural, =1{error} other{errors}}',
 
     // Settings: General
     'General Settings' => 'General Settings',

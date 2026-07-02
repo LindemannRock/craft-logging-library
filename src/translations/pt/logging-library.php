@@ -20,6 +20,7 @@ return [
     'Settings' => 'Definições',
     'System Logs' => 'Registos do sistema',
     'System' => 'Sistema',
+    'Plugins' => 'Plugins',
     'General' => 'Geral',
     'Interface' => 'Interface',
 
@@ -45,9 +46,6 @@ return [
     'Log file not found' => 'Ficheiro de log não encontrado',
     'Unable to determine plugin handle from URL' => 'Não foi possível determinar o handle do plugin a partir da URL',
     'User does not have permission to view logs' => 'O utilizador não tem permissão para ver os registos',
-
-    // Validation messages
-    'Found {count, number} {count, plural, =1{error} other{errors}}' => '{count, number} {count, plural, =1{erro encontrado} other{erros encontrados}}',
 
     // Settings: General
     'General Settings' => 'Definições gerais',

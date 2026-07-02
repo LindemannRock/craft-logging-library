@@ -20,6 +20,7 @@ return [
     'Settings' => 'Instellingen',
     'System Logs' => 'Systeemlogboeken',
     'System' => 'Systeem',
+    'Plugins' => 'Plugins',
     'General' => 'Algemeen',
     'Interface' => 'Interface',
 
@@ -45,9 +46,6 @@ return [
     'Log file not found' => 'Logbestand niet gevonden',
     'Unable to determine plugin handle from URL' => 'Kan plugin-handle niet bepalen uit URL',
     'User does not have permission to view logs' => 'De gebruiker heeft geen toestemming om logboeken te bekijken',
-
-    // Validation messages
-    'Found {count, number} {count, plural, =1{error} other{errors}}' => '{count, number} {count, plural, =1{fout} other{fouten}} gevonden',
 
     // Settings: General
     'General Settings' => 'Algemene instellingen',
