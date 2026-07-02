@@ -89,6 +89,22 @@ class RuntimeLogStoreTest extends TestCase
         self::assertSame(['all', 'runtime-alpha'], array_column($page['categoryOptions'], 'value'));
     }
 
+    public function testRuntimePageFiltersRecordsOlderThanTtl(): void
+    {
+        $now = time();
+
+        $this->store->appendMessages([
+            ['Recent runtime event', Logger::LEVEL_WARNING, 'runtime-alpha', $now - 10, [], 100],
+            ['Expired runtime event', Logger::LEVEL_WARNING, 'runtime-beta', $now - 120, [], 200],
+        ], $this->settings());
+
+        $page = $this->store->getLogPage('all', 'all', '', 'timestamp', 'desc', 1, 10, 60);
+
+        self::assertSame(1, $page['total']);
+        self::assertSame('Recent runtime event', $page['entries'][0]['message']);
+        self::assertSame(['all', 'runtime-alpha'], array_column($page['categoryOptions'], 'value'));
+    }
+
     public function testRuntimeStoreHonorsMaxEntries(): void
     {
         $settings = $this->settings(['maxEntries' => 2]);

@@ -742,7 +742,8 @@ class LogsController extends Controller
             $sort,
             $dir,
             $page,
-            $limit
+            $limit,
+            max(1, (int)($runtimeConfig['ttl'] ?? 86400))
         );
 
         return [

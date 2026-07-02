@@ -74,9 +74,13 @@ class RuntimeLogStoreService extends Component
     /**
      * Return a filtered, sorted, paginated page of runtime records.
      */
-    public function getLogPage(string $level, string $category, string $search, string $sort, string $dir, int $page, int $limit): array
+    public function getLogPage(string $level, string $category, string $search, string $sort, string $dir, int $page, int $limit, ?int $ttl = null): array
     {
         $records = $this->_getRecords();
+        if ($ttl !== null) {
+            $records = $this->_filterByTtl($records, $ttl);
+        }
+
         $search = mb_strtolower($search);
 
         $records = array_values(array_filter($records, function(array $record) use ($level, $search): bool {
@@ -247,6 +251,20 @@ class RuntimeLogStoreService extends Component
         }
 
         return $options;
+    }
+
+    /**
+     * Remove records older than the configured retention window.
+     */
+    private function _filterByTtl(array $records, int $ttl): array
+    {
+        $cutoff = time() - max(1, $ttl);
+
+        return array_values(array_filter($records, static function(array $record) use ($cutoff): bool {
+            $timestamp = strtotime((string)($record['timestamp'] ?? ''));
+
+            return $timestamp !== false && $timestamp >= $cutoff;
+        }));
     }
 
     /**
