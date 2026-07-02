@@ -124,6 +124,46 @@ class RuntimeLogStoreTest extends TestCase
         self::assertSame(['Three', 'Two'], array_column($page['entries'], 'message'));
     }
 
+    public function testRuntimeTimestampSortUsesSequenceTiebreaker(): void
+    {
+        $timestamp = strtotime('2026-07-02 10:00:00');
+
+        $this->store->appendMessages([
+            ['First same-second event', Logger::LEVEL_INFO, 'runtime-alpha', $timestamp, [], 100],
+            ['Second same-second event', Logger::LEVEL_INFO, 'runtime-alpha', $timestamp, [], 100],
+            ['Third same-second event', Logger::LEVEL_INFO, 'runtime-alpha', $timestamp, [], 100],
+        ], $this->settings());
+
+        $page = $this->store->getLogPage('all', 'all', '', 'timestamp', 'desc', 1, 10);
+
+        self::assertSame([
+            'Third same-second event',
+            'Second same-second event',
+            'First same-second event',
+        ], array_column($page['entries'], 'message'));
+    }
+
+    public function testRuntimeLevelSortUsesSeverityOrder(): void
+    {
+        $timestamp = strtotime('2026-07-02 10:00:00');
+
+        $this->store->appendMessages([
+            ['Warning event', Logger::LEVEL_WARNING, 'runtime-alpha', $timestamp, [], 100],
+            ['Info event', Logger::LEVEL_INFO, 'runtime-alpha', $timestamp, [], 100],
+            ['Error event', Logger::LEVEL_ERROR, 'runtime-alpha', $timestamp, [], 100],
+            ['Debug event', Logger::LEVEL_TRACE, 'runtime-alpha', $timestamp, [], 100],
+        ], $this->settings());
+
+        $page = $this->store->getLogPage('all', 'all', '', 'level', 'asc', 1, 10);
+
+        self::assertSame([
+            'Error event',
+            'Warning event',
+            'Info event',
+            'Debug event',
+        ], array_column($page['entries'], 'message'));
+    }
+
     public function testRuntimeStoreClampsMaxEntriesToTenThousand(): void
     {
         $messages = [];

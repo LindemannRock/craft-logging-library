@@ -122,19 +122,7 @@ class RuntimeLogStoreService extends Component
         }
 
         $sort = in_array($sort, ['timestamp', 'level', 'category', 'user', 'message'], true) ? $sort : 'timestamp';
-        $direction = $dir === 'asc' ? 1 : -1;
-
-        usort($records, function(array $a, array $b) use ($sort, $direction): int {
-            $aValue = $a[$sort] ?? '';
-            $bValue = $b[$sort] ?? '';
-
-            if ($sort === 'timestamp') {
-                $aValue = strtotime((string)$aValue) ?: 0;
-                $bValue = strtotime((string)$bValue) ?: 0;
-            }
-
-            return ($aValue <=> $bValue) * $direction;
-        });
+        $records = $this->_sortRecords($records, $sort, $dir);
 
         $total = count($records);
         $offset = max(0, ($page - 1) * $limit);
@@ -251,6 +239,66 @@ class RuntimeLogStoreService extends Component
         }
 
         return $options;
+    }
+
+    /**
+     * Sort records using the same stable behavior as file-backed log pages.
+     */
+    private function _sortRecords(array $records, string $sort, string $dir): array
+    {
+        $direction = $dir === 'asc' ? 1 : -1;
+
+        foreach ($records as $index => &$record) {
+            $record['_seq'] = $index;
+        }
+        unset($record);
+
+        if ($sort === 'level') {
+            $levelOrder = [
+                'error' => 1,
+                'warning' => 2,
+                'info' => 3,
+                'debug' => 4,
+                'unknown' => 5,
+            ];
+
+            usort($records, static function(array $a, array $b) use ($direction, $levelOrder): int {
+                $aLevel = (string)($a['canonicalLevel'] ?? $a['level'] ?? 'unknown');
+                $bLevel = (string)($b['canonicalLevel'] ?? $b['level'] ?? 'unknown');
+                $comparison = (($levelOrder[$aLevel] ?? 99) <=> ($levelOrder[$bLevel] ?? 99));
+
+                if ($comparison === 0) {
+                    $comparison = (($a['_seq'] ?? 0) <=> ($b['_seq'] ?? 0));
+                }
+
+                return $comparison * $direction;
+            });
+        } else {
+            usort($records, static function(array $a, array $b) use ($sort, $direction): int {
+                $aValue = $a[$sort] ?? '';
+                $bValue = $b[$sort] ?? '';
+
+                if ($sort === 'timestamp') {
+                    $aValue = strtotime((string)$aValue) ?: 0;
+                    $bValue = strtotime((string)$bValue) ?: 0;
+                }
+
+                $comparison = ($aValue <=> $bValue);
+
+                if ($comparison === 0) {
+                    $comparison = (($a['_seq'] ?? 0) <=> ($b['_seq'] ?? 0));
+                }
+
+                return $comparison * $direction;
+            });
+        }
+
+        foreach ($records as &$record) {
+            unset($record['_seq']);
+        }
+        unset($record);
+
+        return $records;
     }
 
     /**
