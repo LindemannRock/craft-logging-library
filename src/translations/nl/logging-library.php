@@ -88,6 +88,7 @@ return [
     'Level' => 'Niveau',
     'Source' => 'Bron',
     'User' => 'Gebruiker',
+    'Request User' => 'Aanvraaggebruiker',
     'User #{id}' => 'Gebruiker #{id}',
     'Message' => 'Bericht',
 

@@ -28,13 +28,7 @@
     <td class="truncate" data-column="category" title="{{ sourceLabel }}">{{ sourceLabel }}</td>
 
     <td class="nowrap" data-column="user">
-        {% if item.user matches '/user:(\\d+)/' %}
-            {% set userId = item.user|replace('user:', '') %}
-            {% set user = craft.users.id(userId).one() %}
-            {{ user ? user.username : 'User #{id}'|t('logging-library', {id: userId}) }}
-        {% else %}
-            {{ item.user ?: 'System'|t('logging-library') }}
-        {% endif %}
+        {{ (item.userLabel ?? item.user) ?: 'System'|t('logging-library') }}
     </td>
 
     {% set previewText = item.message ~ ((item.context and item.context not in ['[]', '']) ? ' ' ~ item.context : '') %}

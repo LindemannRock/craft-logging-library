@@ -88,6 +88,7 @@ return [
     'Level' => 'Level',
     'Source' => 'Source',
     'User' => 'User',
+    'Request User' => 'Request User',
     'User #{id}' => 'User #{id}',
     'Message' => 'Message',
 

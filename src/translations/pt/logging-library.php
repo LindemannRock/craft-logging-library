@@ -88,6 +88,7 @@ return [
     'Level' => 'Nível',
     'Source' => 'Origem',
     'User' => 'Utilizador',
+    'Request User' => 'Utilizador do pedido',
     'User #{id}' => 'Utilizador #{id}',
     'Message' => 'Mensagem',
 

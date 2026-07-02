@@ -88,6 +88,7 @@ return [
     'Level' => 'Nivel',
     'Source' => 'Origen',
     'User' => 'Usuario',
+    'Request User' => 'Usuario de la solicitud',
     'User #{id}' => 'Usuario #{id}',
     'Message' => 'Mensaje',
 

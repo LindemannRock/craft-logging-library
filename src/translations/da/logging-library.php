@@ -88,6 +88,7 @@ return [
     'Level' => 'Niveau',
     'Source' => 'Kilde',
     'User' => 'Bruger',
+    'Request User' => 'Anmodningsbruger',
     'User #{id}' => 'Bruger #{id}',
     'Message' => 'Besked',
 

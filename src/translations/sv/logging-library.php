@@ -88,6 +88,7 @@ return [
     'Level' => 'Nivå',
     'Source' => 'Källa',
     'User' => 'Användare',
+    'Request User' => 'Begärande användare',
     'User #{id}' => 'Användare #{id}',
     'Message' => 'Meddelande',
 

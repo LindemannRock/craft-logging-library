@@ -184,7 +184,7 @@
             {key: 'timestamp', label: 'Time'|t('logging-library'), sortable: true},
             {key: 'level', label: 'Level'|t('logging-library'), sortable: true},
             {key: 'category', label: 'Source'|t('logging-library'), sortable: true},
-            {key: 'user', label: 'User'|t('logging-library'), sortable: true},
+            {key: 'user', label: (isRuntime ? 'Request User' : 'User')|t('logging-library'), sortable: true},
             {key: 'message', label: 'Message'|t('logging-library'), sortable: true},
         ] : [
             {key: 'timestamp', label: 'Time'|t('logging-library'), sortable: true},
@@ -296,7 +296,9 @@
 
     {# User #}
     <td class="nowrap">
-        {% if item.user matches '/user:(\\d+)/' %}
+        {% if isRuntime %}
+            {{ (item.userLabel ?? item.user) ?: 'System'|t('logging-library') }}
+        {% elseif item.user matches '/user:(\\d+)/' %}
             {% set userId = item.user|replace('user:', '') %}
             {% set user = craft.users.id(userId).one() %}
             {{ user ? user.username : 'User #{id}'|t('logging-library', {id: userId}) }}
