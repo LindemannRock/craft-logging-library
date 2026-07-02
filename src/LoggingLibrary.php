@@ -446,6 +446,8 @@ class LoggingLibrary extends Plugin
         $runtimeConfig['levels'] = self::_normalizeRuntimeLevels($runtimeConfig['levels'] ?? $defaults['levels']);
         $runtimeConfig['maxEntries'] = min(10000, max(1, (int)($runtimeConfig['maxEntries'] ?? $defaults['maxEntries'])));
         $runtimeConfig['refreshInterval'] = max(0, (int)($runtimeConfig['refreshInterval'] ?? $defaults['refreshInterval']));
+        $runtimeConfig['maxMessageBytes'] = max(1, (int)($runtimeConfig['maxMessageBytes'] ?? $defaults['maxMessageBytes']));
+        $runtimeConfig['maxContextBytes'] = max(1, (int)($runtimeConfig['maxContextBytes'] ?? $defaults['maxContextBytes']));
         $runtimeConfig['categories'] = array_values(array_filter((array)($runtimeConfig['categories'] ?? []), 'is_string'));
         $runtimeConfig['except'] = array_values(array_filter((array)($runtimeConfig['except'] ?? []), 'is_string'));
 

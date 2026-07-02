@@ -155,6 +155,28 @@ class RuntimeLogStoreTest extends TestCase
         self::assertLessThanOrEqual(43, strlen($page['entries'][0]['context']));
     }
 
+    public function testRuntimeStoreClampsNonPositiveMessageAndContextLimits(): void
+    {
+        $this->store->appendMessages([
+            [
+                'This message should still be bounded',
+                Logger::LEVEL_ERROR,
+                'runtime-alpha',
+                strtotime('2026-07-02 10:00:00'),
+                [['file' => __FILE__, 'line' => __LINE__]],
+                100,
+            ],
+        ], $this->settings([
+            'maxMessageBytes' => 0,
+            'maxContextBytes' => -10,
+        ]));
+
+        $page = $this->store->getLogPage('all', 'all', '', 'timestamp', 'desc', 1, 10);
+
+        self::assertSame('T...', $page['entries'][0]['message']);
+        self::assertSame('{...', $page['entries'][0]['context']);
+    }
+
     public function testRuntimeTargetCapturesDirectCraftLogCalls(): void
     {
         $target = new RuntimeLogTarget([

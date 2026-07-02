@@ -319,7 +319,9 @@ class RuntimeLogStoreService extends Component
 
     private function _truncate(string $value, int $maxBytes): string
     {
-        if ($maxBytes <= 0 || strlen($value) <= $maxBytes) {
+        $maxBytes = max(1, $maxBytes);
+
+        if (strlen($value) <= $maxBytes) {
             return $value;
         }
 
