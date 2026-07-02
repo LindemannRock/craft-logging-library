@@ -71,7 +71,22 @@ class RuntimeLogStoreTest extends TestCase
         self::assertSame(1, $page['total']);
         self::assertSame('Needle warning message', $page['entries'][0]['message']);
         self::assertSame('runtime-alpha', $page['category']);
-        self::assertGreaterThanOrEqual(3, count($page['categoryOptions']));
+        self::assertSame(['all', 'runtime-alpha'], array_column($page['categoryOptions'], 'value'));
+    }
+
+    public function testRuntimeCategoryOptionsAreScopedToLevelAndSearch(): void
+    {
+        $this->store->appendMessages([
+            ['Needle warning message', Logger::LEVEL_WARNING, 'runtime-alpha', strtotime('2026-07-02 10:00:00'), [], 100],
+            ['Other error message', Logger::LEVEL_ERROR, 'runtime-beta', strtotime('2026-07-02 10:01:00'), [], 200],
+            ['Needle info message', Logger::LEVEL_INFO, 'runtime-gamma', strtotime('2026-07-02 10:02:00'), [], 300],
+        ], $this->settings());
+
+        $page = $this->store->getLogPage('warning', 'runtime-gamma', 'needle', 'timestamp', 'desc', 1, 10);
+
+        self::assertSame('all', $page['category']);
+        self::assertSame(1, $page['total']);
+        self::assertSame(['all', 'runtime-alpha'], array_column($page['categoryOptions'], 'value'));
     }
 
     public function testRuntimeStoreHonorsMaxEntries(): void

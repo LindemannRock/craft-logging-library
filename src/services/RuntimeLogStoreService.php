@@ -12,6 +12,7 @@ namespace lindemannrock\logginglibrary\services;
 
 use Craft;
 use craft\base\Component;
+use craft\elements\User;
 use craft\helpers\Json;
 use yii\helpers\VarDumper;
 use yii\log\Logger;
@@ -76,26 +77,10 @@ class RuntimeLogStoreService extends Component
     public function getLogPage(string $level, string $category, string $search, string $sort, string $dir, int $page, int $limit): array
     {
         $records = $this->_getRecords();
-        $categoryCounts = [];
-
-        foreach ($records as $record) {
-            $recordCategory = (string)($record['category'] ?? '');
-            if ($recordCategory !== '') {
-                $categoryCounts[$recordCategory] = ($categoryCounts[$recordCategory] ?? 0) + 1;
-            }
-        }
-
-        if ($category !== 'all' && !isset($categoryCounts[$category])) {
-            $category = 'all';
-        }
-
         $search = mb_strtolower($search);
-        $records = array_values(array_filter($records, function(array $record) use ($level, $category, $search): bool {
-            if ($level !== 'all' && ($record['canonicalLevel'] ?? '') !== $level) {
-                return false;
-            }
 
-            if ($category !== 'all' && ($record['category'] ?? '') !== $category) {
+        $records = array_values(array_filter($records, function(array $record) use ($level, $search): bool {
+            if ($level !== 'all' && ($record['canonicalLevel'] ?? '') !== $level) {
                 return false;
             }
 
@@ -112,6 +97,25 @@ class RuntimeLogStoreService extends Component
 
             return str_contains($haystack, $search);
         }));
+
+        $categoryCounts = [];
+
+        foreach ($records as $record) {
+            $recordCategory = (string)($record['category'] ?? '');
+            if ($recordCategory !== '') {
+                $categoryCounts[$recordCategory] = ($categoryCounts[$recordCategory] ?? 0) + 1;
+            }
+        }
+
+        if ($category !== 'all' && !isset($categoryCounts[$category])) {
+            $category = 'all';
+        }
+
+        if ($category !== 'all') {
+            $records = array_values(array_filter($records, function(array $record) use ($category): bool {
+                return ($record['category'] ?? '') === $category;
+            }));
+        }
 
         $sort = in_array($sort, ['timestamp', 'level', 'category', 'user', 'message'], true) ? $sort : 'timestamp';
         $direction = $dir === 'asc' ? 1 : -1;
@@ -130,9 +134,10 @@ class RuntimeLogStoreService extends Component
 
         $total = count($records);
         $offset = max(0, ($page - 1) * $limit);
+        $entries = array_slice($records, $offset, $limit);
 
         return [
-            'entries' => array_slice($records, $offset, $limit),
+            'entries' => $this->_withUserLabels($entries),
             'total' => $total,
             'category' => $category,
             'categoryOptions' => $this->_categoryOptions($categoryCounts),
@@ -242,6 +247,50 @@ class RuntimeLogStoreService extends Component
         }
 
         return $options;
+    }
+
+    /**
+     * Attach display labels for optional user IDs without querying per row.
+     */
+    private function _withUserLabels(array $records): array
+    {
+        $ids = [];
+
+        foreach ($records as $record) {
+            $user = (string)($record['user'] ?? '');
+            if (preg_match('/^user:(\d+)$/', $user, $matches)) {
+                $ids[] = (int)$matches[1];
+            }
+        }
+
+        $usernames = [];
+        $ids = array_values(array_unique(array_filter($ids)));
+
+        if ($ids !== []) {
+            try {
+                foreach (User::find()->id($ids)->status(null)->all() as $user) {
+                    $usernames[(int)$user->id] = (string)$user->username;
+                }
+            } catch (\Throwable) {
+                $usernames = [];
+            }
+        }
+
+        foreach ($records as &$record) {
+            $user = (string)($record['user'] ?? '');
+            $record['userLabel'] = Craft::t('logging-library', 'System');
+
+            if (preg_match('/^user:(\d+)$/', $user, $matches)) {
+                $id = (int)$matches[1];
+                $record['userLabel'] = $usernames[$id]
+                    ?? Craft::t('logging-library', 'User #{id}', ['id' => $id]);
+            } elseif ($user !== '') {
+                $record['userLabel'] = $user;
+            }
+        }
+        unset($record);
+
+        return $records;
     }
 
     private function _canonicalLevel(int $level): string
