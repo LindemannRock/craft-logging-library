@@ -191,9 +191,7 @@ class RuntimeLogStoreService extends Component
             'category' => (string)$category,
             'message' => $messageText,
             'context' => $contextText,
-            'source' => 'runtime-cache',
             'user' => $user,
-            'raw' => $messageText . ($contextText !== '' ? ' ' . $contextText : ''),
         ];
     }
 
