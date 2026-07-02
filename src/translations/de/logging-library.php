@@ -116,6 +116,7 @@ return [
     'Log Location' => 'Protokollspeicherort',
     'Runtime Store' => 'Laufzeitspeicher',
     'Craft cache' => 'Craft Cache',
+    'Redis ({cache})' => 'Redis ({cache})',
     'Runtime Location' => 'Laufzeit-Speicherort',
     'Recent runtime logs are stored in Craft cache and are intended for short-lived diagnostics, not complete log history.' => 'Aktuelle Laufzeitprotokolle werden im Craft Cache gespeichert und sind für kurzlebige Diagnose gedacht, nicht für den vollständigen Protokollverlauf.',
 

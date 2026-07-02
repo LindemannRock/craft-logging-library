@@ -14,7 +14,6 @@
 
 {% set isRuntime = isRuntime ?? false %}
 {% set availableLevels = availableLevels ?? [] %}
-{% set craftUsesRedisCache = craft.app.cache is defined and craft.app.cache.className is defined and craft.app.cache.className == 'yii\\redis\\Cache' %}
 
 {# ============================================================================
    BUILD FILTER OPTIONS
@@ -454,7 +453,7 @@
 
             <div class="log-config-item">
                 <div class="label">{{ "Runtime Store"|t('logging-library') }}</div>
-                <div class="value">{{ craftUsesRedisCache ? 'Redis (' ~ "Craft cache"|t('logging-library') ~ ')' : "Craft cache"|t('logging-library') }}</div>
+                <div class="value">{{ (runtimeUsesRedisCache ?? false) ? 'Redis ({cache})'|t('logging-library', {cache: "Craft cache"|t('logging-library')}) : "Craft cache"|t('logging-library') }}</div>
             </div>
 
             <div class="log-config-item">

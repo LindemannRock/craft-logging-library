@@ -116,6 +116,7 @@ return [
     'Log Location' => 'Loglocatie',
     'Runtime Store' => 'Runtimeopslag',
     'Craft cache' => 'Craft-cache',
+    'Redis ({cache})' => 'Redis ({cache})',
     'Runtime Location' => 'Runtimelocatie',
     'Recent runtime logs are stored in Craft cache and are intended for short-lived diagnostics, not complete log history.' => 'Recente runtime-logboeken worden opgeslagen in Craft-cache en zijn bedoeld voor kortstondige diagnose, niet voor volledige logboekgeschiedenis.',
 

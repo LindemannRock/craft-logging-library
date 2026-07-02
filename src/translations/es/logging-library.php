@@ -116,6 +116,7 @@ return [
     'Log Location' => 'Ubicación del registro',
     'Runtime Store' => 'Almacén de tiempo de ejecución',
     'Craft cache' => 'caché de Craft',
+    'Redis ({cache})' => 'Redis ({cache})',
     'Runtime Location' => 'Ubicación de tiempo de ejecución',
     'Recent runtime logs are stored in Craft cache and are intended for short-lived diagnostics, not complete log history.' => 'Los registros recientes de tiempo de ejecución se almacenan en la caché de Craft y están pensados para diagnósticos efímeros, no para el historial completo de registros.',
 
