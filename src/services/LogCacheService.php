@@ -387,7 +387,7 @@ class LogCacheService extends Component
 
         return [
             'timestamp' => $datetime,
-            'user' => $matches['user'] ?? 'System',
+            'user' => $matches['user'] ?? '',
             'level' => $level,
             'channel' => $matches['channel'] ?? null,
             'category' => $category,

@@ -70,6 +70,21 @@ final class LogIndexedCacheTest extends TestCase
         LoggingLibrary::getInstance()->logCache->invalidateLogCache($path);
     }
 
+    public function testIndexedPageUsesTranslatedSystemLabelForLogsWithoutUser(): void
+    {
+        $path = $this->seedLogFile(
+            self::TEST_HANDLE_PREFIX . 'indexed-system-user-2026-05-25.log',
+            "2026-05-25 10:00:00 [web.INFO] [application] System message\n",
+        );
+
+        $page = LoggingLibrary::getInstance()->logCache->getLogPage($path, 'all', 'all', '', 'timestamp', 'desc', 1, 10);
+
+        self::assertSame('', $page['entries'][0]['user']);
+        self::assertSame('System', $page['entries'][0]['userLabel']);
+
+        LoggingLibrary::getInstance()->logCache->invalidateLogCache($path);
+    }
+
     public function testIndexedSearchTreatsLikeWildcardsLiterally(): void
     {
         $path = $this->seedLogFile(
