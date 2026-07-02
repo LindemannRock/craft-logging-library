@@ -462,16 +462,18 @@
                 <div class="value" id="runtime-log-entry-count">{{ pagination.total|number_format }} / {{ (runtimeMaxEntries ?? 1000)|number_format }}</div>
             </div>
 
-            <div class="log-config-item" style="grid-template-columns: 1fr; padding: 8px 0;">
-                <form method="post" accept-charset="UTF-8">
-                    {{ csrfInput() }}
-                    {{ actionInput('logging-library/logs/clear-runtime') }}
-                    {{ redirectInput(craft.app.request.url) }}
-                    <button type="submit" class="btn fullwidth">
-                        {{ "Clear Runtime Logs"|t('logging-library') }}
-                    </button>
-                </form>
-            </div>
+            {% if canClearRuntimeLogs ?? false %}
+                <div class="log-config-item" style="grid-template-columns: 1fr; padding: 8px 0;">
+                    <form method="post" accept-charset="UTF-8">
+                        {{ csrfInput() }}
+                        {{ actionInput('logging-library/logs/clear-runtime') }}
+                        {{ redirectInput(craft.app.request.url) }}
+                        <button type="submit" class="btn fullwidth">
+                            {{ "Clear Runtime Logs"|t('logging-library') }}
+                        </button>
+                    </form>
+                </div>
+            {% endif %}
         {% else %}
             <div class="log-config-item">
                 <div class="label">{{ "Available Logs"|t('logging-library') }}</div>

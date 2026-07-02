@@ -326,6 +326,7 @@ class LogsController extends Controller
             'runtimeCurrentLevel' => $context['runtimeCurrentLevel'],
             'runtimeMaxEntries' => $context['runtimeMaxEntries'],
             'runtimeRefreshInterval' => $context['runtimeRefreshInterval'],
+            'canClearRuntimeLogs' => $user->checkPermission(LoggingLibrary::PERMISSION_CLEAR_CACHE),
             'logConfig' => null,
         ]);
     }
@@ -392,6 +393,7 @@ class LogsController extends Controller
     {
         $this->requirePostRequest();
         $this->_checkPermissions([LoggingLibrary::PERMISSION_VIEW_ALL_LOGS]);
+        $this->_checkPermissions([LoggingLibrary::PERMISSION_CLEAR_CACHE]);
 
         if (!LoggingLibrary::isRuntimeLogStoreEnabled()) {
             throw new NotFoundHttpException(Craft::t('logging-library', 'Recent runtime logs are disabled'));
