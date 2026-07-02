@@ -295,11 +295,7 @@
 
     {# User #}
     <td class="nowrap">
-        {% if isRuntime or item.userLabel is defined %}
-            {{ (item.userLabel ?? item.user) ?: 'System'|t('logging-library') }}
-        {% else %}
-            {{ item.user ?: 'System'|t('logging-library') }}
-        {% endif %}
+        {{ (item.userLabel ?? '') ?: 'System'|t('logging-library') }}
     </td>
 
     {# Message + context inline; click row to see them on separate lines. #}
