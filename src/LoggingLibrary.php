@@ -479,7 +479,6 @@ class LoggingLibrary extends Plugin
         ]);
 
         $dispatcher->targets[] = $target;
-        $target->init();
     }
 
     private static function _normalizeRuntimeLevels(mixed $levels): array
