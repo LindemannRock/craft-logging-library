@@ -11,10 +11,13 @@ declare(strict_types=1);
 namespace lindemannrock\logginglibrary\tests\Integration;
 
 use Craft;
+use craft\console\Request as CraftConsoleRequest;
+use lindemannrock\logginglibrary\controllers\LogsController;
 use lindemannrock\logginglibrary\log\targets\RuntimeLogTarget;
 use lindemannrock\logginglibrary\LoggingLibrary;
 use lindemannrock\logginglibrary\services\RuntimeLogStoreService;
 use lindemannrock\logginglibrary\tests\TestCase;
+use yii\web\ForbiddenHttpException;
 use yii\log\Logger;
 
 /**
@@ -193,6 +196,41 @@ class RuntimeLogStoreTest extends TestCase
         self::assertSame('{...', $page['entries'][0]['context']);
     }
 
+    public function testRuntimeUserLabelsResolveAndFallBack(): void
+    {
+        $method = new \ReflectionMethod($this->store, '_withUserLabels');
+
+        $records = [
+            ['user' => 'user:999999999', 'message' => 'a'],
+            ['user' => '', 'message' => 'b'],
+            ['user' => 'cli', 'message' => 'c'],
+        ];
+
+        $out = $method->invoke($this->store, $records);
+
+        self::assertSame('User #999999999', $out[0]['userLabel']);
+        self::assertSame('System', $out[1]['userLabel']);
+        self::assertSame('cli', $out[2]['userLabel']);
+    }
+
+    public function testClearRuntimeRejectsUserWithoutClearCachePermission(): void
+    {
+        $user = $this->createTestUser('__logginglibrary_test_');
+        $this->grantPermissions($user, [LoggingLibrary::PERMISSION_VIEW_ALL_LOGS]);
+        $this->actingAs($user);
+
+        $originalRequest = Craft::$app->getRequest();
+        Craft::$app->set('request', new RuntimeLogStorePostRequest());
+
+        try {
+            $this->expectException(ForbiddenHttpException::class);
+
+            (new LogsController('logs', LoggingLibrary::getInstance()))->actionClearRuntime();
+        } finally {
+            Craft::$app->set('request', $originalRequest);
+        }
+    }
+
     public function testRuntimeTargetCapturesDirectCraftLogCalls(): void
     {
         $target = new RuntimeLogTarget([
@@ -237,5 +275,13 @@ class RuntimeLogStoreTest extends TestCase
                 'includeUserId' => false,
             ],
         ], $overrides);
+    }
+}
+
+final class RuntimeLogStorePostRequest extends CraftConsoleRequest
+{
+    public function getIsPost(): bool
+    {
+        return true;
     }
 }
