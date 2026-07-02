@@ -34,7 +34,7 @@ class RuntimeLogTarget extends Target
     /**
      * @inheritdoc
      */
-    public $exportInterval = 1;
+    public $exportInterval = 20;
 
     /**
      * @inheritdoc
