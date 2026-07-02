@@ -96,4 +96,24 @@ final class LogSortTest extends TestCase
             self::assertArrayNotHasKey('_seq', $entry);
         }
     }
+
+    public function testFileLogUserLabelsResolveAndFallBack(): void
+    {
+        $service = new LogCacheService();
+        $method = new \ReflectionMethod($service, '_withUserLabels');
+
+        $records = [
+            ['user' => 'user:999999999', 'message' => 'a'],
+            ['user' => '', 'message' => 'b'],
+            ['user' => 'System', 'message' => 'c'],
+            ['user' => 'cli', 'message' => 'd'],
+        ];
+
+        $out = $method->invoke($service, $records);
+
+        self::assertSame('User #999999999', $out[0]['userLabel']);
+        self::assertSame('System', $out[1]['userLabel']);
+        self::assertSame('System', $out[2]['userLabel']);
+        self::assertSame('cli', $out[3]['userLabel']);
+    }
 }

@@ -295,12 +295,8 @@
 
     {# User #}
     <td class="nowrap">
-        {% if isRuntime %}
+        {% if isRuntime or item.userLabel is defined %}
             {{ (item.userLabel ?? item.user) ?: 'System'|t('logging-library') }}
-        {% elseif item.user matches '/user:(\\d+)/' %}
-            {% set userId = item.user|replace('user:', '') %}
-            {% set user = craft.users.id(userId).one() %}
-            {{ user ? user.username : 'User #{id}'|t('logging-library', {id: userId}) }}
         {% else %}
             {{ item.user ?: 'System'|t('logging-library') }}
         {% endif %}
