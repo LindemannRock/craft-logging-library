@@ -13,6 +13,7 @@ namespace lindemannrock\logginglibrary\tests\Integration;
 use Craft;
 use craft\console\Request as CraftConsoleRequest;
 use lindemannrock\logginglibrary\controllers\LogsController;
+use lindemannrock\logginglibrary\helpers\UserLabelHelper;
 use lindemannrock\logginglibrary\log\targets\RuntimeLogTarget;
 use lindemannrock\logginglibrary\LoggingLibrary;
 use lindemannrock\logginglibrary\services\RuntimeLogStoreService;
@@ -240,15 +241,13 @@ class RuntimeLogStoreTest extends TestCase
 
     public function testRuntimeUserLabelsResolveAndFallBack(): void
     {
-        $method = new \ReflectionMethod($this->store, '_withUserLabels');
-
         $records = [
             ['user' => 'user:999999999', 'message' => 'a'],
             ['user' => '', 'message' => 'b'],
             ['user' => 'cli', 'message' => 'c'],
         ];
 
-        $out = $method->invoke($this->store, $records);
+        $out = UserLabelHelper::withUserLabels($records);
 
         self::assertSame('User #999999999', $out[0]['userLabel']);
         self::assertSame('System', $out[1]['userLabel']);

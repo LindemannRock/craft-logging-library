@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace lindemannrock\logginglibrary\tests\Integration;
 
 use lindemannrock\logginglibrary\services\LogCacheService;
+use lindemannrock\logginglibrary\helpers\UserLabelHelper;
 use lindemannrock\logginglibrary\tests\TestCase;
 
 /**
@@ -99,9 +100,6 @@ final class LogSortTest extends TestCase
 
     public function testFileLogUserLabelsResolveAndFallBack(): void
     {
-        $service = new LogCacheService();
-        $method = new \ReflectionMethod($service, '_withUserLabels');
-
         $records = [
             ['user' => 'user:999999999', 'message' => 'a'],
             ['user' => '', 'message' => 'b'],
@@ -109,7 +107,7 @@ final class LogSortTest extends TestCase
             ['user' => 'cli', 'message' => 'd'],
         ];
 
-        $out = $method->invoke($service, $records);
+        $out = UserLabelHelper::withUserLabels($records);
 
         self::assertSame('User #999999999', $out[0]['userLabel']);
         self::assertSame('System', $out[1]['userLabel']);

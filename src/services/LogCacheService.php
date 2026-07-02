@@ -12,9 +12,9 @@ namespace lindemannrock\logginglibrary\services;
 
 use Craft;
 use craft\base\Component;
-use craft\elements\User;
 use craft\helpers\FileHelper;
 use lindemannrock\base\helpers\PluginHelper;
+use lindemannrock\logginglibrary\helpers\UserLabelHelper;
 use lindemannrock\logginglibrary\LoggingLibrary;
 use PDO;
 use PDOException;
@@ -121,7 +121,7 @@ class LogCacheService extends Component
         $entries = $this->_getIndexedEntries($pdo, $whereSql, $params, $sort, $dir, $page, $limit);
 
         return [
-            'entries' => $this->_withUserLabels($entries),
+            'entries' => UserLabelHelper::withUserLabels($entries),
             'total' => $total,
             'category' => $category,
             'categoryOptions' => $this->_buildCategoryOptions($categoryCounts),
@@ -681,55 +681,11 @@ class LogCacheService extends Component
         unset($log);
 
         return [
-            'entries' => $this->_withUserLabels($entries),
+            'entries' => UserLabelHelper::withUserLabels($entries),
             'total' => $totalCount,
             'category' => $category,
             'categoryOptions' => $this->_buildCategoryOptions($categoryCounts),
         ];
-    }
-
-    /**
-     * Attach display labels for optional user IDs without querying per row.
-     */
-    private function _withUserLabels(array $records): array
-    {
-        $ids = [];
-
-        foreach ($records as $record) {
-            $user = (string)($record['user'] ?? '');
-            if (preg_match('/^user:(\d+)$/', $user, $matches)) {
-                $ids[] = (int)$matches[1];
-            }
-        }
-
-        $usernames = [];
-        $ids = array_values(array_unique(array_filter($ids)));
-
-        if ($ids !== []) {
-            try {
-                foreach (User::find()->id($ids)->status(null)->all() as $user) {
-                    $usernames[(int)$user->id] = (string)$user->username;
-                }
-            } catch (\Throwable) {
-                $usernames = [];
-            }
-        }
-
-        foreach ($records as &$record) {
-            $user = (string)($record['user'] ?? '');
-            $record['userLabel'] = Craft::t('logging-library', 'System');
-
-            if (preg_match('/^user:(\d+)$/', $user, $matches)) {
-                $id = (int)$matches[1];
-                $record['userLabel'] = $usernames[$id]
-                    ?? Craft::t('logging-library', 'User #{id}', ['id' => $id]);
-            } elseif ($user !== '') {
-                $record['userLabel'] = $user;
-            }
-        }
-        unset($record);
-
-        return $records;
     }
 
     /**
