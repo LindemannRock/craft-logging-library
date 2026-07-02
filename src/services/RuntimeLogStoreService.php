@@ -221,7 +221,7 @@ class RuntimeLogStoreService extends Component
 
     private function _categoryOptions(array $categoryCounts): array
     {
-        ksort($categoryCounts);
+        ksort($categoryCounts, SORT_NATURAL | SORT_FLAG_CASE);
         $formatter = Craft::$app->getFormatter();
 
         $options = [[

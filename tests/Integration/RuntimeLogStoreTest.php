@@ -95,6 +95,19 @@ class RuntimeLogStoreTest extends TestCase
         self::assertSame(['all', 'runtime-alpha'], array_column($page['categoryOptions'], 'value'));
     }
 
+    public function testRuntimeCategoryOptionsSortCaseInsensitively(): void
+    {
+        $this->store->appendMessages([
+            ['Zebra message', Logger::LEVEL_INFO, 'Zebra', strtotime('2026-07-02 10:00:00'), [], 100],
+            ['Apple message', Logger::LEVEL_INFO, 'apple', strtotime('2026-07-02 10:01:00'), [], 100],
+            ['Banana message', Logger::LEVEL_INFO, 'Banana', strtotime('2026-07-02 10:02:00'), [], 100],
+        ], $this->settings());
+
+        $page = $this->store->getLogPage('all', 'all', '', 'timestamp', 'desc', 1, 10);
+
+        self::assertSame(['all', 'apple', 'Banana', 'Zebra'], array_column($page['categoryOptions'], 'value'));
+    }
+
     public function testRuntimePageFiltersRecordsOlderThanTtl(): void
     {
         $now = time();
