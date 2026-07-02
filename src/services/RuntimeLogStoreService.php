@@ -222,17 +222,19 @@ class RuntimeLogStoreService extends Component
     private function _categoryOptions(array $categoryCounts): array
     {
         ksort($categoryCounts);
+        $formatter = Craft::$app->getFormatter();
 
         $options = [[
             'value' => 'all',
-            'label' => Craft::t('logging-library', 'All Sources'),
-            'status' => 'all',
+            'label' => Craft::t('logging-library', 'Source'),
+            'extra' => '(' . $formatter->asInteger(array_sum($categoryCounts)) . ')',
         ]];
 
         foreach ($categoryCounts as $category => $count) {
             $options[] = [
                 'value' => $category,
-                'label' => sprintf('%s (%s)', $category, Craft::$app->getFormatter()->asDecimal($count)),
+                'label' => $category,
+                'extra' => '(' . $formatter->asInteger($count) . ')',
             ];
         }
 

@@ -75,6 +75,8 @@ class RuntimeLogStoreTest extends TestCase
         self::assertSame('Needle warning message', $page['entries'][0]['message']);
         self::assertSame('runtime-alpha', $page['category']);
         self::assertSame(['all', 'runtime-alpha'], array_column($page['categoryOptions'], 'value'));
+        self::assertSame(['Source', 'runtime-alpha'], array_column($page['categoryOptions'], 'label'));
+        self::assertSame(['(1)', '(1)'], array_column($page['categoryOptions'], 'extra'));
     }
 
     public function testRuntimeCategoryOptionsAreScopedToLevelAndSearch(): void
