@@ -15,6 +15,7 @@ return [
 
     // Navigation
     'All Logs' => 'Tutti i log',
+    'Runtime Logs' => 'Log runtime',
     'Logs' => 'Log',
     'Settings' => 'Impostazioni',
     'System Logs' => 'Log di sistema',
@@ -36,9 +37,11 @@ return [
     'Could not save settings.' => 'Impossibile salvare le impostazioni.',
     'Log cache refreshed.' => 'Cache dei log aggiornata.',
     'Failed to refresh log cache.' => 'Impossibile aggiornare la cache dei log.',
+    'Recent runtime logs cleared.' => 'Log runtime recenti cancellati.',
     'Plugin logging not configured' => 'Log del plugin non configurati',
     'Log viewer is disabled for this plugin' => 'Il visualizzatore di log è disabilitato per questo plugin',
     'Log viewer is disabled for this environment' => 'Il visualizzatore di log è disabilitato per questo ambiente',
+    'Recent runtime logs are disabled' => 'I log di runtime recenti sono disabilitati',
     'Log file not found' => 'File di log non trovato',
     'Unable to determine plugin handle from URL' => 'Impossibile determinare l\'handle del plugin dall\'URL',
     'User does not have permission to view logs' => 'L\'utente non dispone dell\'autorizzazione per visualizzare i log',
@@ -90,6 +93,7 @@ return [
 
     // Table empty
     'No log files found. Log files are created when plugin activities occur.' => 'Nessun file di log trovato. I file di log vengono creati quando si verificano attività del plugin.',
+    'No recent runtime logs found. Runtime logs are short-lived and only appear after matching events are captured.' => 'Nessun log di runtime recente trovato. I log di runtime sono di breve durata e appaiono solo dopo l\'acquisizione di eventi corrispondenti.',
     'No log entries found for the selected filters.' => 'Nessuna voce di log trovata per i filtri selezionati.',
 
     // Pagination
@@ -107,9 +111,14 @@ return [
     'Current File' => 'File attuale',
     'Log entries' => 'Voci di log',
     'Refresh Cache' => 'Aggiorna cache',
+    'Clear Runtime Logs' => 'Cancella log runtime',
     'Loading' => 'Caricamento',
     'Download File' => 'Scarica file',
     'Log Location' => 'Posizione del log',
+    'Runtime Store' => 'Archivio runtime',
+    'Craft cache' => 'cache Craft',
+    'Runtime Location' => 'Posizione runtime',
+    'Recent runtime logs are stored in Craft cache and are intended for short-lived diagnostics, not complete log history.' => 'I log di runtime recenti vengono archiviati nella cache Craft e sono pensati per diagnostiche di breve durata, non per la cronologia completa dei log.',
 
     // Config overrides
     'This is being overridden by the <code>forceEnableLogViewer</code> setting in <code>config/logging-library.php</code>.' => 'Questa impostazione viene sovrascritta dall\'impostazione <code>forceEnableLogViewer</code> in <code>config/logging-library.php</code>.',

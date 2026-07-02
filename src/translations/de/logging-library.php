@@ -15,6 +15,7 @@ return [
 
     // Navigation
     'All Logs' => 'Alle Protokolle',
+    'Runtime Logs' => 'Laufzeitprotokolle',
     'Logs' => 'Protokolle',
     'Settings' => 'Einstellungen',
     'System Logs' => 'Systemprotokolle',
@@ -36,9 +37,11 @@ return [
     'Could not save settings.' => 'Einstellungen konnten nicht gespeichert werden.',
     'Log cache refreshed.' => 'Protokoll-Cache aktualisiert.',
     'Failed to refresh log cache.' => 'Protokoll-Cache konnte nicht aktualisiert werden.',
+    'Recent runtime logs cleared.' => 'Aktuelle Laufzeitprotokolle gelöscht.',
     'Plugin logging not configured' => 'Plugin-Protokollierung nicht konfiguriert',
     'Log viewer is disabled for this plugin' => 'Protokoll-Viewer ist für dieses Plugin deaktiviert',
     'Log viewer is disabled for this environment' => 'Protokoll-Viewer ist für diese Umgebung deaktiviert',
+    'Recent runtime logs are disabled' => 'Aktuelle Laufzeitprotokolle sind deaktiviert',
     'Log file not found' => 'Protokolldatei nicht gefunden',
     'Unable to determine plugin handle from URL' => 'Plugin-Handle konnte nicht aus URL ermittelt werden',
     'User does not have permission to view logs' => 'Der Benutzer hat keine Berechtigung, Protokolle anzuzeigen',
@@ -90,6 +93,7 @@ return [
 
     // Table empty
     'No log files found. Log files are created when plugin activities occur.' => 'Keine Protokolldateien gefunden. Protokolldateien werden erstellt, wenn Plugin-Aktivitäten auftreten.',
+    'No recent runtime logs found. Runtime logs are short-lived and only appear after matching events are captured.' => 'Keine aktuellen Laufzeitprotokolle gefunden. Laufzeitprotokolle sind kurzlebig und erscheinen nur, nachdem passende Ereignisse erfasst wurden.',
     'No log entries found for the selected filters.' => 'Keine Protokolleinträge für die ausgewählten Filter gefunden.',
 
     // Pagination
@@ -107,9 +111,14 @@ return [
     'Current File' => 'Aktuelle Datei',
     'Log entries' => 'Protokolleinträge',
     'Refresh Cache' => 'Cache aktualisieren',
+    'Clear Runtime Logs' => 'Laufzeitprotokolle löschen',
     'Loading' => 'Wird geladen',
     'Download File' => 'Datei herunterladen',
     'Log Location' => 'Protokollspeicherort',
+    'Runtime Store' => 'Laufzeitspeicher',
+    'Craft cache' => 'Craft Cache',
+    'Runtime Location' => 'Laufzeit-Speicherort',
+    'Recent runtime logs are stored in Craft cache and are intended for short-lived diagnostics, not complete log history.' => 'Aktuelle Laufzeitprotokolle werden im Craft Cache gespeichert und sind für kurzlebige Diagnose gedacht, nicht für den vollständigen Protokollverlauf.',
 
     // Config overrides
     'This is being overridden by the <code>forceEnableLogViewer</code> setting in <code>config/logging-library.php</code>.' => 'Dies wird durch die Einstellung <code>forceEnableLogViewer</code> in <code>config/logging-library.php</code> überschrieben.',

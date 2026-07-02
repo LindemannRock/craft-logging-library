@@ -15,6 +15,7 @@ return [
 
     // Navigation
     'All Logs' => 'Alle logger',
+    'Runtime Logs' => 'Runtime-logger',
     'Logs' => 'Logger',
     'Settings' => 'Innstillinger',
     'System Logs' => 'Systemlogger',
@@ -36,9 +37,11 @@ return [
     'Could not save settings.' => 'Kunne ikke lagre innstillingene.',
     'Log cache refreshed.' => 'Logg-cache oppdatert.',
     'Failed to refresh log cache.' => 'Kunne ikke oppdatere logg-cache.',
+    'Recent runtime logs cleared.' => 'Nylige runtime-logger er tømt.',
     'Plugin logging not configured' => 'Plugin-logging er ikke konfigurert',
     'Log viewer is disabled for this plugin' => 'Loggviseren er deaktivert for dette pluginet',
     'Log viewer is disabled for this environment' => 'Loggviseren er deaktivert for dette miljøet',
+    'Recent runtime logs are disabled' => 'Nylige runtime-logger er deaktivert',
     'Log file not found' => 'Loggfilen ble ikke funnet',
     'Unable to determine plugin handle from URL' => 'Plugin-handle kunne ikke bestemmes fra URL',
     'User does not have permission to view logs' => 'Brukeren har ikke tillatelse til å vise logger',
@@ -90,6 +93,7 @@ return [
 
     // Table empty
     'No log files found. Log files are created when plugin activities occur.' => 'Ingen loggfiler funnet. Loggfiler opprettes når plugin-aktiviteter oppstår.',
+    'No recent runtime logs found. Runtime logs are short-lived and only appear after matching events are captured.' => 'Ingen nylige runtime-logger funnet. Runtime-logger er kortvarige og vises bare etter at samsvarende hendelser er fanget.',
     'No log entries found for the selected filters.' => 'Ingen loggoppføringer funnet for de valgte filtrene.',
 
     // Pagination
@@ -107,9 +111,14 @@ return [
     'Current File' => 'Gjeldende fil',
     'Log entries' => 'Loggoppføringer',
     'Refresh Cache' => 'Oppdater cache',
+    'Clear Runtime Logs' => 'Tøm runtime-logger',
     'Loading' => 'Laster',
     'Download File' => 'Last ned fil',
     'Log Location' => 'Loggplassering',
+    'Runtime Store' => 'Runtime-lager',
+    'Craft cache' => 'Craft-cache',
+    'Runtime Location' => 'Runtime-plassering',
+    'Recent runtime logs are stored in Craft cache and are intended for short-lived diagnostics, not complete log history.' => 'Nylige runtime-logger lagres i Craft-cache og er ment for kortvarig diagnostikk, ikke fullstendig logghistorikk.',
 
     // Config overrides
     'This is being overridden by the <code>forceEnableLogViewer</code> setting in <code>config/logging-library.php</code>.' => 'Dette overstyres av innstillingen <code>forceEnableLogViewer</code> i <code>config/logging-library.php</code>.',

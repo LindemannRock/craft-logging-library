@@ -15,6 +15,7 @@ return [
 
     // Navigation
     'All Logs' => 'すべてのログ',
+    'Runtime Logs' => 'ランタイムログ',
     'Logs' => 'ログ',
     'Settings' => '設定',
     'System Logs' => 'システムログ',
@@ -36,9 +37,11 @@ return [
     'Could not save settings.' => '設定を保存できませんでした。',
     'Log cache refreshed.' => 'ログキャッシュを更新しました。',
     'Failed to refresh log cache.' => 'ログキャッシュを更新できませんでした。',
+    'Recent runtime logs cleared.' => '最近のランタイムログをクリアしました。',
     'Plugin logging not configured' => 'プラグインのログ機能が設定されていません',
     'Log viewer is disabled for this plugin' => 'このプラグインではログビューアーが無効になっています',
     'Log viewer is disabled for this environment' => 'この環境ではログビューアーが無効になっています',
+    'Recent runtime logs are disabled' => '最近のランタイムログは無効になっています',
     'Log file not found' => 'ログファイルが見つかりません',
     'Unable to determine plugin handle from URL' => 'URL からプラグイン Handle を特定できません',
     'User does not have permission to view logs' => 'ユーザーにログを表示する権限がありません',
@@ -90,6 +93,7 @@ return [
 
     // Table empty
     'No log files found. Log files are created when plugin activities occur.' => 'ログファイルが見つかりません。プラグインのアクティビティが発生するとログファイルが作成されます。',
+    'No recent runtime logs found. Runtime logs are short-lived and only appear after matching events are captured.' => '最近のランタイムログが見つかりません。ランタイムログは短期間のみ保持され、一致するイベントが取得された後にのみ表示されます。',
     'No log entries found for the selected filters.' => '選択したフィルターに一致するログエントリが見つかりません。',
 
     // Pagination
@@ -107,9 +111,14 @@ return [
     'Current File' => '現在のファイル',
     'Log entries' => 'ログエントリ',
     'Refresh Cache' => 'キャッシュを更新',
+    'Clear Runtime Logs' => 'ランタイムログをクリア',
     'Loading' => 'ロードしています',
     'Download File' => 'ファイルをダウンロード',
     'Log Location' => 'ログの場所',
+    'Runtime Store' => 'ランタイムストア',
+    'Craft cache' => 'Craft キャッシュ',
+    'Runtime Location' => 'ランタイムの場所',
+    'Recent runtime logs are stored in Craft cache and are intended for short-lived diagnostics, not complete log history.' => '最近のランタイムログは Craft キャッシュに保存され、短期間の診断を目的としています。完全なログ履歴ではありません。',
 
     // Config overrides
     'This is being overridden by the <code>forceEnableLogViewer</code> setting in <code>config/logging-library.php</code>.' => 'この設定は <code>config/logging-library.php</code> の <code>forceEnableLogViewer</code> 設定によって上書きされています。',

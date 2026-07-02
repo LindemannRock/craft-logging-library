@@ -23,9 +23,11 @@ use craft\utilities\ClearCaches;
 use craft\web\UrlManager;
 use lindemannrock\base\helpers\CpNavHelper;
 use lindemannrock\base\helpers\PluginHelper;
+use lindemannrock\logginglibrary\log\targets\RuntimeLogTarget;
 use lindemannrock\logginglibrary\models\Settings;
 use lindemannrock\logginglibrary\services\LogCacheService;
 use lindemannrock\logginglibrary\services\LoggingService;
+use lindemannrock\logginglibrary\services\RuntimeLogStoreService;
 use Monolog\Formatter\LineFormatter;
 use Monolog\LogRecord;
 use Monolog\Processor\ProcessorInterface;
@@ -37,6 +39,7 @@ use yii\base\Event;
  * Provides centralized logging configuration for Craft CMS plugins
  *
  * @property-read LogCacheService $logCache
+ * @property-read RuntimeLogStoreService $runtimeLogStore
  * @since 1.0.0
  */
 class LoggingLibrary extends Plugin
@@ -98,7 +101,10 @@ class LoggingLibrary extends Plugin
         // Register services
         $this->setComponents([
             'logCache' => LogCacheService::class,
+            'runtimeLogStore' => RuntimeLogStoreService::class,
         ]);
+
+        self::_registerRuntimeLogTarget();
 
         // Register CP routes for all plugins using the logging library
         Event::on(
@@ -112,6 +118,9 @@ class LoggingLibrary extends Plugin
                 $event->rules['logging-library/settings/interface'] = 'logging-library/settings/interface';
                 $event->rules['logging-library/settings/save'] = 'logging-library/settings/save';
                 $event->rules['logging-library/logs/system'] = 'logging-library/logs/index';
+                $event->rules['logging-library/logs/runtime'] = 'logging-library/logs/runtime';
+                $event->rules['logging-library/logs/runtime-data'] = 'logging-library/logs/runtime-data';
+                $event->rules['logging-library/logs/clear-runtime'] = 'logging-library/logs/clear-runtime';
                 $event->rules['logging-library/logs/system/download'] = 'logging-library/logs/download';
                 $event->rules['logging-library/logs/system/refresh-cache'] = 'logging-library/logs/refresh-cache';
             }
@@ -147,7 +156,7 @@ class LoggingLibrary extends Plugin
     public function getCpNavItem(): ?array
     {
         $settings = $this->getSettings();
-        if (!($settings instanceof Settings) || !$settings->showCpSection || !self::areLogViewersAvailable($settings)) {
+        if (!($settings instanceof Settings) || !$settings->showCpSection || (!self::areLogViewersAvailable($settings) && !self::isRuntimeLogStoreEnabled())) {
             return null;
         }
 
@@ -182,6 +191,13 @@ class LoggingLibrary extends Plugin
                 'url' => 'logging-library',
                 'permissionsAll' => [self::PERMISSION_VIEW_ALL_LOGS],
                 'when' => self::areLogViewersAvailable($settings),
+            ],
+            [
+                'key' => 'runtime-logs',
+                'label' => Craft::t('logging-library', 'Runtime Logs'),
+                'url' => 'logging-library/logs/runtime',
+                'permissionsAll' => [self::PERMISSION_VIEW_ALL_LOGS],
+                'when' => self::isRuntimeLogStoreEnabled(),
             ],
             [
                 'key' => 'settings',
@@ -379,6 +395,106 @@ class LoggingLibrary extends Plugin
     public static function areLogViewersAvailable(?Settings $settings = null): bool
     {
         return !self::_detectEdgeEnvironment() || self::isForceEnableLogViewer($settings);
+    }
+
+    /**
+     * Whether the cache-backed recent runtime log store is enabled.
+     *
+     * @since 5.14.0
+     */
+    public static function isRuntimeLogStoreEnabled(): bool
+    {
+        $config = self::getRuntimeLogStoreConfig();
+
+        return (bool)($config['enabled'] ?? false);
+    }
+
+    /**
+     * Get normalized runtime log store config.
+     *
+     * @since 5.14.0
+     */
+    public static function getRuntimeLogStoreConfig(): array
+    {
+        $defaults = [
+            'enabled' => false,
+            'ttl' => 86400,
+            'maxEntries' => 1000,
+            'refreshInterval' => 5,
+            'maxMessageBytes' => 8000,
+            'maxContextBytes' => 8000,
+            'levels' => ['error', 'warning', 'info'],
+            'categories' => [],
+            'except' => [],
+            'privacy' => [
+                'includeUserId' => false,
+            ],
+        ];
+
+        try {
+            $config = Craft::$app->getConfig()->getConfigFromFile('logging-library');
+        } catch (\Throwable) {
+            return $defaults;
+        }
+
+        $runtimeConfig = is_array($config) && isset($config['runtimeLogStore']) && is_array($config['runtimeLogStore'])
+            ? $config['runtimeLogStore']
+            : [];
+
+        $runtimeConfig = array_merge($defaults, $runtimeConfig);
+        $runtimeConfig['privacy'] = array_merge($defaults['privacy'], $runtimeConfig['privacy'] ?? []);
+        $runtimeConfig['levels'] = self::_normalizeRuntimeLevels($runtimeConfig['levels'] ?? $defaults['levels']);
+        $runtimeConfig['maxEntries'] = min(10000, max(1, (int)($runtimeConfig['maxEntries'] ?? $defaults['maxEntries'])));
+        $runtimeConfig['refreshInterval'] = max(0, (int)($runtimeConfig['refreshInterval'] ?? $defaults['refreshInterval']));
+        $runtimeConfig['categories'] = array_values(array_filter((array)($runtimeConfig['categories'] ?? []), 'is_string'));
+        $runtimeConfig['except'] = array_values(array_filter((array)($runtimeConfig['except'] ?? []), 'is_string'));
+
+        return $runtimeConfig;
+    }
+
+    /**
+     * Register the runtime log target when enabled.
+     */
+    private static function _registerRuntimeLogTarget(): void
+    {
+        $config = self::getRuntimeLogStoreConfig();
+        if (!($config['enabled'] ?? false)) {
+            return;
+        }
+
+        $dispatcher = Craft::getLogger()->dispatcher;
+        foreach ($dispatcher->targets as $target) {
+            if ($target instanceof RuntimeLogTarget) {
+                return;
+            }
+        }
+
+        $target = new RuntimeLogTarget([
+            'levels' => $config['levels'],
+            'categories' => $config['categories'],
+            'except' => array_merge(['yii\i18n\PhpMessageSource:*'], $config['except']),
+            'runtimeSettings' => $config,
+        ]);
+
+        $dispatcher->targets[] = $target;
+        $target->init();
+    }
+
+    private static function _normalizeRuntimeLevels(mixed $levels): array
+    {
+        $normalized = [];
+        foreach ((array)$levels as $level) {
+            $level = strtolower((string)$level);
+            if ($level === 'debug') {
+                $level = 'trace';
+            }
+
+            if (in_array($level, ['error', 'warning', 'info', 'trace'], true)) {
+                $normalized[] = $level;
+            }
+        }
+
+        return array_values(array_unique($normalized)) ?: ['error', 'warning', 'info'];
     }
 
     /**

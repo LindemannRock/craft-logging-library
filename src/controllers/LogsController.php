@@ -90,6 +90,12 @@ class LogsController extends Controller
             // Standalone mode - no specific config needed
             $settings = LoggingLibrary::getInstance()->getSettings();
             if ($settings instanceof Settings && !LoggingLibrary::areLogViewersAvailable($settings)) {
+                $sections = LoggingLibrary::getInstance()->getCpSections($settings);
+                $route = CpNavHelper::firstAccessibleRoute($user, $settings, $sections);
+                if ($route && $route !== 'logging-library') {
+                    return $this->redirect($route);
+                }
+
                 throw new NotFoundHttpException(Craft::t('logging-library', 'Log viewer is disabled for this environment'));
             }
 
@@ -243,6 +249,159 @@ class LogsController extends Controller
             ],
             'logConfig' => $config,
         ]);
+    }
+
+    /**
+     * Display recent cache-backed runtime logs.
+     *
+     * @return Response
+     * @since 5.14.0
+     */
+    public function actionRuntime(): Response
+    {
+        $user = Craft::$app->getUser();
+        $settings = LoggingLibrary::getInstance()->getSettings();
+
+        if (!$user->checkPermission(LoggingLibrary::PERMISSION_VIEW_ALL_LOGS)) {
+            if ($settings instanceof Settings) {
+                $sections = LoggingLibrary::getInstance()->getCpSections($settings);
+                $route = CpNavHelper::firstAccessibleRoute($user, $settings, $sections);
+                if ($route) {
+                    return $this->redirect($route);
+                }
+            }
+
+            $this->requirePermission(LoggingLibrary::PERMISSION_VIEW_ALL_LOGS);
+        }
+
+        $this->_checkPermissions([LoggingLibrary::PERMISSION_VIEW_ALL_LOGS]);
+
+        if (!LoggingLibrary::isRuntimeLogStoreEnabled()) {
+            throw new NotFoundHttpException(Craft::t('logging-library', 'Recent runtime logs are disabled'));
+        }
+
+        $context = $this->_runtimeLogContext($settings instanceof Settings ? $settings : null);
+        $logPage = $context['logPage'];
+
+        $totalEntries = $logPage['total'];
+        $totalPages = $totalEntries > 0 ? ceil($totalEntries / $context['limit']) : 0;
+
+        return $this->renderTemplate('logging-library/logs/index', [
+            'pluginHandle' => 'logging-library',
+            'pluginName' => $settings instanceof Settings ? $settings->getFullName() : LoggingLibrary::getInstance()->name,
+            'isStandalone' => true,
+            'isRuntime' => true,
+            'logMenuItems' => null,
+            'logMenuLabel' => null,
+            'logFiles' => [],
+            'selectedFile' => null,
+            'sources' => [],
+            'sourceGroups' => [],
+            'categoryOptions' => $logPage['categoryOptions'],
+            'logEntries' => $logPage['entries'],
+            'canDownload' => false,
+            'filters' => [
+                'level' => $context['level'],
+                'category' => $logPage['category'],
+                'source' => 'all',
+                'search' => $context['search'],
+                'sort' => $context['sort'],
+                'dir' => $context['dir'],
+                'page' => $context['page'],
+            ],
+            'pagination' => [
+                'total' => $totalEntries,
+                'perPage' => $context['limit'],
+                'currentPage' => $context['page'],
+                'totalPages' => $totalPages,
+            ],
+            'levels' => [
+                'all' => Craft::t('logging-library', 'All Levels'),
+                'error' => Craft::t('logging-library', 'Error'),
+                'warning' => Craft::t('logging-library', 'Warning'),
+                'info' => Craft::t('logging-library', 'Info'),
+                'debug' => Craft::t('logging-library', 'Debug'),
+            ],
+            'availableLevels' => $context['runtimeLevels'],
+            'runtimeCurrentLevel' => $context['runtimeCurrentLevel'],
+            'runtimeMaxEntries' => $context['runtimeMaxEntries'],
+            'runtimeRefreshInterval' => $context['runtimeRefreshInterval'],
+            'logConfig' => null,
+        ]);
+    }
+
+    /**
+     * JSON endpoint backing the runtime log viewer's AJAX auto-refresh.
+     *
+     * @return Response
+     * @since 5.14.0
+     */
+    public function actionRuntimeData(): Response
+    {
+        $this->requireAcceptsJson();
+        $this->_checkPermissions([LoggingLibrary::PERMISSION_VIEW_ALL_LOGS]);
+
+        if (!LoggingLibrary::isRuntimeLogStoreEnabled()) {
+            throw new NotFoundHttpException(Craft::t('logging-library', 'Recent runtime logs are disabled'));
+        }
+
+        $settings = LoggingLibrary::getInstance()->getSettings();
+        $context = $this->_runtimeLogContext($settings instanceof Settings ? $settings : null);
+        $logPage = $context['logPage'];
+        $totalEntries = $logPage['total'];
+        $totalPages = $totalEntries > 0 ? ceil($totalEntries / $context['limit']) : 0;
+
+        $rowsHtml = '';
+        foreach ($logPage['entries'] as $index => $entry) {
+            $rowsHtml .= Craft::$app->getView()->renderTemplate('logging-library/logs/_runtime-row', [
+                'item' => $entry,
+                'levels' => $this->_logLevelLabels(),
+                'rowIndex' => $index + 1,
+            ]);
+        }
+
+        if ($rowsHtml === '') {
+            $rowsHtml = Craft::$app->getView()->renderTemplate('logging-library/logs/_runtime-empty-row', [
+                'message' => Craft::t('logging-library', 'No recent runtime logs found. Runtime logs are short-lived and only appear after matching events are captured.'),
+            ]);
+        }
+
+        return $this->asJson([
+            'success' => true,
+            'rowsHtml' => $rowsHtml,
+            'totalCount' => $totalEntries,
+            'pagination' => [
+                'page' => $context['page'],
+                'limit' => $context['limit'],
+                'totalCount' => $totalEntries,
+                'totalPages' => $totalPages,
+            ],
+            'refresh' => [
+                'enabled' => $context['runtimeRefreshInterval'] > 0,
+            ],
+        ]);
+    }
+
+    /**
+     * Clear the cache-backed recent runtime log store.
+     *
+     * @return Response
+     * @since 5.14.0
+     */
+    public function actionClearRuntime(): Response
+    {
+        $this->requirePostRequest();
+        $this->_checkPermissions([LoggingLibrary::PERMISSION_VIEW_ALL_LOGS]);
+
+        if (!LoggingLibrary::isRuntimeLogStoreEnabled()) {
+            throw new NotFoundHttpException(Craft::t('logging-library', 'Recent runtime logs are disabled'));
+        }
+
+        LoggingLibrary::getInstance()->runtimeLogStore->clear();
+
+        Craft::$app->getSession()->setNotice(Craft::t('logging-library', 'Recent runtime logs cleared.'));
+
+        return $this->redirectToPostedUrl(null, 'logging-library/logs/runtime');
     }
 
     /**
@@ -542,6 +701,110 @@ class LogsController extends Controller
             $groups,
             fn($group) => !empty($group['options'])
         ));
+    }
+
+    /**
+     * Build the filtered runtime log context used by both the page and AJAX refresh endpoint.
+     */
+    private function _runtimeLogContext(?Settings $settings): array
+    {
+        $request = Craft::$app->getRequest();
+        $runtimeConfig = LoggingLibrary::getRuntimeLogStoreConfig();
+        $runtimeLevels = $this->_runtimeLevels($runtimeConfig);
+
+        $level = (string)$request->getParam('level', 'all');
+        $validLevels = array_merge(['all'], $runtimeLevels);
+        if (!in_array($level, $validLevels, true)) {
+            $level = 'all';
+        }
+
+        $category = (string)$request->getParam('category', 'all');
+
+        $search = trim((string)$request->getParam('search', ''));
+        if (mb_strlen($search) > 64) {
+            $search = mb_substr($search, 0, 64);
+        }
+
+        $validSortFields = ['timestamp', 'level', 'category', 'user', 'message'];
+        $sort = (string)$request->getParam('sort', 'timestamp');
+        if (!in_array($sort, $validSortFields, true)) {
+            $sort = 'timestamp';
+        }
+
+        $dir = strtolower((string)$request->getParam('dir', 'desc')) === 'asc' ? 'asc' : 'desc';
+        $page = max(1, (int)$request->getParam('page', 1));
+        $limit = max(1, $settings instanceof Settings ? $settings->itemsPerPage : 50);
+
+        $logPage = LoggingLibrary::getInstance()->runtimeLogStore->getLogPage(
+            $level,
+            $category,
+            $search,
+            $sort,
+            $dir,
+            $page,
+            $limit
+        );
+
+        return [
+            'runtimeConfig' => $runtimeConfig,
+            'runtimeLevels' => $runtimeLevels,
+            'runtimeCurrentLevel' => $this->_runtimeCurrentLevel($runtimeLevels),
+            'runtimeMaxEntries' => max(1, (int)($runtimeConfig['maxEntries'] ?? 1000)),
+            'runtimeRefreshInterval' => max(0, (int)($runtimeConfig['refreshInterval'] ?? 5)),
+            'level' => $level,
+            'category' => $logPage['category'],
+            'search' => $search,
+            'sort' => $sort,
+            'dir' => $dir,
+            'page' => $page,
+            'limit' => $limit,
+            'logPage' => $logPage,
+        ];
+    }
+
+    /**
+     * Runtime levels configured for the CP filter.
+     */
+    private function _runtimeLevels(array $runtimeConfig): array
+    {
+        $runtimeLevels = array_values(array_filter(array_map(
+            static fn(string $level): string => $level === 'trace' ? 'debug' : $level,
+            (array)($runtimeConfig['levels'] ?? [])
+        ), static fn(string $level): bool => in_array($level, ['error', 'warning', 'info', 'debug'], true)));
+
+        if (!Craft::$app->getConfig()->getGeneral()->devMode) {
+            $runtimeLevels = array_values(array_filter($runtimeLevels, static fn(string $level): bool => $level !== 'debug'));
+        }
+
+        return array_values(array_unique($runtimeLevels));
+    }
+
+    /**
+     * Most verbose runtime level enabled by configuration.
+     */
+    private function _runtimeCurrentLevel(array $runtimeLevels): string
+    {
+        foreach (['debug', 'info', 'warning', 'error'] as $level) {
+            if (in_array($level, $runtimeLevels, true)) {
+                return $level;
+            }
+        }
+
+        return 'error';
+    }
+
+    /**
+     * Viewer labels for canonical log levels.
+     */
+    private function _logLevelLabels(): array
+    {
+        return [
+            'all' => Craft::t('logging-library', 'All Levels'),
+            'error' => Craft::t('logging-library', 'Error'),
+            'warning' => Craft::t('logging-library', 'Warning'),
+            'info' => Craft::t('logging-library', 'Info'),
+            'debug' => Craft::t('logging-library', 'Debug'),
+        ];
     }
 
     /**

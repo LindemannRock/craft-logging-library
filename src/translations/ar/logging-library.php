@@ -15,6 +15,7 @@ return [
 
     // Navigation
     'All Logs' => 'جميع السجلات',
+    'Runtime Logs' => 'سجلات وقت التشغيل',
     'Logs' => 'السجلات',
     'Settings' => 'الإعدادات',
     'System Logs' => 'سجلات النظام',
@@ -36,9 +37,11 @@ return [
     'Could not save settings.' => 'تعذّر حفظ الإعدادات.',
     'Log cache refreshed.' => 'تم تحديث Cache السجل.',
     'Failed to refresh log cache.' => 'تعذّر تحديث Cache السجل.',
+    'Recent runtime logs cleared.' => 'تم مسح سجلات وقت التشغيل الأخيرة.',
     'Plugin logging not configured' => 'تسجيل الإضافة غير مكوّن',
     'Log viewer is disabled for this plugin' => 'عارض السجلات معطّل لهذه الإضافة',
     'Log viewer is disabled for this environment' => 'عارض السجلات معطّل لهذه البيئة',
+    'Recent runtime logs are disabled' => 'سجلات وقت التشغيل الحديثة معطّلة',
     'Log file not found' => 'ملف السجل غير موجود',
     'Unable to determine plugin handle from URL' => 'تعذّر تحديد مُعرِّف الإضافة من URL',
     'User does not have permission to view logs' => 'ليس لدى المستخدم صلاحية لعرض السجلات',
@@ -90,6 +93,7 @@ return [
 
     // Table empty
     'No log files found. Log files are created when plugin activities occur.' => 'لم يتم العثور على ملفات سجل. يتم إنشاء ملفات السجل عند حدوث أنشطة الإضافة.',
+    'No recent runtime logs found. Runtime logs are short-lived and only appear after matching events are captured.' => 'لم يتم العثور على سجلات وقت تشغيل حديثة. سجلات وقت التشغيل قصيرة الأجل ولا تظهر إلا بعد التقاط أحداث مطابقة.',
     'No log entries found for the selected filters.' => 'لم يتم العثور على إدخالات سجل للمرشحات المحددة.',
 
     // Pagination
@@ -107,9 +111,14 @@ return [
     'Current File' => 'الملف الحالي',
     'Log entries' => 'إدخالات السجل',
     'Refresh Cache' => 'تحديث Cache',
+    'Clear Runtime Logs' => 'مسح سجلات وقت التشغيل',
     'Loading' => 'جار التحميل',
     'Download File' => 'تنزيل الملف',
     'Log Location' => 'موقع السجل',
+    'Runtime Store' => 'مخزن وقت التشغيل',
+    'Craft cache' => 'Cache الخاص بـ Craft',
+    'Runtime Location' => 'موقع وقت التشغيل',
+    'Recent runtime logs are stored in Craft cache and are intended for short-lived diagnostics, not complete log history.' => 'يتم تخزين سجلات وقت التشغيل الحديثة في Cache الخاص بـ Craft وهي مخصصة للتشخيصات قصيرة الأجل، وليس لسجل السجلات الكامل.',
 
     // Config overrides
     'This is being overridden by the <code>forceEnableLogViewer</code> setting in <code>config/logging-library.php</code>.' => 'يتم تجاوز هذا الإعداد بواسطة الإعداد <code>forceEnableLogViewer</code> في <code>config/logging-library.php</code>.',

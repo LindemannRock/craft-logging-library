@@ -15,6 +15,7 @@ return [
 
     // Navigation
     'All Logs' => 'Todos los registros',
+    'Runtime Logs' => 'Registros de tiempo de ejecución',
     'Logs' => 'Registros',
     'Settings' => 'Configuración',
     'System Logs' => 'Registros del sistema',
@@ -36,9 +37,11 @@ return [
     'Could not save settings.' => 'No se pudo guardar la configuración.',
     'Log cache refreshed.' => 'Caché del registro actualizada.',
     'Failed to refresh log cache.' => 'No se pudo actualizar la caché del registro.',
+    'Recent runtime logs cleared.' => 'Registros recientes de tiempo de ejecución borrados.',
     'Plugin logging not configured' => 'Registros del plugin no configurados',
     'Log viewer is disabled for this plugin' => 'El visor de registros está desactivado para este plugin',
     'Log viewer is disabled for this environment' => 'El visor de registros está desactivado para este entorno',
+    'Recent runtime logs are disabled' => 'Los registros recientes de tiempo de ejecución están desactivados',
     'Log file not found' => 'Archivo de registro no encontrado',
     'Unable to determine plugin handle from URL' => 'No se pudo determinar el identificador del plugin a partir de la URL',
     'User does not have permission to view logs' => 'El usuario no tiene permiso para ver los registros',
@@ -90,6 +93,7 @@ return [
 
     // Table empty
     'No log files found. Log files are created when plugin activities occur.' => 'No se encontraron archivos de registro. Los archivos de registro se crean cuando ocurren actividades del plugin.',
+    'No recent runtime logs found. Runtime logs are short-lived and only appear after matching events are captured.' => 'No se encontraron registros recientes de tiempo de ejecución. Los registros de tiempo de ejecución son efímeros y solo aparecen después de capturar eventos coincidentes.',
     'No log entries found for the selected filters.' => 'No se encontraron entradas de registro para los filtros seleccionados.',
 
     // Pagination
@@ -107,9 +111,14 @@ return [
     'Current File' => 'Archivo actual',
     'Log entries' => 'Entradas de registro',
     'Refresh Cache' => 'Actualizar caché',
+    'Clear Runtime Logs' => 'Borrar registros de tiempo de ejecución',
     'Loading' => 'Cargando',
     'Download File' => 'Descargar archivo',
     'Log Location' => 'Ubicación del registro',
+    'Runtime Store' => 'Almacén de tiempo de ejecución',
+    'Craft cache' => 'caché de Craft',
+    'Runtime Location' => 'Ubicación de tiempo de ejecución',
+    'Recent runtime logs are stored in Craft cache and are intended for short-lived diagnostics, not complete log history.' => 'Los registros recientes de tiempo de ejecución se almacenan en la caché de Craft y están pensados para diagnósticos efímeros, no para el historial completo de registros.',
 
     // Config overrides
     'This is being overridden by the <code>forceEnableLogViewer</code> setting in <code>config/logging-library.php</code>.' => 'Este valor está siendo anulado por la configuración <code>forceEnableLogViewer</code> en <code>config/logging-library.php</code>.',

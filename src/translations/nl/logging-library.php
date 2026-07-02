@@ -15,6 +15,7 @@ return [
 
     // Navigation
     'All Logs' => 'Alle logboeken',
+    'Runtime Logs' => 'Runtime-logboeken',
     'Logs' => 'Logboeken',
     'Settings' => 'Instellingen',
     'System Logs' => 'Systeemlogboeken',
@@ -36,9 +37,11 @@ return [
     'Could not save settings.' => 'Instellingen konden niet worden opgeslagen.',
     'Log cache refreshed.' => 'Logcache vernieuwd.',
     'Failed to refresh log cache.' => 'Logcache kon niet worden vernieuwd.',
+    'Recent runtime logs cleared.' => 'Recente runtime-logboeken gewist.',
     'Plugin logging not configured' => 'Plugin-logboeken niet geconfigureerd',
     'Log viewer is disabled for this plugin' => 'Logviewer is uitgeschakeld voor deze plugin',
     'Log viewer is disabled for this environment' => 'Logviewer is uitgeschakeld voor deze omgeving',
+    'Recent runtime logs are disabled' => 'Recente runtime-logboeken zijn uitgeschakeld',
     'Log file not found' => 'Logbestand niet gevonden',
     'Unable to determine plugin handle from URL' => 'Kan plugin-handle niet bepalen uit URL',
     'User does not have permission to view logs' => 'De gebruiker heeft geen toestemming om logboeken te bekijken',
@@ -90,6 +93,7 @@ return [
 
     // Table empty
     'No log files found. Log files are created when plugin activities occur.' => 'Geen logbestanden gevonden. Logbestanden worden aangemaakt wanneer plugin-activiteiten plaatsvinden.',
+    'No recent runtime logs found. Runtime logs are short-lived and only appear after matching events are captured.' => 'Geen recente runtime-logboeken gevonden. Runtime-logboeken zijn kortstondig en verschijnen alleen nadat overeenkomende gebeurtenissen zijn vastgelegd.',
     'No log entries found for the selected filters.' => 'Geen logvermeldingen gevonden voor de geselecteerde filters.',
 
     // Pagination
@@ -107,9 +111,14 @@ return [
     'Current File' => 'Huidig bestand',
     'Log entries' => 'Logvermeldingen',
     'Refresh Cache' => 'Cache vernieuwen',
+    'Clear Runtime Logs' => 'Runtime-logboeken wissen',
     'Loading' => 'Laden',
     'Download File' => 'Bestand downloaden',
     'Log Location' => 'Loglocatie',
+    'Runtime Store' => 'Runtimeopslag',
+    'Craft cache' => 'Craft-cache',
+    'Runtime Location' => 'Runtimelocatie',
+    'Recent runtime logs are stored in Craft cache and are intended for short-lived diagnostics, not complete log history.' => 'Recente runtime-logboeken worden opgeslagen in Craft-cache en zijn bedoeld voor kortstondige diagnose, niet voor volledige logboekgeschiedenis.',
 
     // Config overrides
     'This is being overridden by the <code>forceEnableLogViewer</code> setting in <code>config/logging-library.php</code>.' => 'Dit wordt overschreven door de instelling <code>forceEnableLogViewer</code> in <code>config/logging-library.php</code>.',

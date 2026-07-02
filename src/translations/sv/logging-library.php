@@ -15,6 +15,7 @@ return [
 
     // Navigation
     'All Logs' => 'Alla loggar',
+    'Runtime Logs' => 'Runtime-loggar',
     'Logs' => 'Loggar',
     'Settings' => 'Inställningar',
     'System Logs' => 'Systemloggar',
@@ -36,9 +37,11 @@ return [
     'Could not save settings.' => 'Det gick inte att spara inställningarna.',
     'Log cache refreshed.' => 'Loggcachen uppdaterades.',
     'Failed to refresh log cache.' => 'Det gick inte att uppdatera loggcachen.',
+    'Recent runtime logs cleared.' => 'Senaste runtime-loggarna rensades.',
     'Plugin logging not configured' => 'Plugin-loggning är inte konfigurerad',
     'Log viewer is disabled for this plugin' => 'Loggvisaren är inaktiverad för detta plugin',
     'Log viewer is disabled for this environment' => 'Loggvisaren är inaktiverad för denna miljö',
+    'Recent runtime logs are disabled' => 'Senaste runtime-loggar är inaktiverade',
     'Log file not found' => 'Loggfilen hittades inte',
     'Unable to determine plugin handle from URL' => 'Det gick inte att fastställa plugin-handle från URL',
     'User does not have permission to view logs' => 'Användaren har inte behörighet att visa loggar',
@@ -90,6 +93,7 @@ return [
 
     // Table empty
     'No log files found. Log files are created when plugin activities occur.' => 'Inga loggfiler hittades. Loggfiler skapas när plugin-aktiviteter inträffar.',
+    'No recent runtime logs found. Runtime logs are short-lived and only appear after matching events are captured.' => 'Inga senaste runtime-loggar hittades. Runtime-loggar är kortlivade och visas bara efter att matchande händelser har fångats.',
     'No log entries found for the selected filters.' => 'Inga loggposter hittades för de valda filtren.',
 
     // Pagination
@@ -107,9 +111,14 @@ return [
     'Current File' => 'Aktuell fil',
     'Log entries' => 'Loggposter',
     'Refresh Cache' => 'Uppdatera cache',
+    'Clear Runtime Logs' => 'Rensa runtime-loggar',
     'Loading' => 'Läser in',
     'Download File' => 'Ladda ner fil',
     'Log Location' => 'Loggplats',
+    'Runtime Store' => 'Runtime-lagring',
+    'Craft cache' => 'Craft-cache',
+    'Runtime Location' => 'Runtime-plats',
+    'Recent runtime logs are stored in Craft cache and are intended for short-lived diagnostics, not complete log history.' => 'Senaste runtime-loggar lagras i Craft-cache och är avsedda för kortlivad diagnostik, inte fullständig logghistorik.',
 
     // Config overrides
     'This is being overridden by the <code>forceEnableLogViewer</code> setting in <code>config/logging-library.php</code>.' => 'Detta åsidosätts av inställningen <code>forceEnableLogViewer</code> i <code>config/logging-library.php</code>.',

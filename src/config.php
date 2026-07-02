@@ -25,6 +25,22 @@ return [
         // Force-enable file-based log viewers even when an edge/ephemeral environment is detected
         'forceEnableLogViewer' => false,
 
+        // Store recent runtime log records in Craft cache for edge/ephemeral environments
+        'runtimeLogStore' => [
+            'enabled' => false,
+            'ttl' => 86400,
+            'maxEntries' => 1000,
+            'refreshInterval' => 5,
+            'maxMessageBytes' => 8000,
+            'maxContextBytes' => 8000,
+            'levels' => ['error', 'warning', 'info'],
+            'categories' => [],
+            'except' => [],
+            'privacy' => [
+                'includeUserId' => false,
+            ],
+        ],
+
         // ========================================
         // BASE PLUGIN OVERRIDES (optional)
         // ========================================

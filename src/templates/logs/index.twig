@@ -12,6 +12,10 @@
 
 {% extends 'lindemannrock-base/_layouts/cp-table' %}
 
+{% set isRuntime = isRuntime ?? false %}
+{% set availableLevels = availableLevels ?? [] %}
+{% set craftUsesRedisCache = craft.app.cache is defined and craft.app.cache.className is defined and craft.app.cache.className == 'yii\\redis\\Cache' %}
+
 {# ============================================================================
    BUILD FILTER OPTIONS
    ============================================================================ #}
@@ -32,7 +36,8 @@
 
 {% for value, label in levels %}
     {% if value != 'all' %}
-        {% if isStandalone or (levelSeverity[value] is defined and levelSeverity[value] <= configuredSeverity) %}
+        {% set runtimeLevelAllowed = not isRuntime or value in availableLevels %}
+        {% if runtimeLevelAllowed and (isStandalone or (levelSeverity[value] is defined and levelSeverity[value] <= configuredSeverity)) %}
             {% if value != 'debug' or craft.app.config.general.devMode %}
                 {% set levelOptions = levelOptions|merge([{
                     value: value,
@@ -58,7 +63,7 @@
     }]) %}
 {% endfor %}
 
-{% set supportsCategoryFilter = selectedFile and ((selectedFile.source ?? '') in ['web', 'queue', 'console']) %}
+{% set supportsCategoryFilter = isRuntime or (selectedFile and ((selectedFile.source ?? '') in ['web', 'queue', 'console'])) %}
 {% set categoryFilter = supportsCategoryFilter and categoryOptions|length > 1 ? {
     type: 'dropdown',
     param: 'category',
@@ -116,9 +121,21 @@
     },
 ] %}
 
+{% set runtimeFilters = [
+    {
+        type: 'status',
+        param: 'level',
+        current: filters.level,
+        label: levels[filters.level] ?? 'All Levels'|t('logging-library'),
+        colorSet: 'logLevel',
+        options: levelOptions,
+    },
+] %}
+
 {% if categoryFilter %}
     {% set standaloneFilters = standaloneFilters|merge([categoryFilter]) %}
     {% set pluginFilters = pluginFilters|merge([categoryFilter]) %}
+    {% set runtimeFilters = runtimeFilters|merge([categoryFilter]) %}
 {% endif %}
 
 {# ============================================================================
@@ -136,12 +153,12 @@
         name: pluginName,
     },
     page: {
-        title: 'System Logs'|t('logging-library'),
-        subnav: isStandalone ? 'all-logs' : 'logs',
-        url: isStandalone ? url('logging-library') : url(pluginHandle ~ '/logs'),
+        title: isRuntime ? 'Runtime Logs'|t('logging-library') : 'System Logs'|t('logging-library'),
+        subnav: isRuntime ? 'runtime-logs' : (isStandalone ? 'all-logs' : 'logs'),
+        url: isRuntime ? url('logging-library/logs/runtime') : (isStandalone ? url('logging-library') : url(pluginHandle ~ '/logs')),
         crumbs: isStandalone ? [
             { label: pluginName, url: url('logging-library') },
-            { label: 'All Logs'|t('logging-library'), url: url('logging-library') },
+            { label: isRuntime ? 'Runtime Logs'|t('logging-library') : 'All Logs'|t('logging-library'), url: isRuntime ? url('logging-library/logs/runtime') : url('logging-library') },
         ] : [
             { label: pluginName, url: url(pluginHandle) },
             { label: 'Logs'|t('logging-library'), url: url(pluginHandle ~ '/logs/') },
@@ -153,7 +170,7 @@
         items: sidebarItems,
         selected: 'system',
     },
-    filters: isStandalone ? standaloneFilters : pluginFilters,
+    filters: isRuntime ? runtimeFilters : (isStandalone ? standaloneFilters : pluginFilters),
     search: {
         placeholder: 'Search messages and context...'|t('logging-library'),
         value: filters.search,
@@ -163,7 +180,7 @@
         direction: filters.dir,
     },
     table: {
-        columns: (isStandalone and supportsCategoryFilter) ? [
+        columns: ((isStandalone and supportsCategoryFilter) or isRuntime) ? [
             {key: 'timestamp', label: 'Time'|t('logging-library'), sortable: true},
             {key: 'level', label: 'Level'|t('logging-library'), sortable: true},
             {key: 'category', label: 'Source'|t('logging-library'), sortable: true},
@@ -176,9 +193,11 @@
             {key: 'message', label: 'Message'|t('logging-library'), sortable: true},
         ],
         items: logEntries,
-        emptyMessage: logFiles|length == 0
+        emptyMessage: isRuntime
+            ? 'No recent runtime logs found. Runtime logs are short-lived and only appear after matching events are captured.'|t('logging-library')
+            : (logFiles|length == 0
             ? 'No log files found. Log files are created when plugin activities occur.'|t('logging-library')
-            : 'No log entries found for the selected filters.'|t('logging-library'),
+            : 'No log entries found for the selected filters.'|t('logging-library')),
         expandable: true,
         rowClassKey: 'levelClass',
     },
@@ -190,6 +209,11 @@
     },
     checkboxes: false,
     rowActions: false,
+    ajax: {
+        enabled: isRuntime and (runtimeRefreshInterval ?? 0) > 0,
+        interval: runtimeRefreshInterval ?? 0,
+        endpoint: actionUrl('logging-library/logs/runtime-data'),
+    },
 } %}
 
 
@@ -210,7 +234,16 @@
         }
     </style>
 
-    {% if logFiles|length == 0 and logConfig %}
+    {% if isRuntime %}
+        <div class="info-box-table-wrapper">
+            {% include 'lindemannrock-base/_components/info-box' with {
+                message: 'Recent runtime logs are stored in Craft cache and are intended for short-lived diagnostics, not complete log history.'|t('logging-library'),
+                type: 'tip',
+                margin: 'none',
+                stretch: true,
+            } %}
+        </div>
+    {% elseif logFiles|length == 0 and logConfig %}
         <div class="info-box-table-wrapper">
             {% include 'lindemannrock-base/_components/info-box' with {
                 message: 'Current log level'|t('logging-library') ~ ': <strong>' ~ logConfig.logLevel|capitalize|t('logging-library')|upper ~ '</strong>',
@@ -256,7 +289,7 @@
 
     {# Category/Source — shown only for multi-category sources (web/queue/console).
        For php-errors and plugin-specific logs the value is uniform across rows. #}
-    {% if isStandalone and supportsCategoryFilter %}
+    {% if (isStandalone and supportsCategoryFilter) or isRuntime %}
         {% set sourceLabel = item.category ?: (selectedFile.source ?? 'unknown') %}
         <td class="truncate" title="{{ sourceLabel }}">{{ sourceLabel }}</td>
     {% endif %}
@@ -289,6 +322,64 @@
 
     {% if item.context and item.context != '[]' and item.context != '' %}
         <pre class="lr-log-pre" style="margin-top: 12px;">{{ item.context|e }}</pre>
+    {% endif %}
+{% endblock %}
+
+
+{# ============================================================================
+   RUNTIME AUTO-REFRESH
+   ============================================================================ #}
+
+{% block scripts %}
+    {% if isRuntime %}
+        <script>
+        function toggleRuntimeLogRow(row, event) {
+            if (!row || row.dataset.runtimeRefreshRow !== 'true') {
+                return;
+            }
+
+            if (event.target.closest('.checkbox') || event.target.tagName === 'A' || event.target.tagName === 'BUTTON' || event.target.closest('button')) {
+                return;
+            }
+
+            const entryId = row.dataset.entryId;
+            const contextRow = document.querySelector('.lr-context-row[data-entry-id="' + entryId + '"]');
+            if (!contextRow) {
+                return;
+            }
+
+            const isVisible = contextRow.style.display !== 'none';
+            contextRow.style.display = isVisible ? 'none' : 'table-row';
+            row.classList.toggle('lr-row-expanded', !isVisible);
+        }
+
+        document.addEventListener('lr:refresh', function(e) {
+            const data = e.detail || {};
+            const tbody = document.getElementById('lr-table-body');
+            if (!tbody || typeof data.rowsHtml !== 'string') {
+                return;
+            }
+
+            tbody.innerHTML = data.rowsHtml;
+            if (typeof data.totalCount !== 'undefined') {
+                const runtimeLogEntryCount = document.getElementById('runtime-log-entry-count');
+                if (runtimeLogEntryCount) {
+                    const formatter = new Intl.NumberFormat();
+                    runtimeLogEntryCount.textContent = formatter.format(data.totalCount) + ' / ' + formatter.format({{ (runtimeMaxEntries ?? 1000)|json_encode|raw }});
+                }
+            }
+            window.lrViewSettings?.apply?.();
+        });
+
+        document.getElementById('lr-table-body')?.addEventListener('click', function(event) {
+            const row = event.target.closest('.lr-clickable-row');
+            if (!row || !this.contains(row)) {
+                return;
+            }
+
+            toggleRuntimeLogRow(row, event);
+        });
+        </script>
     {% endif %}
 {% endblock %}
 
@@ -347,10 +438,44 @@
             </div>
         {% endif %}
 
-        <div class="log-config-item">
-            <div class="label">{{ "Available Logs"|t('logging-library') }}</div>
-            <div class="value">{{ logFiles|length|number_format }} {{ logFiles|length == 1 ? 'file'|t('logging-library') : 'files'|t('logging-library') }}</div>
-        </div>
+        {% if isRuntime %}
+            <div class="log-config-item">
+                <div class="label">{{ "Current Level"|t('logging-library') }}</div>
+                <div class="value">
+                    {% include 'lindemannrock-base/_components/badge' with {
+                        label: (levels[runtimeCurrentLevel] ?? runtimeCurrentLevel|capitalize)|upper,
+                        value: runtimeCurrentLevel,
+                        colorSet: 'logLevel',
+                    } only %}
+                </div>
+            </div>
+
+            <div class="log-config-item">
+                <div class="label">{{ "Runtime Store"|t('logging-library') }}</div>
+                <div class="value">{{ craftUsesRedisCache ? 'Redis (' ~ "Craft cache"|t('logging-library') ~ ')' : "Craft cache"|t('logging-library') }}</div>
+            </div>
+
+            <div class="log-config-item">
+                <div class="label">{{ "Log entries"|t('logging-library') }}</div>
+                <div class="value" id="runtime-log-entry-count">{{ pagination.total|number_format }} / {{ (runtimeMaxEntries ?? 1000)|number_format }}</div>
+            </div>
+
+            <div class="log-config-item" style="grid-template-columns: 1fr; padding: 8px 0;">
+                <form method="post" accept-charset="UTF-8">
+                    {{ csrfInput() }}
+                    {{ actionInput('logging-library/logs/clear-runtime') }}
+                    {{ redirectInput(craft.app.request.url) }}
+                    <button type="submit" class="btn fullwidth">
+                        {{ "Clear Runtime Logs"|t('logging-library') }}
+                    </button>
+                </form>
+            </div>
+        {% else %}
+            <div class="log-config-item">
+                <div class="label">{{ "Available Logs"|t('logging-library') }}</div>
+                <div class="value">{{ logFiles|length|number_format }} {{ logFiles|length == 1 ? 'file'|t('logging-library') : 'files'|t('logging-library') }}</div>
+            </div>
+        {% endif %}
 
         {% if selectedFile %}
             {% set selectedFileParams = isStandalone
@@ -434,10 +559,12 @@
         {% endif %}
 
         <div class="log-config-item location">
-            <div class="label">{{ "Log Location"|t('logging-library') }}</div>
+            <div class="label">{{ isRuntime ? "Runtime Location"|t('logging-library') : "Log Location"|t('logging-library') }}</div>
             <div class="value">
                 <code style="font-size: 10px; line-height: 1.5; color: #606d7b; word-break: break-all; display: block;">
-                    {% if isStandalone %}
+                    {% if isRuntime %}
+                        craft.app.cache
+                    {% elseif isStandalone %}
                         storage/logs/
                     {% else %}
                         storage/logs/{{ pluginHandle }}-{date}.log

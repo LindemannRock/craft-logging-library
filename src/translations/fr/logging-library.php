@@ -15,6 +15,7 @@ return [
 
     // Navigation
     'All Logs' => 'Tous les journaux',
+    'Runtime Logs' => 'Journaux d\'exécution',
     'Logs' => 'Journaux',
     'Settings' => 'Paramètres',
     'System Logs' => 'Journaux système',
@@ -36,9 +37,11 @@ return [
     'Could not save settings.' => 'Impossible d\'enregistrer les paramètres.',
     'Log cache refreshed.' => 'Cache des journaux actualisé.',
     'Failed to refresh log cache.' => 'Échec de l\'actualisation du cache des journaux.',
+    'Recent runtime logs cleared.' => 'Journaux d\'exécution récents effacés.',
     'Plugin logging not configured' => 'Journalisation du plugin non configurée',
     'Log viewer is disabled for this plugin' => 'La visionneuse de journaux est désactivée pour ce plugin',
     'Log viewer is disabled for this environment' => 'La visionneuse de journaux est désactivée pour cet environnement',
+    'Recent runtime logs are disabled' => 'Les journaux d\'exécution récents sont désactivés',
     'Log file not found' => 'Fichier journal introuvable',
     'Unable to determine plugin handle from URL' => 'Impossible de déterminer l\'identifiant du plugin depuis l\'URL',
     'User does not have permission to view logs' => 'L\'utilisateur n\'a pas la permission de consulter les journaux',
@@ -90,6 +93,7 @@ return [
 
     // Table empty
     'No log files found. Log files are created when plugin activities occur.' => 'Aucun fichier journal trouvé. Les fichiers journaux sont créés lors des activités du plugin.',
+    'No recent runtime logs found. Runtime logs are short-lived and only appear after matching events are captured.' => 'Aucun journal d\'exécution récent trouvé. Les journaux d\'exécution sont de courte durée et n\'apparaissent qu\'après la capture d\'événements correspondants.',
     'No log entries found for the selected filters.' => 'Aucune entrée de journal trouvée pour les filtres sélectionnés.',
 
     // Pagination
@@ -107,9 +111,14 @@ return [
     'Current File' => 'Fichier actuel',
     'Log entries' => 'Entrées de journal',
     'Refresh Cache' => 'Actualiser le cache',
+    'Clear Runtime Logs' => 'Effacer les journaux d\'exécution',
     'Loading' => 'Chargement',
     'Download File' => 'Télécharger le fichier',
     'Log Location' => 'Emplacement du journal',
+    'Runtime Store' => 'Stockage d\'exécution',
+    'Craft cache' => 'cache Craft',
+    'Runtime Location' => 'Emplacement d\'exécution',
+    'Recent runtime logs are stored in Craft cache and are intended for short-lived diagnostics, not complete log history.' => 'Les journaux d\'exécution récents sont stockés dans le cache Craft et sont destinés aux diagnostics de courte durée, pas à l\'historique complet des journaux.',
 
     // Config overrides
     'This is being overridden by the <code>forceEnableLogViewer</code> setting in <code>config/logging-library.php</code>.' => 'Ce paramètre est remplacé par le paramètre <code>forceEnableLogViewer</code> dans <code>config/logging-library.php</code>.',

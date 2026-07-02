@@ -15,6 +15,7 @@ return [
 
     // Navigation
     'All Logs' => 'Todos os registos',
+    'Runtime Logs' => 'Registos de runtime',
     'Logs' => 'Registos',
     'Settings' => 'Definições',
     'System Logs' => 'Registos do sistema',
@@ -36,9 +37,11 @@ return [
     'Could not save settings.' => 'Não foi possível guardar as definições.',
     'Log cache refreshed.' => 'Cache do log atualizada.',
     'Failed to refresh log cache.' => 'Não foi possível atualizar a cache do log.',
+    'Recent runtime logs cleared.' => 'Logs de runtime recentes limpos.',
     'Plugin logging not configured' => 'Registo do plugin não configurado',
     'Log viewer is disabled for this plugin' => 'O visualizador de registos está desativado para este plugin',
     'Log viewer is disabled for this environment' => 'O visualizador de registos está desativado para este ambiente',
+    'Recent runtime logs are disabled' => 'Os registos de runtime recentes estão desativados',
     'Log file not found' => 'Ficheiro de log não encontrado',
     'Unable to determine plugin handle from URL' => 'Não foi possível determinar o handle do plugin a partir da URL',
     'User does not have permission to view logs' => 'O utilizador não tem permissão para ver os registos',
@@ -90,6 +93,7 @@ return [
 
     // Table empty
     'No log files found. Log files are created when plugin activities occur.' => 'Nenhum ficheiro de log encontrado. Os ficheiros de log são criados quando ocorrem atividades do plugin.',
+    'No recent runtime logs found. Runtime logs are short-lived and only appear after matching events are captured.' => 'Nenhum registo de runtime recente encontrado. Os registos de runtime são de curta duração e só aparecem depois de eventos correspondentes serem capturados.',
     'No log entries found for the selected filters.' => 'Nenhuma entrada de registo encontrada para os filtros selecionados.',
 
     // Pagination
@@ -107,9 +111,14 @@ return [
     'Current File' => 'Ficheiro atual',
     'Log entries' => 'Entradas de registo',
     'Refresh Cache' => 'Atualizar cache',
+    'Clear Runtime Logs' => 'Limpar logs de runtime',
     'Loading' => 'A carregar',
     'Download File' => 'Transferir ficheiro',
     'Log Location' => 'Localização do log',
+    'Runtime Store' => 'Armazenamento de runtime',
+    'Craft cache' => 'cache Craft',
+    'Runtime Location' => 'Localização de runtime',
+    'Recent runtime logs are stored in Craft cache and are intended for short-lived diagnostics, not complete log history.' => 'Os registos de runtime recentes são armazenados na cache Craft e destinam-se a diagnósticos de curta duração, não ao histórico completo de registos.',
 
     // Config overrides
     'This is being overridden by the <code>forceEnableLogViewer</code> setting in <code>config/logging-library.php</code>.' => 'Isto está a ser substituído pela definição <code>forceEnableLogViewer</code> em <code>config/logging-library.php</code>.',
