@@ -825,12 +825,34 @@ class LoggingLibrary extends Plugin
             $files[] = $fileInfo;
         }
 
-        // Sort by last modified date descending (newest first)
+        // Sort by logical log date descending. Dated log filenames should not
+        // jump ahead just because an old file was touched during parsing/tests.
         usort($files, function($a, $b) {
-            return $b['lastModified'] - $a['lastModified'];
+            $dateComparison = self::_logFileDateSortValue($b) <=> self::_logFileDateSortValue($a);
+
+            if ($dateComparison !== 0) {
+                return $dateComparison;
+            }
+
+            return $b['lastModified'] <=> $a['lastModified'];
         });
 
         return $files;
+    }
+
+    private static function _logFileDateSortValue(array $fileInfo): int
+    {
+        $date = (string)($fileInfo['date'] ?? '');
+
+        if ($date === 'current') {
+            return PHP_INT_MAX;
+        }
+
+        if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
+            return strtotime($date) ?: 0;
+        }
+
+        return 0;
     }
 
     /**

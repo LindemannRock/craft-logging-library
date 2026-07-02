@@ -88,6 +88,34 @@ final class LogFilesDiscoveryTest extends TestCase
         self::assertSame("{$handle}-2026-05-16.log", $entry['filename']);
     }
 
+    public function testGetAllLogFilesSortsDatedLogsByFilenameDateBeforeMtime(): void
+    {
+        $handle = self::TEST_HANDLE_PREFIX . 'dated';
+
+        $newerPath = $this->seedLogFile(
+            "{$handle}-2026-07-03.log",
+            "2026-07-03 10:00:00 [user:1][INFO][{$handle}] newer file\n",
+        );
+        $olderPath = $this->seedLogFile(
+            "{$handle}-2026-07-02.log",
+            "2026-07-02 10:00:00 [user:1][INFO][{$handle}] older file\n",
+        );
+
+        touch($newerPath, strtotime('2026-07-03 00:00:00'));
+        touch($olderPath, strtotime('2026-07-04 00:00:00'));
+
+        $files = array_values(array_filter(
+            LoggingLibrary::getAllLogFiles(),
+            fn(array $file) => ($file['source'] ?? '') === $handle
+        ));
+
+        self::assertSame(
+            ["{$handle}-2026-07-03.log", "{$handle}-2026-07-02.log"],
+            array_column($files, 'filename'),
+            'Standalone file picker options must follow filename date before mtime.',
+        );
+    }
+
     public function testGetAllLogFilesClassifiesUndatedSourceLog(): void
     {
         $source = self::TEST_HANDLE_PREFIX . 'freeform-email';
