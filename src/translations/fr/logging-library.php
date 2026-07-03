@@ -39,6 +39,7 @@ return [
     'Log cache refreshed.' => 'Cache des journaux actualisé.',
     'Failed to refresh log cache.' => 'Échec de l\'actualisation du cache des journaux.',
     'Recent runtime logs cleared.' => 'Journaux d\'exécution récents effacés.',
+    'Unable to clear recent runtime logs.' => 'Impossible d\'effacer les journaux d\'exécution récents.',
     'Plugin logging not configured' => 'Journalisation du plugin non configurée',
     'Log viewer is disabled for this plugin' => 'La visionneuse de journaux est désactivée pour ce plugin',
     'Log viewer is disabled for this environment' => 'La visionneuse de journaux est désactivée pour cet environnement',

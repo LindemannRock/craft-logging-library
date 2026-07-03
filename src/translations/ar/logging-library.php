@@ -39,6 +39,7 @@ return [
     'Log cache refreshed.' => 'تم تحديث Cache السجل.',
     'Failed to refresh log cache.' => 'تعذّر تحديث Cache السجل.',
     'Recent runtime logs cleared.' => 'تم مسح سجلات وقت التشغيل الأخيرة.',
+    'Unable to clear recent runtime logs.' => 'تعذّر مسح سجلات وقت التشغيل الأخيرة.',
     'Plugin logging not configured' => 'تسجيل الإضافة غير مكوّن',
     'Log viewer is disabled for this plugin' => 'عارض السجلات معطّل لهذه الإضافة',
     'Log viewer is disabled for this environment' => 'عارض السجلات معطّل لهذه البيئة',

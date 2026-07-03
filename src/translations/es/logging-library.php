@@ -39,6 +39,7 @@ return [
     'Log cache refreshed.' => 'Caché del registro actualizada.',
     'Failed to refresh log cache.' => 'No se pudo actualizar la caché del registro.',
     'Recent runtime logs cleared.' => 'Registros recientes de tiempo de ejecución borrados.',
+    'Unable to clear recent runtime logs.' => 'No se pudieron borrar los registros recientes de tiempo de ejecución.',
     'Plugin logging not configured' => 'Registros del plugin no configurados',
     'Log viewer is disabled for this plugin' => 'El visor de registros está desactivado para este plugin',
     'Log viewer is disabled for this environment' => 'El visor de registros está desactivado para este entorno',

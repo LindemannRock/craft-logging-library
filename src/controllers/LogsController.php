@@ -393,7 +393,10 @@ class LogsController extends Controller
             throw new NotFoundHttpException(Craft::t('logging-library', 'Recent runtime logs are disabled'));
         }
 
-        LoggingLibrary::getInstance()->runtimeLogStore->clear();
+        if (!LoggingLibrary::getInstance()->runtimeLogStore->clear()) {
+            Craft::$app->getSession()->setError(Craft::t('logging-library', 'Unable to clear recent runtime logs.'));
+            return $this->redirectToPostedUrl(null, 'logging-library/logs/runtime');
+        }
 
         Craft::$app->getSession()->setNotice(Craft::t('logging-library', 'Recent runtime logs cleared.'));
 

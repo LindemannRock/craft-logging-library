@@ -39,6 +39,7 @@ return [
     'Log cache refreshed.' => 'ログキャッシュを更新しました。',
     'Failed to refresh log cache.' => 'ログキャッシュを更新できませんでした。',
     'Recent runtime logs cleared.' => '最近のランタイムログを削除しました。',
+    'Unable to clear recent runtime logs.' => '最近のランタイムログを削除できません。',
     'Plugin logging not configured' => 'プラグインのログ機能が設定されていません',
     'Log viewer is disabled for this plugin' => 'このプラグインではログビューアーが無効になっています',
     'Log viewer is disabled for this environment' => 'この環境ではログビューアーが無効になっています',

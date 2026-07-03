@@ -14,6 +14,7 @@ use Craft;
 use craft\base\Component;
 use craft\helpers\FileHelper;
 use lindemannrock\base\helpers\PluginHelper;
+use lindemannrock\logginglibrary\helpers\CategoryOptionsHelper;
 use lindemannrock\logginglibrary\helpers\LogLevelHelper;
 use lindemannrock\logginglibrary\helpers\UserLabelHelper;
 use lindemannrock\logginglibrary\LoggingLibrary;
@@ -124,7 +125,7 @@ class LogCacheService extends Component
             'entries' => UserLabelHelper::withUserLabels($entries),
             'total' => $total,
             'category' => $category,
-            'categoryOptions' => $this->_buildCategoryOptions($categoryCounts),
+            'categoryOptions' => CategoryOptionsHelper::options($categoryCounts),
         ];
     }
 
@@ -715,7 +716,7 @@ class LogCacheService extends Component
             'entries' => UserLabelHelper::withUserLabels($entries),
             'total' => $totalCount,
             'category' => $category,
-            'categoryOptions' => $this->_buildCategoryOptions($categoryCounts),
+            'categoryOptions' => CategoryOptionsHelper::options($categoryCounts),
         ];
     }
 
@@ -1017,8 +1018,8 @@ class LogCacheService extends Component
                 WHEN lower(level) LIKE \'%warning%\' THEN 2
                 WHEN lower(level) LIKE \'%notice%\' OR lower(level) LIKE \'%deprecated%\' OR lower(level) LIKE \'%strict%\' OR lower(level) = \'info\' THEN 3
                 WHEN lower(level) IN (\'debug\', \'trace\') THEN 4
-                WHEN lower(level) = \'unknown\' THEN 5
-                ELSE 99
+                WHEN NOT ' . $this->_indexedKnownLevelWhere() . ' THEN 5
+                ELSE 5
             END ' . $direction . ', seq ' . $direction;
         }
 
@@ -1066,33 +1067,6 @@ class LogCacheService extends Component
             '%' => '\\%',
             '_' => '\\_',
         ]);
-    }
-
-    /**
-     * Build category filter options from indexed counts.
-     *
-     * @param array<string, int> $categoryCounts
-     * @return array
-     */
-    private function _buildCategoryOptions(array $categoryCounts): array
-    {
-        $formatter = Craft::$app->getFormatter();
-
-        $options = [[
-            'value' => 'all',
-            'label' => Craft::t('logging-library', 'Source'),
-            'extra' => '(' . $formatter->asInteger(array_sum($categoryCounts)) . ')',
-        ]];
-
-        foreach ($categoryCounts as $category => $count) {
-            $options[] = [
-                'value' => $category,
-                'label' => $category,
-                'extra' => '(' . $formatter->asInteger($count) . ')',
-            ];
-        }
-
-        return $options;
     }
 
     /**

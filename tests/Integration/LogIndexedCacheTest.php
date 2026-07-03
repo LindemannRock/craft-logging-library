@@ -181,6 +181,22 @@ final class LogIndexedCacheTest extends TestCase
         LoggingLibrary::getInstance()->logCache->invalidateLogCache($path);
     }
 
+    public function testIndexedLevelSortBucketsNonStandardLevelsAsUnknown(): void
+    {
+        $path = $this->seedLogFile(
+            self::TEST_HANDLE_PREFIX . 'indexed-unknown-sort-2026-05-25.log',
+            "2026-05-25 10:00:00 [VERBOSE] Non-standard message\n" .
+            "2026-05-25 10:00:01 [UNKNOWN] Explicit unknown message\n" .
+            "2026-05-25 10:00:02 [ERROR] Error message\n",
+        );
+
+        $page = LoggingLibrary::getInstance()->logCache->getLogPage($path, 'all', 'all', '', 'level', 'desc', 1, 10);
+
+        self::assertSame(['Explicit unknown message', 'Non-standard message', 'Error message'], array_column($page['entries'], 'message'));
+
+        LoggingLibrary::getInstance()->logCache->invalidateLogCache($path);
+    }
+
     public function testIndexedPageNormalizesPhpTimestampsForSorting(): void
     {
         $path = $this->seedLogFile(

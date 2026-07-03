@@ -39,6 +39,7 @@ return [
     'Log cache refreshed.' => 'Protokoll-Cache aktualisiert.',
     'Failed to refresh log cache.' => 'Protokoll-Cache konnte nicht aktualisiert werden.',
     'Recent runtime logs cleared.' => 'Aktuelle Laufzeitprotokolle gelöscht.',
+    'Unable to clear recent runtime logs.' => 'Aktuelle Laufzeitprotokolle konnten nicht gelöscht werden.',
     'Plugin logging not configured' => 'Plugin-Protokollierung nicht konfiguriert',
     'Log viewer is disabled for this plugin' => 'Protokoll-Viewer ist für dieses Plugin deaktiviert',
     'Log viewer is disabled for this environment' => 'Protokoll-Viewer ist für diese Umgebung deaktiviert',

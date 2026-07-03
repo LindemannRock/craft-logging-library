@@ -39,6 +39,7 @@ return [
     'Log cache refreshed.' => 'Cache dei log aggiornata.',
     'Failed to refresh log cache.' => 'Impossibile aggiornare la cache dei log.',
     'Recent runtime logs cleared.' => 'Log runtime recenti cancellati.',
+    'Unable to clear recent runtime logs.' => 'Impossibile cancellare i log runtime recenti.',
     'Plugin logging not configured' => 'Log del plugin non configurati',
     'Log viewer is disabled for this plugin' => 'Il visualizzatore di log è disabilitato per questo plugin',
     'Log viewer is disabled for this environment' => 'Il visualizzatore di log è disabilitato per questo ambiente',

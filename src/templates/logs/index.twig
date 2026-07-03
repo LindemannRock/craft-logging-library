@@ -273,19 +273,13 @@
        controller (LogsController::_getLogPageFromFile). `levelClass` is
        applied to the parent <tr> via `tableConfig.rowClassKey` and drives
        row-tint CSS in `lindemannrock-base/_partials/styles-log-level-rows`. #}
-    {% set levelValue = item.level ?: 'unknown' %}
     {% set canonicalLevel = item.canonicalLevel ?? '' %}
-    {% set isCanonical = canonicalLevel != '' %}
     <td>
-        {% if isCanonical %}
-            {% include 'lindemannrock-base/_components/badge' with {
-                label: (levels[canonicalLevel] ?? canonicalLevel|title)|upper,
-                value: canonicalLevel,
-                colorSet: 'logLevel',
-            } only %}
-        {% else %}
-            <span class="light code">{{ (levels[levelValue] ?? levelValue|replace({'-': ' ', '_': ' '})|title)|upper }}</span>
-        {% endif %}
+        {% include 'lindemannrock-base/_components/badge' with {
+            label: (levels[canonicalLevel] ?? canonicalLevel|title)|upper,
+            value: canonicalLevel,
+            colorSet: 'logLevel',
+        } only %}
     </td>
 
     {# Category/Source — shown only for multi-category sources (web/queue/console).

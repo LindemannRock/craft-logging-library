@@ -13,6 +13,7 @@ namespace lindemannrock\logginglibrary\services;
 use Craft;
 use craft\base\Component;
 use craft\helpers\Json;
+use lindemannrock\logginglibrary\helpers\CategoryOptionsHelper;
 use lindemannrock\logginglibrary\helpers\UserLabelHelper;
 use yii\helpers\VarDumper;
 use yii\log\Logger;
@@ -142,23 +143,25 @@ class RuntimeLogStoreService extends Component
             'total' => $total,
             'storedTotal' => $storedTotal,
             'category' => $category,
-            'categoryOptions' => $this->_categoryOptions($categoryCounts),
+            'categoryOptions' => CategoryOptionsHelper::options($categoryCounts),
         ];
     }
 
     /**
      * Clear the runtime log store.
      */
-    public function clear(): void
+    public function clear(): bool
     {
         $mutex = Craft::$app->getMutex();
         if (!$mutex->acquire(self::LOCK_KEY, 5)) {
-            return;
+            return false;
         }
 
         try {
             Craft::$app->getCache()->delete(self::CACHE_KEY);
+            return true;
         } catch (\Throwable) {
+            return false;
         } finally {
             $mutex->release(self::LOCK_KEY);
         }
@@ -234,28 +237,6 @@ class RuntimeLogStoreService extends Component
 
             return $record;
         }, array_filter($records, 'is_array')));
-    }
-
-    private function _categoryOptions(array $categoryCounts): array
-    {
-        uksort($categoryCounts, static fn(string $a, string $b): int => strcasecmp($a, $b));
-        $formatter = Craft::$app->getFormatter();
-
-        $options = [[
-            'value' => 'all',
-            'label' => Craft::t('logging-library', 'Source'),
-            'extra' => '(' . $formatter->asInteger(array_sum($categoryCounts)) . ')',
-        ]];
-
-        foreach ($categoryCounts as $category => $count) {
-            $options[] = [
-                'value' => $category,
-                'label' => $category,
-                'extra' => '(' . $formatter->asInteger($count) . ')',
-            ];
-        }
-
-        return $options;
     }
 
     /**

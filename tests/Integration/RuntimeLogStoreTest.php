@@ -320,6 +320,22 @@ class RuntimeLogStoreTest extends TestCase
         }
     }
 
+    public function testClearRuntimeStoreReturnsFalseWhenLockCannotBeAcquired(): void
+    {
+        $lockConstant = (new \ReflectionClass($this->store))->getReflectionConstant('LOCK_KEY');
+        self::assertNotNull($lockConstant);
+        $lockKey = (string)$lockConstant->getValue();
+        $mutex = Craft::$app->getMutex();
+
+        self::assertTrue($mutex->acquire($lockKey, 1));
+
+        try {
+            self::assertFalse($this->store->clear());
+        } finally {
+            $mutex->release($lockKey);
+        }
+    }
+
     public function testRuntimeTargetCapturesDirectCraftLogCalls(): void
     {
         $target = new RuntimeLogTarget([

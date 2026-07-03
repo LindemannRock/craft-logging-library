@@ -39,6 +39,7 @@ return [
     'Log cache refreshed.' => 'Log-cache opdateret.',
     'Failed to refresh log cache.' => 'Log-cache kunne ikke opdateres.',
     'Recent runtime logs cleared.' => 'Seneste runtime-logge ryddet.',
+    'Unable to clear recent runtime logs.' => 'De seneste runtime-logge kunne ikke ryddes.',
     'Plugin logging not configured' => 'Plugin-logning er ikke konfigureret',
     'Log viewer is disabled for this plugin' => 'Logviseren er deaktiveret for dette plugin',
     'Log viewer is disabled for this environment' => 'Logviseren er deaktiveret for dette miljø',

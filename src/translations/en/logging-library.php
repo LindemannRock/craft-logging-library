@@ -39,6 +39,7 @@ return [
     'Log cache refreshed.' => 'Log cache refreshed.',
     'Failed to refresh log cache.' => 'Failed to refresh log cache.',
     'Recent runtime logs cleared.' => 'Recent runtime logs cleared.',
+    'Unable to clear recent runtime logs.' => 'Unable to clear recent runtime logs.',
     'Plugin logging not configured' => 'Plugin logging not configured',
     'Log viewer is disabled for this plugin' => 'Log viewer is disabled for this plugin',
     'Log viewer is disabled for this environment' => 'Log viewer is disabled for this environment',

@@ -39,6 +39,7 @@ return [
     'Log cache refreshed.' => 'Logcache vernieuwd.',
     'Failed to refresh log cache.' => 'Logcache kon niet worden vernieuwd.',
     'Recent runtime logs cleared.' => 'Recente runtime-logboeken gewist.',
+    'Unable to clear recent runtime logs.' => 'Kan recente runtime-logboeken niet wissen.',
     'Plugin logging not configured' => 'Plugin-logboeken niet geconfigureerd',
     'Log viewer is disabled for this plugin' => 'Logviewer is uitgeschakeld voor deze plugin',
     'Log viewer is disabled for this environment' => 'Logviewer is uitgeschakeld voor deze omgeving',
