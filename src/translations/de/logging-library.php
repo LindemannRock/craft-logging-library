@@ -113,6 +113,7 @@ return [
     'Log entries' => 'Protokolleinträge',
     'Refresh Cache' => 'Cache aktualisieren',
     'Clear Runtime Logs' => 'Laufzeitprotokolle löschen',
+    'Clear recent runtime logs? This cannot be undone.' => 'Aktuelle Laufzeitprotokolle löschen? Dies kann nicht rückgängig gemacht werden.',
     'Loading' => 'Wird geladen',
     'Download File' => 'Datei herunterladen',
     'Log Location' => 'Protokollspeicherort',

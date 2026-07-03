@@ -113,6 +113,7 @@ return [
     'Log entries' => 'Entradas de registro',
     'Refresh Cache' => 'Actualizar caché',
     'Clear Runtime Logs' => 'Borrar registros de tiempo de ejecución',
+    'Clear recent runtime logs? This cannot be undone.' => '¿Borrar los registros recientes de tiempo de ejecución? Esta acción no se puede deshacer.',
     'Loading' => 'Cargando',
     'Download File' => 'Descargar archivo',
     'Log Location' => 'Ubicación del registro',

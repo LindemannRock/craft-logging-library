@@ -264,6 +264,17 @@ final class LogParsingTest extends TestCase
         self::assertSame('Critical message', $errorEntries[0]['message']);
     }
 
+    public function testLoggingServiceLogHandlesInvalidUtf8Context(): void
+    {
+        $handle = self::TEST_HANDLE_PREFIX . 'invalid-context';
+
+        LoggingService::log('Invalid context event', 'info', $handle, [
+            'payload' => "\xB1\x31",
+        ]);
+
+        self::assertTrue(true);
+    }
+
     public function testBracketLevelPluginLogParsesLevelAndContext(): void
     {
         $path = $this->seedLogFile(

@@ -113,6 +113,7 @@ return [
     'Log entries' => 'ログエントリ',
     'Refresh Cache' => 'キャッシュを更新',
     'Clear Runtime Logs' => 'ランタイムログを削除する',
+    'Clear recent runtime logs? This cannot be undone.' => '最近のランタイムログを削除しますか？この操作は取り消せません。',
     'Loading' => 'ロードしています',
     'Download File' => 'ファイルをダウンロード',
     'Log Location' => 'ログの場所',

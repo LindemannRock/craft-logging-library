@@ -113,6 +113,7 @@ return [
     'Log entries' => 'Loggposter',
     'Refresh Cache' => 'Uppdatera cache',
     'Clear Runtime Logs' => 'Rensa runtime-loggar',
+    'Clear recent runtime logs? This cannot be undone.' => 'Rensa de senaste runtime-loggarna? Detta kan inte ångras.',
     'Loading' => 'Läser in',
     'Download File' => 'Ladda ner fil',
     'Log Location' => 'Loggplats',

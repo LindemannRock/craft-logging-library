@@ -113,6 +113,7 @@ return [
     'Log entries' => 'Entrées de journal',
     'Refresh Cache' => 'Actualiser le cache',
     'Clear Runtime Logs' => 'Effacer les journaux d\'exécution',
+    'Clear recent runtime logs? This cannot be undone.' => 'Effacer les journaux d\'exécution récents ? Cette action est irréversible.',
     'Loading' => 'Chargement',
     'Download File' => 'Télécharger le fichier',
     'Log Location' => 'Emplacement du journal',

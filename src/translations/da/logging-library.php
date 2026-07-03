@@ -113,6 +113,7 @@ return [
     'Log entries' => 'Logposter',
     'Refresh Cache' => 'Opdater cache',
     'Clear Runtime Logs' => 'Ryd runtime-logge',
+    'Clear recent runtime logs? This cannot be undone.' => 'Ryd de seneste runtime-logge? Dette kan ikke fortrydes.',
     'Loading' => 'Indlæser',
     'Download File' => 'Download fil',
     'Log Location' => 'Logplacering',

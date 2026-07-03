@@ -12,6 +12,7 @@ namespace lindemannrock\logginglibrary\services;
 
 use Craft;
 use craft\base\Component;
+use craft\helpers\Json;
 use lindemannrock\logginglibrary\helpers\LogLevelHelper;
 use lindemannrock\logginglibrary\LoggingLibrary;
 
@@ -59,7 +60,11 @@ class LoggingService extends Component
         // Format message with context if provided
         $formattedMessage = $message;
         if (!empty($context)) {
-            $formattedMessage .= ' | ' . json_encode($context, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+            try {
+                $formattedMessage .= ' | ' . Json::encode($context);
+            } catch (\Throwable) {
+                $formattedMessage .= ' | [context encoding failed]';
+            }
         }
 
         // Use appropriate Craft logging method based on level

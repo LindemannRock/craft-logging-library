@@ -25,6 +25,8 @@ class CategoryOptionsHelper
      */
     public static function options(array $categoryCounts): array
     {
+        uksort($categoryCounts, static fn(string $a, string $b): int => strcasecmp($a, $b));
+
         $formatter = Craft::$app->getFormatter();
 
         $options = [[

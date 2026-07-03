@@ -113,6 +113,7 @@ return [
     'Log entries' => 'Voci di log',
     'Refresh Cache' => 'Aggiorna cache',
     'Clear Runtime Logs' => 'Cancella log runtime',
+    'Clear recent runtime logs? This cannot be undone.' => 'Cancellare i log runtime recenti? Questa azione non può essere annullata.',
     'Loading' => 'Caricamento',
     'Download File' => 'Scarica file',
     'Log Location' => 'Posizione del log',

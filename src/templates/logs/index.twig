@@ -456,7 +456,7 @@
                         {{ csrfInput() }}
                         {{ actionInput('logging-library/logs/clear-runtime') }}
                         {{ redirectInput(craft.app.request.url) }}
-                        <button type="submit" class="btn fullwidth">
+                        <button type="submit" class="btn fullwidth" data-confirm="{{ 'Clear recent runtime logs? This cannot be undone.'|t('logging-library')|e }}">
                             {{ "Clear Runtime Logs"|t('logging-library') }}
                         </button>
                     </form>

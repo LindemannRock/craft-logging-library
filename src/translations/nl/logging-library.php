@@ -113,6 +113,7 @@ return [
     'Log entries' => 'Logvermeldingen',
     'Refresh Cache' => 'Cache vernieuwen',
     'Clear Runtime Logs' => 'Runtime-logboeken wissen',
+    'Clear recent runtime logs? This cannot be undone.' => 'Recente runtime-logboeken wissen? Dit kan niet ongedaan worden gemaakt.',
     'Loading' => 'Laden',
     'Download File' => 'Bestand downloaden',
     'Log Location' => 'Loglocatie',

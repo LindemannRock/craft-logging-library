@@ -113,6 +113,7 @@ return [
     'Log entries' => 'إدخالات السجل',
     'Refresh Cache' => 'تحديث Cache',
     'Clear Runtime Logs' => 'مسح سجلات وقت التشغيل',
+    'Clear recent runtime logs? This cannot be undone.' => 'مسح سجلات وقت التشغيل الأخيرة؟ لا يمكن التراجع عن هذا الإجراء.',
     'Loading' => 'جار التحميل',
     'Download File' => 'تنزيل الملف',
     'Log Location' => 'موقع السجل',

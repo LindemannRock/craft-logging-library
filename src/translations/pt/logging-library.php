@@ -113,6 +113,7 @@ return [
     'Log entries' => 'Entradas de registo',
     'Refresh Cache' => 'Atualizar cache',
     'Clear Runtime Logs' => 'Limpar registos de runtime',
+    'Clear recent runtime logs? This cannot be undone.' => 'Limpar os registos de runtime recentes? Esta ação não pode ser anulada.',
     'Loading' => 'A carregar',
     'Download File' => 'Transferir ficheiro',
     'Log Location' => 'Localização do log',

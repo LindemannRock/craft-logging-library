@@ -113,6 +113,7 @@ return [
     'Log entries' => 'Loggoppføringer',
     'Refresh Cache' => 'Oppdater cache',
     'Clear Runtime Logs' => 'Tøm runtime-logger',
+    'Clear recent runtime logs? This cannot be undone.' => 'Tøm nylige runtime-logger? Dette kan ikke angres.',
     'Loading' => 'Laster',
     'Download File' => 'Last ned fil',
     'Log Location' => 'Loggplassering',

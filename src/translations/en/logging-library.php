@@ -113,6 +113,7 @@ return [
     'Log entries' => 'Log entries',
     'Refresh Cache' => 'Refresh Cache',
     'Clear Runtime Logs' => 'Clear Runtime Logs',
+    'Clear recent runtime logs? This cannot be undone.' => 'Clear recent runtime logs? This cannot be undone.',
     'Loading' => 'Loading',
     'Download File' => 'Download File',
     'Log Location' => 'Log Location',
