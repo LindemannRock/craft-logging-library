@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace lindemannrock\logginglibrary\tests\Integration;
 
+use lindemannrock\logginglibrary\helpers\CategoryOptionsHelper;
 use lindemannrock\logginglibrary\LoggingLibrary;
 use lindemannrock\logginglibrary\tests\TestCase;
 
@@ -83,17 +84,15 @@ final class LogIndexedCacheTest extends TestCase
         LoggingLibrary::getInstance()->logCache->invalidateLogCache($path);
     }
 
-    public function testFallbackCategoryCountsUseIndexedCaseInsensitiveSort(): void
+    public function testCategoryOptionsUseIndexedCaseInsensitiveSort(): void
     {
-        $method = new \ReflectionMethod(LoggingLibrary::getInstance()->logCache, '_countCategories');
-
-        $counts = $method->invoke(LoggingLibrary::getInstance()->logCache, [
-            ['category' => 'job-2'],
-            ['category' => 'job-10'],
-            ['category' => 'Apple'],
+        $options = CategoryOptionsHelper::options([
+            'job-2' => 1,
+            'job-10' => 1,
+            'Apple' => 1,
         ]);
 
-        self::assertSame(['Apple', 'job-10', 'job-2'], array_keys($counts));
+        self::assertSame(['all', 'Apple', 'job-10', 'job-2'], array_column($options, 'value'));
     }
 
     public function testIndexedPageUsesTranslatedSystemLabelForLogsWithoutUser(): void

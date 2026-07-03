@@ -738,7 +738,6 @@ class LogCacheService extends Component
             $counts[$category] = ($counts[$category] ?? 0) + 1;
         }
 
-        uksort($counts, static fn(string $a, string $b): int => strcasecmp($a, $b));
         return $counts;
     }
 
@@ -945,7 +944,7 @@ class LogCacheService extends Component
      */
     private function _getIndexedCategoryCounts(PDO $pdo, string $whereSql, array $params): array
     {
-        $statement = $pdo->prepare('SELECT category, COUNT(*) AS count FROM entries' . $whereSql . ' GROUP BY category ORDER BY category COLLATE NOCASE ASC');
+        $statement = $pdo->prepare('SELECT category, COUNT(*) AS count FROM entries' . $whereSql . ' GROUP BY category');
         $statement->execute($params);
 
         $counts = [];
