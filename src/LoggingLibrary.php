@@ -618,9 +618,6 @@ class LoggingLibrary extends Plugin
         // Add the target to the log dispatcher
         $dispatcher = Craft::getLogger()->dispatcher;
         $dispatcher->targets[] = $target;
-
-        // Initialize the target immediately
-        $target->init();
     }
 
     /**
@@ -926,8 +923,22 @@ class LoggingLibrary extends Plugin
     private static function _detectEdgeEnvironment(): bool
     {
         return
-            App::env('SERVD_PROJECT_SLUG') !== null;        // Servd.host - VERIFIED and tested
+            self::_hasNonBlankEnv('SERVD_PROJECT_SLUG');        // Servd.host - VERIFIED and tested
             // TODO: Add other platforms after testing actual deployments with Craft CMS
+    }
+
+    /**
+     * Check whether an environment value is present and non-blank.
+     */
+    private static function _hasNonBlankEnv(string $name): bool
+    {
+        $value = App::env($name);
+
+        if (is_string($value)) {
+            return trim($value) !== '';
+        }
+
+        return $value !== null;
     }
 
     /**

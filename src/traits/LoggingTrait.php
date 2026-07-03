@@ -40,11 +40,16 @@ trait LoggingTrait
     {
         if ($this->_loggingHandle === null) {
             // Try to auto-detect from class name or plugin handle
-            if (method_exists($this, 'handle') && $this->handle) {
-                $this->_loggingHandle = $this->handle;
+            if (method_exists($this, 'getHandle')) {
+                $handle = $this->getHandle();
+                if (is_string($handle) && $handle !== '') {
+                    $this->_loggingHandle = $handle;
+                }
             } elseif (property_exists($this, 'handle') && $this->handle) {
                 $this->_loggingHandle = $this->handle;
-            } else {
+            }
+
+            if ($this->_loggingHandle === null) {
                 // Fallback: derive from class name
                 $className = (new \ReflectionClass($this))->getShortName();
                 $this->_loggingHandle = strtolower(preg_replace('/(?<!^)[A-Z]/', '-$0', $className));
