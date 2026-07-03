@@ -199,6 +199,35 @@ final class LogParsingTest extends TestCase
         self::assertSame(1, $stats['levels']['unknown']);
     }
 
+    public function testLogStatsCountsTraceAsDebug(): void
+    {
+        $handle = self::TEST_HANDLE_PREFIX . 'stats-trace';
+        $this->seedLogFile(
+            "{$handle}-2026-05-17.log",
+            "2026-05-17 10:00:00 [web.TRACE] [application] Trace message\n",
+        );
+
+        $stats = LoggingService::getLogStats($handle);
+
+        self::assertSame(1, $stats['levels']['debug']);
+    }
+
+    public function testRecentEntriesDebugFilterIncludesTrace(): void
+    {
+        $handle = self::TEST_HANDLE_PREFIX . 'recent-trace';
+        $this->seedLogFile(
+            "{$handle}-2026-05-17.log",
+            "2026-05-17 10:00:00 [web.TRACE] [application] Trace message\n" .
+            "2026-05-17 10:00:01 [web.INFO] [application] Info message\n",
+        );
+
+        $entries = LoggingService::getRecentEntries($handle, 10, 'debug');
+
+        self::assertCount(1, $entries);
+        self::assertSame('debug', $entries[0]['level']);
+        self::assertSame('Trace message', $entries[0]['message']);
+    }
+
     public function testBracketLevelPluginLogParsesLevelAndContext(): void
     {
         $path = $this->seedLogFile(

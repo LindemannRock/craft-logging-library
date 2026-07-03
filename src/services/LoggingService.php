@@ -179,7 +179,7 @@ class LoggingService extends Component
                 break;
             }
 
-            $logLevel = $log['level'] ?? 'unknown';
+            $logLevel = self::_canonicalLevel((string)($log['level'] ?? 'unknown'));
             if ($level !== 'all' && $logLevel !== $level) {
                 $lineNumber--;
                 continue;
@@ -243,11 +243,23 @@ class LoggingService extends Component
         $logQuery = LoggingLibrary::getInstance()->logCache->getLogs($filePath);
         $logs = $logQuery->all();
         foreach ($logs as $log) {
-            $level = $log['level'] ?? 'unknown';
+            $level = self::_canonicalLevel((string)($log['level'] ?? 'unknown'));
             if (isset($counts[$level])) {
                 $counts[$level]++;
             }
         }
         return $counts;
+    }
+
+    /**
+     * Canonicalize parsed log levels for dashboard helpers.
+     */
+    private static function _canonicalLevel(string $level): string
+    {
+        return match ($level) {
+            'trace' => 'debug',
+            'error', 'warning', 'info', 'debug' => $level,
+            default => 'unknown',
+        };
     }
 }

@@ -79,6 +79,8 @@ class RuntimeLogStoreService extends Component
 
     /**
      * Return a filtered, sorted, paginated page of runtime records.
+     *
+     * @return array{entries: array, total: int, storedTotal: int, category: string, categoryOptions: array}
      */
     public function getLogPage(string $level, string $category, string $search, string $sort, string $dir, int $page, int $limit, ?int $ttl = null): array
     {

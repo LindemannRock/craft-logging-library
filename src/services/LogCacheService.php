@@ -170,7 +170,7 @@ class LogCacheService extends Component
         unset($log);
 
         if ($sort === 'level') {
-            $levelOrder = ['error' => 1, 'warning' => 2, 'info' => 3, 'debug' => 4, 'unknown' => 5];
+            $levelOrder = ['error' => 1, 'warning' => 2, 'info' => 3, 'debug' => 4, 'trace' => 4, 'unknown' => 5];
             usort($logs, function($a, $b) use ($levelOrder, $orderDirection) {
                 $aLevel = $levelOrder[$a['level'] ?? 'unknown'] ?? 99;
                 $bLevel = $levelOrder[$b['level'] ?? 'unknown'] ?? 99;
@@ -1022,6 +1022,7 @@ class LogCacheService extends Component
                 WHEN \'warning\' THEN 2
                 WHEN \'info\' THEN 3
                 WHEN \'debug\' THEN 4
+                WHEN \'trace\' THEN 4
                 WHEN \'unknown\' THEN 5
                 ELSE 99
             END ' . $direction . ', seq ' . $direction;

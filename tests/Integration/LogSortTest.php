@@ -89,6 +89,22 @@ final class LogSortTest extends TestCase
         );
     }
 
+    public function testLevelSortTreatsTraceAsDebug(): void
+    {
+        $logs = [
+            ['timestamp' => '2026-05-16 20:37:07', 'level' => 'trace', 'message' => 'trace-message'],
+            ['timestamp' => '2026-05-16 20:37:08', 'level' => 'unknown', 'message' => 'unknown-message'],
+            ['timestamp' => '2026-05-16 20:37:09', 'level' => 'error', 'message' => 'error-message'],
+        ];
+
+        $sortedAsc = LogCacheService::sortLogs($logs, 'level', 'asc');
+
+        self::assertSame(
+            ['error-message', 'trace-message', 'unknown-message'],
+            array_column($sortedAsc, 'message'),
+        );
+    }
+
     public function testSeqHelperIsStrippedFromResult(): void
     {
         $sorted = LogCacheService::sortLogs($this->sameSecondCluster(), 'timestamp', 'desc');

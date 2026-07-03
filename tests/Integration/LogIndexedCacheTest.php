@@ -146,6 +146,22 @@ final class LogIndexedCacheTest extends TestCase
         LoggingLibrary::getInstance()->logCache->invalidateLogCache($path);
     }
 
+    public function testIndexedLevelSortTreatsTraceAsDebug(): void
+    {
+        $path = $this->seedLogFile(
+            self::TEST_HANDLE_PREFIX . 'indexed-trace-sort-2026-05-25.log',
+            "2026-05-25 10:00:00 [web.TRACE] [indexed] Trace message\n" .
+            "2026-05-25 10:00:01 [web.DEBUG] [indexed] Debug message\n" .
+            "2026-05-25 10:00:02 [web.ERROR] [indexed] Error message\n",
+        );
+
+        $page = LoggingLibrary::getInstance()->logCache->getLogPage($path, 'all', 'all', '', 'level', 'asc', 1, 10);
+
+        self::assertSame(['Error message', 'Trace message', 'Debug message'], array_column($page['entries'], 'message'));
+
+        LoggingLibrary::getInstance()->logCache->invalidateLogCache($path);
+    }
+
     public function testIndexedPageNormalizesPhpTimestampsForSorting(): void
     {
         $path = $this->seedLogFile(
