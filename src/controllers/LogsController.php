@@ -326,6 +326,7 @@ class LogsController extends Controller
             'runtimeCurrentLevel' => $context['runtimeCurrentLevel'],
             'runtimeMaxEntries' => $context['runtimeMaxEntries'],
             'runtimeRefreshInterval' => $context['runtimeRefreshInterval'],
+            'runtimeStoredTotal' => $context['runtimeStoredTotal'],
             'runtimeUsesRedisCache' => Craft::$app->getCache() instanceof \yii\redis\Cache,
             'canClearRuntimeLogs' => $user->checkPermission(LoggingLibrary::PERMISSION_CLEAR_CACHE),
             'logConfig' => null,
@@ -364,7 +365,9 @@ class LogsController extends Controller
 
         if ($rowsHtml === '') {
             $rowsHtml = Craft::$app->getView()->renderTemplate('logging-library/logs/_runtime-empty-row', [
-                'message' => Craft::t('logging-library', 'No recent runtime logs found. Runtime logs are short-lived and only appear after matching events are captured.'),
+                'message' => $context['runtimeStoredTotal'] > 0
+                    ? Craft::t('logging-library', 'No log entries found for the selected filters.')
+                    : Craft::t('logging-library', 'No recent runtime logs found. Runtime logs are short-lived and only appear after matching events are captured.'),
             ]);
         }
 
@@ -738,6 +741,8 @@ class LogsController extends Controller
         $page = max(1, (int)$request->getParam('page', 1));
         $limit = max(1, $settings instanceof Settings ? $settings->itemsPerPage : 50);
 
+        $ttl = max(1, (int)($runtimeConfig['ttl'] ?? 86400));
+
         $logPage = LoggingLibrary::getInstance()->runtimeLogStore->getLogPage(
             $level,
             $category,
@@ -746,7 +751,7 @@ class LogsController extends Controller
             $dir,
             $page,
             $limit,
-            max(1, (int)($runtimeConfig['ttl'] ?? 86400))
+            $ttl
         );
 
         return [
@@ -755,6 +760,7 @@ class LogsController extends Controller
             'runtimeCurrentLevel' => $this->_runtimeCurrentLevel($runtimeLevels),
             'runtimeMaxEntries' => max(1, (int)($runtimeConfig['maxEntries'] ?? 1000)),
             'runtimeRefreshInterval' => max(0, (int)($runtimeConfig['refreshInterval'] ?? 5)),
+            'runtimeStoredTotal' => LoggingLibrary::getInstance()->runtimeLogStore->getRecordCount($ttl),
             'level' => $level,
             'category' => $logPage['category'],
             'search' => $search,

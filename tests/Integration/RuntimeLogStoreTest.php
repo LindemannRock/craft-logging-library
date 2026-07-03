@@ -252,6 +252,39 @@ class RuntimeLogStoreTest extends TestCase
         self::assertSame('{...', $page['entries'][0]['context']);
     }
 
+    public function testRuntimeStoreCapsOversizedMessageAndContextLimits(): void
+    {
+        $this->store->appendMessages([
+            [
+                str_repeat('A', RuntimeLogStoreService::MAX_BYTES_LIMIT + 10),
+                Logger::LEVEL_ERROR,
+                'runtime-alpha',
+                strtotime('2026-07-02 10:00:00'),
+                [['file' => __FILE__, 'line' => __LINE__, 'payload' => str_repeat('B', RuntimeLogStoreService::MAX_BYTES_LIMIT + 10)]],
+                100,
+            ],
+        ], $this->settings([
+            'maxMessageBytes' => RuntimeLogStoreService::MAX_BYTES_LIMIT + 1000,
+            'maxContextBytes' => RuntimeLogStoreService::MAX_BYTES_LIMIT + 1000,
+        ]));
+
+        $page = $this->store->getLogPage('all', 'all', '', 'timestamp', 'desc', 1, 10);
+
+        self::assertSame(RuntimeLogStoreService::MAX_BYTES_LIMIT + 3, strlen($page['entries'][0]['message']));
+        self::assertLessThanOrEqual(RuntimeLogStoreService::MAX_BYTES_LIMIT + 3, strlen($page['entries'][0]['context']));
+    }
+
+    public function testRuntimeStorePreservesMicrosecondTimestampPrecision(): void
+    {
+        $this->store->appendMessages([
+            ['Microsecond runtime event', Logger::LEVEL_INFO, 'runtime-alpha', 1783000800.123456, [], 100],
+        ], $this->settings());
+
+        $page = $this->store->getLogPage('all', 'all', '', 'timestamp', 'desc', 1, 10);
+
+        self::assertStringContainsString('.123456', $page['entries'][0]['timestamp']);
+    }
+
     public function testRuntimeUserLabelsResolveAndFallBack(): void
     {
         $records = [

@@ -27,6 +27,10 @@ class RuntimeLogStoreService extends Component
     private const CACHE_KEY = 'logging-library:runtime-log-store:v1';
     private const LOCK_KEY = 'logging-library:runtime-log-store:v1:lock';
     private const MAX_ENTRIES_LIMIT = 10000;
+    /**
+     * @since 5.14.0
+     */
+    public const MAX_BYTES_LIMIT = 65536;
 
     private bool $_writing = false;
 
@@ -60,7 +64,9 @@ class RuntimeLogStoreService extends Component
             try {
                 $existing = $this->_getRecords();
                 $records = array_slice(array_merge($records, $existing), 0, $maxEntries);
-                Craft::$app->getCache()->set(self::CACHE_KEY, $records, $ttl);
+                if (!Craft::$app->getCache()->set(self::CACHE_KEY, $records, $ttl)) {
+                    Craft::$app->getCache()->delete(self::CACHE_KEY);
+                }
             } finally {
                 $mutex->release(self::LOCK_KEY);
             }
@@ -137,13 +143,35 @@ class RuntimeLogStoreService extends Component
     }
 
     /**
+     * Count records currently retained in the runtime store.
+     *
+     * @since 5.14.0
+     */
+    public function getRecordCount(?int $ttl = null): int
+    {
+        $records = $this->_getRecords();
+        if ($ttl !== null) {
+            $records = $this->_filterByTtl($records, $ttl);
+        }
+
+        return count($records);
+    }
+
+    /**
      * Clear the runtime log store.
      */
     public function clear(): void
     {
+        $mutex = Craft::$app->getMutex();
+        if (!$mutex->acquire(self::LOCK_KEY, 5)) {
+            return;
+        }
+
         try {
             Craft::$app->getCache()->delete(self::CACHE_KEY);
         } catch (\Throwable) {
+        } finally {
+            $mutex->release(self::LOCK_KEY);
         }
     }
 
@@ -180,7 +208,7 @@ class RuntimeLogStoreService extends Component
             }
         }
 
-        $isoTimestamp = date('c', (int)$timestamp);
+        $isoTimestamp = $this->_formatTimestamp((float)$timestamp);
 
         return [
             'id' => sha1($isoTimestamp . '|' . $canonicalLevel . '|' . $category . '|' . $messageText . '|' . microtime(true)),
@@ -341,12 +369,24 @@ class RuntimeLogStoreService extends Component
 
     private function _truncate(string $value, int $maxBytes): string
     {
-        $maxBytes = max(1, $maxBytes);
+        $maxBytes = min(self::MAX_BYTES_LIMIT, max(1, $maxBytes));
 
         if (strlen($value) <= $maxBytes) {
             return $value;
         }
 
         return mb_strcut($value, 0, $maxBytes) . '...';
+    }
+
+    private function _formatTimestamp(float $timestamp): string
+    {
+        $date = \DateTimeImmutable::createFromFormat('U.u', sprintf('%.6F', $timestamp));
+        if (!$date instanceof \DateTimeImmutable) {
+            return date('c', (int)$timestamp);
+        }
+
+        return $date
+            ->setTimezone(new \DateTimeZone(date_default_timezone_get()))
+            ->format('Y-m-d\TH:i:s.uP');
     }
 }

@@ -193,7 +193,9 @@
         ],
         items: logEntries,
         emptyMessage: isRuntime
-            ? 'No recent runtime logs found. Runtime logs are short-lived and only appear after matching events are captured.'|t('logging-library')
+            ? ((runtimeStoredTotal ?? 0) > 0
+                ? 'No log entries found for the selected filters.'|t('logging-library')
+                : 'No recent runtime logs found. Runtime logs are short-lived and only appear after matching events are captured.'|t('logging-library'))
             : (logFiles|length == 0
             ? 'No log files found. Log files are created when plugin activities occur.'|t('logging-library')
             : 'No log entries found for the selected filters.'|t('logging-library')),
