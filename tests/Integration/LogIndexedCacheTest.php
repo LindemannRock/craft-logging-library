@@ -104,6 +104,22 @@ final class LogIndexedCacheTest extends TestCase
         LoggingLibrary::getInstance()->logCache->invalidateLogCache($path);
     }
 
+    public function testIndexedSearchIncludesUserField(): void
+    {
+        $path = $this->seedLogFile(
+            self::TEST_HANDLE_PREFIX . 'indexed-user-search-2026-05-25.log',
+            "2026-05-25 10:00:00 [user:12345][INFO][indexed] User-owned message\n" .
+            "2026-05-25 10:00:01 [user:67890][INFO][indexed] Other user message\n",
+        );
+
+        $page = LoggingLibrary::getInstance()->logCache->getLogPage($path, 'all', 'all', 'user:12345', 'timestamp', 'asc', 1, 10);
+
+        self::assertSame(1, $page['total']);
+        self::assertSame(['User-owned message'], array_column($page['entries'], 'message'));
+
+        LoggingLibrary::getInstance()->logCache->invalidateLogCache($path);
+    }
+
     public function testIndexedPageNormalizesPhpTimestampsForSorting(): void
     {
         $path = $this->seedLogFile(

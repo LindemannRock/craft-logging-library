@@ -70,6 +70,20 @@ final class LogParsingTest extends TestCase
         self::assertStringStartsWith('Cleaned up old backups', $logs[0]['message']);
     }
 
+    public function testCraftTraceLogMapsToDebugInViewerPage(): void
+    {
+        $path = $this->seedLogFile(
+            self::TEST_HANDLE_PREFIX . 'trace-2026-05-17.log',
+            "2026-05-17 10:00:00 [web.TRACE] [application] Trace message\n",
+        );
+
+        $page = LoggingLibrary::getInstance()->logCache->getLogPage($path, 'debug', 'all', '', 'timestamp', 'desc', 1, 10);
+
+        self::assertSame(1, $page['total']);
+        self::assertSame('debug', $page['entries'][0]['canonicalLevel']);
+        self::assertSame('lr-level-debug', $page['entries'][0]['levelClass']);
+    }
+
     public function testPhpErrorLogGetsSourceCategory(): void
     {
         $path = $this->seedLogFile(

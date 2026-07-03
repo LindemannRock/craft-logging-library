@@ -95,12 +95,17 @@ class LogCacheService extends Component
         $params = [];
 
         if ($level !== 'all') {
-            $where[] = 'level = :level';
+            if ($level === 'debug') {
+                $where[] = '(level = :level OR level = :traceLevel)';
+                $params[':traceLevel'] = 'trace';
+            } else {
+                $where[] = 'level = :level';
+            }
             $params[':level'] = $level;
         }
 
         if ($search !== '') {
-            $where[] = '(message LIKE :search ESCAPE \'\\\' OR context LIKE :search ESCAPE \'\\\' OR category LIKE :search ESCAPE \'\\\')';
+            $where[] = '(message LIKE :search ESCAPE \'\\\' OR context LIKE :search ESCAPE \'\\\' OR category LIKE :search ESCAPE \'\\\' OR user LIKE :search ESCAPE \'\\\')';
             $params[':search'] = '%' . $this->_escapeLike($search) . '%';
         }
 
@@ -644,14 +649,19 @@ class LogCacheService extends Component
         $logs = $this->getLogs($filePath)->all();
 
         if ($level !== 'all') {
-            $logs = array_values(array_filter($logs, fn($log) => ($log['level'] ?? '') === $level));
+            $logs = array_values(array_filter($logs, function($log) use ($level): bool {
+                $logLevel = (string)($log['level'] ?? '');
+
+                return $logLevel === $level || ($level === 'debug' && $logLevel === 'trace');
+            }));
         }
 
         if ($search !== '') {
             $logs = array_values(array_filter($logs, function($log) use ($search) {
                 return stripos($log['message'] ?? '', $search) !== false ||
                        stripos($log['context'] ?? '', $search) !== false ||
-                       stripos($log['category'] ?? '', $search) !== false;
+                       stripos($log['category'] ?? '', $search) !== false ||
+                       stripos($log['user'] ?? '', $search) !== false;
             }));
         }
 
@@ -1037,6 +1047,10 @@ class LogCacheService extends Component
             || str_contains($level, 'strict')
         ) {
             return 'info';
+        }
+
+        if ($level === 'trace') {
+            return 'debug';
         }
 
         if (in_array($level, ['debug', 'info'], true)) {

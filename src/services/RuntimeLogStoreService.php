@@ -249,7 +249,7 @@ class RuntimeLogStoreService extends Component
 
     private function _categoryOptions(array $categoryCounts): array
     {
-        ksort($categoryCounts, SORT_NATURAL | SORT_FLAG_CASE);
+        uksort($categoryCounts, static fn(string $a, string $b): int => strcasecmp($a, $b));
         $formatter = Craft::$app->getFormatter();
 
         $options = [[

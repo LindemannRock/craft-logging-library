@@ -240,13 +240,7 @@ class LogsController extends Controller
                 'currentPage' => $page,
                 'totalPages' => $totalPages,
             ],
-            'levels' => [
-                'all' => Craft::t('logging-library', 'All Levels'),
-                'error' => Craft::t('logging-library', 'Error'),
-                'warning' => Craft::t('logging-library', 'Warning'),
-                'info' => Craft::t('logging-library', 'Info'),
-                'debug' => Craft::t('logging-library', 'Debug'),
-            ],
+            'levels' => $this->_logLevelLabels(),
             'logConfig' => $config,
         ]);
     }
@@ -315,13 +309,7 @@ class LogsController extends Controller
                 'currentPage' => $context['page'],
                 'totalPages' => $totalPages,
             ],
-            'levels' => [
-                'all' => Craft::t('logging-library', 'All Levels'),
-                'error' => Craft::t('logging-library', 'Error'),
-                'warning' => Craft::t('logging-library', 'Warning'),
-                'info' => Craft::t('logging-library', 'Info'),
-                'debug' => Craft::t('logging-library', 'Debug'),
-            ],
+            'levels' => $this->_logLevelLabels(),
             'availableLevels' => $context['runtimeLevels'],
             'runtimeCurrentLevel' => $context['runtimeCurrentLevel'],
             'runtimeMaxEntries' => $context['runtimeMaxEntries'],
