@@ -31,7 +31,7 @@
 		"php": "^8.2",
 		"craftcms/cms": "^5.10",
 		"yii2mod/yii2-array-query": "^1.4",
-		"lindemannrock/craft-plugin-base": "^5.30"
+		"lindemannrock/craft-plugin-base": "^5.33"
 	},
 	"require-dev": {
 		"craftcms/ecs": "dev-main",
