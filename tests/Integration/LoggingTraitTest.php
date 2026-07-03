@@ -40,6 +40,16 @@ final class LoggingTraitTest extends TestCase
 
         self::assertSame('logging-trait-fallback-stub', $logger->loggingHandleForTest());
     }
+
+    public function testFormatMessageHandlesInvalidUtf8Context(): void
+    {
+        $logger = new LoggingTraitFallbackStub();
+
+        self::assertSame(
+            'Invalid context event | [context encoding failed]',
+            $logger->formatMessageForTest('Invalid context event', ['payload' => "\xB1\x31"]),
+        );
+    }
 }
 
 final class LoggingTraitMethodHandleStub
@@ -76,5 +86,10 @@ final class LoggingTraitFallbackStub
     public function loggingHandleForTest(): string
     {
         return $this->getLoggingHandle();
+    }
+
+    public function formatMessageForTest(string $message, array $params): string
+    {
+        return $this->formatMessage($message, $params);
     }
 }

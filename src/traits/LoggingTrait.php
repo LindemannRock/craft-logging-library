@@ -11,6 +11,7 @@
 namespace lindemannrock\logginglibrary\traits;
 
 use Craft;
+use craft\helpers\Json;
 
 /**
  * Logging trait for Craft CMS plugins
@@ -101,6 +102,10 @@ trait LoggingTrait
         }
 
         // Add parameters as JSON if provided
-        return $message . ' | ' . json_encode($params, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        try {
+            return $message . ' | ' . Json::encode($params, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        } catch (\Throwable) {
+            return $message . ' | [context encoding failed]';
+        }
     }
 }
