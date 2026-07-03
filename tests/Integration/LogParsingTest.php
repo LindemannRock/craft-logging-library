@@ -212,6 +212,22 @@ final class LogParsingTest extends TestCase
         self::assertSame(1, $stats['levels']['debug']);
     }
 
+    public function testLogStatsCanonicalizesPsr3LevelsLikeViewer(): void
+    {
+        $handle = self::TEST_HANDLE_PREFIX . 'stats-psr3';
+        $this->seedLogFile(
+            "{$handle}-2026-05-17.log",
+            "[2026-05-17T10:00:00+00:00] app.NOTICE: Notice message [] []\n" .
+            "[2026-05-17T10:00:01+00:00] app.CRITICAL: Critical message [] []\n",
+        );
+
+        $stats = LoggingService::getLogStats($handle);
+
+        self::assertSame(1, $stats['levels']['info']);
+        self::assertSame(1, $stats['levels']['error']);
+        self::assertSame(0, $stats['levels']['unknown']);
+    }
+
     public function testRecentEntriesDebugFilterIncludesTrace(): void
     {
         $handle = self::TEST_HANDLE_PREFIX . 'recent-trace';
@@ -226,6 +242,26 @@ final class LogParsingTest extends TestCase
         self::assertCount(1, $entries);
         self::assertSame('debug', $entries[0]['level']);
         self::assertSame('Trace message', $entries[0]['message']);
+    }
+
+    public function testRecentEntriesCanonicalizesPsr3LevelsLikeViewer(): void
+    {
+        $handle = self::TEST_HANDLE_PREFIX . 'recent-psr3';
+        $this->seedLogFile(
+            "{$handle}-2026-05-17.log",
+            "[2026-05-17T10:00:00+00:00] app.NOTICE: Notice message [] []\n" .
+            "[2026-05-17T10:00:01+00:00] app.CRITICAL: Critical message [] []\n",
+        );
+
+        $infoEntries = LoggingService::getRecentEntries($handle, 10, 'info');
+        $errorEntries = LoggingService::getRecentEntries($handle, 10, 'error');
+
+        self::assertCount(1, $infoEntries);
+        self::assertSame('info', $infoEntries[0]['level']);
+        self::assertSame('Notice message', $infoEntries[0]['message']);
+        self::assertCount(1, $errorEntries);
+        self::assertSame('error', $errorEntries[0]['level']);
+        self::assertSame('Critical message', $errorEntries[0]['message']);
     }
 
     public function testBracketLevelPluginLogParsesLevelAndContext(): void

@@ -10,18 +10,13 @@
         </time>
     </td>
 
-    {% set levelValue = item.level ?: 'unknown' %}
     {% set canonicalLevel = item.canonicalLevel ?? '' %}
     <td data-column="level">
-        {% if canonicalLevel %}
-            {% include 'lindemannrock-base/_components/badge' with {
-                label: (levels[canonicalLevel] ?? canonicalLevel|title)|upper,
-                value: canonicalLevel,
-                colorSet: 'logLevel',
-            } only %}
-        {% else %}
-            <span class="light code">{{ (levels[levelValue] ?? levelValue|replace({'-': ' ', '_': ' '})|title)|upper }}</span>
-        {% endif %}
+        {% include 'lindemannrock-base/_components/badge' with {
+            label: (levels[canonicalLevel] ?? canonicalLevel|title)|upper,
+            value: canonicalLevel,
+            colorSet: 'logLevel',
+        } only %}
     </td>
 
     {% set sourceLabel = item.category ?: 'unknown' %}

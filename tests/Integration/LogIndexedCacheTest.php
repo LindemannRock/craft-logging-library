@@ -162,6 +162,25 @@ final class LogIndexedCacheTest extends TestCase
         LoggingLibrary::getInstance()->logCache->invalidateLogCache($path);
     }
 
+    public function testIndexedLevelFilterCanonicalizesPsr3Levels(): void
+    {
+        $path = $this->seedLogFile(
+            self::TEST_HANDLE_PREFIX . 'indexed-psr3-levels-2026-05-25.log',
+            "[2026-05-25T10:00:00+00:00] app.NOTICE: Notice message [] []\n" .
+            "[2026-05-25T10:00:01+00:00] app.CRITICAL: Critical message [] []\n",
+        );
+
+        $infoPage = LoggingLibrary::getInstance()->logCache->getLogPage($path, 'info', 'all', '', 'timestamp', 'asc', 1, 10);
+        $errorPage = LoggingLibrary::getInstance()->logCache->getLogPage($path, 'error', 'all', '', 'timestamp', 'asc', 1, 10);
+
+        self::assertSame(1, $infoPage['total']);
+        self::assertSame('info', $infoPage['entries'][0]['canonicalLevel']);
+        self::assertSame(1, $errorPage['total']);
+        self::assertSame('error', $errorPage['entries'][0]['canonicalLevel']);
+
+        LoggingLibrary::getInstance()->logCache->invalidateLogCache($path);
+    }
+
     public function testIndexedPageNormalizesPhpTimestampsForSorting(): void
     {
         $path = $this->seedLogFile(

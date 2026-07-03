@@ -12,6 +12,7 @@ namespace lindemannrock\logginglibrary\services;
 
 use Craft;
 use craft\base\Component;
+use lindemannrock\logginglibrary\helpers\LogLevelHelper;
 use lindemannrock\logginglibrary\LoggingLibrary;
 
 /**
@@ -179,7 +180,7 @@ class LoggingService extends Component
                 break;
             }
 
-            $logLevel = self::_canonicalLevel((string)($log['level'] ?? 'unknown'));
+            $logLevel = LogLevelHelper::canonicalLevel((string)($log['level'] ?? 'unknown'));
             if ($level !== 'all' && $logLevel !== $level) {
                 $lineNumber--;
                 continue;
@@ -243,23 +244,11 @@ class LoggingService extends Component
         $logQuery = LoggingLibrary::getInstance()->logCache->getLogs($filePath);
         $logs = $logQuery->all();
         foreach ($logs as $log) {
-            $level = self::_canonicalLevel((string)($log['level'] ?? 'unknown'));
+            $level = LogLevelHelper::canonicalLevel((string)($log['level'] ?? 'unknown'));
             if (isset($counts[$level])) {
                 $counts[$level]++;
             }
         }
         return $counts;
-    }
-
-    /**
-     * Canonicalize parsed log levels for dashboard helpers.
-     */
-    private static function _canonicalLevel(string $level): string
-    {
-        return match ($level) {
-            'trace' => 'debug',
-            'error', 'warning', 'info', 'debug' => $level,
-            default => 'unknown',
-        };
     }
 }

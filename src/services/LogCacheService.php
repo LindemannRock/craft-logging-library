@@ -14,6 +14,7 @@ use Craft;
 use craft\base\Component;
 use craft\helpers\FileHelper;
 use lindemannrock\base\helpers\PluginHelper;
+use lindemannrock\logginglibrary\helpers\LogLevelHelper;
 use lindemannrock\logginglibrary\helpers\UserLabelHelper;
 use lindemannrock\logginglibrary\LoggingLibrary;
 use PDO;
@@ -95,13 +96,7 @@ class LogCacheService extends Component
         $params = [];
 
         if ($level !== 'all') {
-            if ($level === 'debug') {
-                $where[] = '(level = :level OR level = :traceLevel)';
-                $params[':traceLevel'] = 'trace';
-            } else {
-                $where[] = 'level = :level';
-            }
-            $params[':level'] = $level;
+            $where[] = $this->_indexedCanonicalLevelWhere($level);
         }
 
         if ($search !== '') {
@@ -170,10 +165,10 @@ class LogCacheService extends Component
         unset($log);
 
         if ($sort === 'level') {
-            $levelOrder = ['error' => 1, 'warning' => 2, 'info' => 3, 'debug' => 4, 'trace' => 4, 'unknown' => 5];
+            $levelOrder = ['error' => 1, 'warning' => 2, 'info' => 3, 'debug' => 4, 'unknown' => 5];
             usort($logs, function($a, $b) use ($levelOrder, $orderDirection) {
-                $aLevel = $levelOrder[$a['level'] ?? 'unknown'] ?? 99;
-                $bLevel = $levelOrder[$b['level'] ?? 'unknown'] ?? 99;
+                $aLevel = $levelOrder[LogLevelHelper::canonicalLevel((string)($a['level'] ?? 'unknown'))] ?? 99;
+                $bLevel = $levelOrder[LogLevelHelper::canonicalLevel((string)($b['level'] ?? 'unknown'))] ?? 99;
                 $result = $aLevel - $bLevel;
                 if ($result === 0) {
                     $result = ($a['_seq'] ?? 0) <=> ($b['_seq'] ?? 0);
@@ -676,9 +671,9 @@ class LogCacheService extends Component
 
         if ($level !== 'all') {
             $logs = array_values(array_filter($logs, function($log) use ($level): bool {
-                $logLevel = (string)($log['level'] ?? '');
+                $logLevel = LogLevelHelper::canonicalLevel((string)($log['level'] ?? 'unknown'));
 
-                return $logLevel === $level || ($level === 'debug' && $logLevel === 'trace');
+                return $logLevel === $level;
             }));
         }
 
@@ -708,7 +703,7 @@ class LogCacheService extends Component
 
         foreach ($entries as $index => &$log) {
             $levelLower = strtolower((string)($log['level'] ?? ''));
-            $canonical = self::_canonicalLevel($levelLower);
+            $canonical = LogLevelHelper::canonicalLevel($levelLower);
 
             $log['lineNumber'] = $offset + $index + 1;
             $log['canonicalLevel'] = $canonical;
@@ -992,7 +987,7 @@ class LogCacheService extends Component
         $lineNumber = $offset + 1;
         foreach ($statement->fetchAll() as $row) {
             $level = strtolower((string)($row['level'] ?? ''));
-            $canonical = self::_canonicalLevel($level);
+            $canonical = LogLevelHelper::canonicalLevel($level);
 
             $entries[] = [
                 'timestamp' => (string)($row['timestamp'] ?? ''),
@@ -1017,13 +1012,12 @@ class LogCacheService extends Component
     private function _getIndexedOrderBy(string $sort, string $direction): string
     {
         if ($sort === 'level') {
-            return 'CASE level
-                WHEN \'error\' THEN 1
-                WHEN \'warning\' THEN 2
-                WHEN \'info\' THEN 3
-                WHEN \'debug\' THEN 4
-                WHEN \'trace\' THEN 4
-                WHEN \'unknown\' THEN 5
+            return 'CASE
+                WHEN lower(level) LIKE \'%fatal%\' OR lower(level) LIKE \'%parse%\' OR lower(level) LIKE \'%recoverable%\' OR lower(level) LIKE \'%error%\' OR lower(level) IN (\'critical\', \'alert\', \'emergency\') THEN 1
+                WHEN lower(level) LIKE \'%warning%\' THEN 2
+                WHEN lower(level) LIKE \'%notice%\' OR lower(level) LIKE \'%deprecated%\' OR lower(level) LIKE \'%strict%\' OR lower(level) = \'info\' THEN 3
+                WHEN lower(level) IN (\'debug\', \'trace\') THEN 4
+                WHEN lower(level) = \'unknown\' THEN 5
                 ELSE 99
             END ' . $direction . ', seq ' . $direction;
         }
@@ -1040,6 +1034,29 @@ class LogCacheService extends Component
     }
 
     /**
+     * Build a SQLite WHERE predicate matching the shared string-level buckets.
+     */
+    private function _indexedCanonicalLevelWhere(string $level): string
+    {
+        return match ($level) {
+            'error' => "(lower(level) LIKE '%fatal%' OR lower(level) LIKE '%parse%' OR lower(level) LIKE '%recoverable%' OR lower(level) LIKE '%error%' OR lower(level) IN ('critical', 'alert', 'emergency'))",
+            'warning' => "lower(level) LIKE '%warning%'",
+            'info' => "(lower(level) LIKE '%notice%' OR lower(level) LIKE '%deprecated%' OR lower(level) LIKE '%strict%' OR lower(level) = 'info')",
+            'debug' => "lower(level) IN ('debug', 'trace')",
+            'unknown' => 'NOT ' . $this->_indexedKnownLevelWhere(),
+            default => '0 = 1',
+        };
+    }
+
+    /**
+     * SQL predicate for every level recognized by LogLevelHelper.
+     */
+    private function _indexedKnownLevelWhere(): string
+    {
+        return "(lower(level) LIKE '%fatal%' OR lower(level) LIKE '%parse%' OR lower(level) LIKE '%recoverable%' OR lower(level) LIKE '%error%' OR lower(level) IN ('critical', 'alert', 'emergency') OR lower(level) LIKE '%warning%' OR lower(level) LIKE '%notice%' OR lower(level) LIKE '%deprecated%' OR lower(level) LIKE '%strict%' OR lower(level) IN ('info', 'debug', 'trace'))";
+    }
+
+    /**
      * Escape SQLite LIKE wildcard characters while preserving bound parameters.
      */
     private function _escapeLike(string $value): string
@@ -1049,47 +1066,6 @@ class LogCacheService extends Component
             '%' => '\\%',
             '_' => '\\_',
         ]);
-    }
-
-    /**
-     * Canonicalize log levels for row tinting and badge rendering.
-     */
-    private static function _canonicalLevel(string $level): string
-    {
-        if ($level === '') {
-            return '';
-        }
-
-        if (
-            str_contains($level, 'fatal')
-            || str_contains($level, 'parse')
-            || str_contains($level, 'recoverable')
-            || str_contains($level, 'error')
-        ) {
-            return 'error';
-        }
-
-        if (str_contains($level, 'warning')) {
-            return 'warning';
-        }
-
-        if (
-            str_contains($level, 'notice')
-            || str_contains($level, 'deprecated')
-            || str_contains($level, 'strict')
-        ) {
-            return 'info';
-        }
-
-        if ($level === 'trace') {
-            return 'debug';
-        }
-
-        if (in_array($level, ['debug', 'info'], true)) {
-            return $level;
-        }
-
-        return '';
     }
 
     /**
