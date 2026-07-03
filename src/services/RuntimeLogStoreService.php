@@ -86,6 +86,7 @@ class RuntimeLogStoreService extends Component
         if ($ttl !== null) {
             $records = $this->_filterByTtl($records, $ttl);
         }
+        $storedTotal = count($records);
 
         $search = mb_strtolower($search);
 
@@ -137,24 +138,10 @@ class RuntimeLogStoreService extends Component
         return [
             'entries' => UserLabelHelper::withUserLabels($entries),
             'total' => $total,
+            'storedTotal' => $storedTotal,
             'category' => $category,
             'categoryOptions' => $this->_categoryOptions($categoryCounts),
         ];
-    }
-
-    /**
-     * Count records currently retained in the runtime store.
-     *
-     * @since 5.14.0
-     */
-    public function getRecordCount(?int $ttl = null): int
-    {
-        $records = $this->_getRecords();
-        if ($ttl !== null) {
-            $records = $this->_filterByTtl($records, $ttl);
-        }
-
-        return count($records);
     }
 
     /**

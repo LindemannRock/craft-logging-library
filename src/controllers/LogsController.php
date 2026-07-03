@@ -750,7 +750,7 @@ class LogsController extends Controller
             'runtimeCurrentLevel' => $this->_runtimeCurrentLevel($runtimeLevels),
             'runtimeMaxEntries' => max(1, (int)($runtimeConfig['maxEntries'] ?? 1000)),
             'runtimeRefreshInterval' => max(0, (int)($runtimeConfig['refreshInterval'] ?? 5)),
-            'runtimeStoredTotal' => LoggingLibrary::getInstance()->runtimeLogStore->getRecordCount($ttl),
+            'runtimeStoredTotal' => $logPage['storedTotal'],
             'level' => $level,
             'category' => $logPage['category'],
             'search' => $search,
