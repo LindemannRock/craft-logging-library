@@ -348,6 +348,7 @@ class LogsController extends Controller
                 'item' => $entry,
                 'levels' => $this->_logLevelLabels(),
                 'rowIndex' => $index + 1,
+                'colspan' => 5,
             ]);
         }
 
@@ -356,6 +357,7 @@ class LogsController extends Controller
                 'message' => $context['runtimeStoredTotal'] > 0
                     ? Craft::t('logging-library', 'No log entries found for the selected filters.')
                     : Craft::t('logging-library', 'No recent runtime logs found. Runtime logs are short-lived and only appear after matching events are captured.'),
+                'colspan' => 5,
             ]);
         }
 

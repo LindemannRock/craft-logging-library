@@ -292,12 +292,12 @@
        For php-errors and plugin-specific logs the value is uniform across rows. #}
     {% if (isStandalone and supportsCategoryFilter) or isRuntime %}
         {% set sourceLabel = item.category ?: (selectedFile.source ?? 'unknown') %}
-        <td class="truncate" title="{{ sourceLabel }}">{{ sourceLabel }}</td>
+        <td class="truncate" title="{{ sourceLabel|e }}">{{ sourceLabel|e }}</td>
     {% endif %}
 
     {# User #}
     <td class="nowrap">
-        {{ (item.userLabel ?? '') ?: 'System'|t('logging-library') }}
+        {{ ((item.userLabel ?? '') ?: 'System'|t('logging-library'))|e }}
     </td>
 
     {# Message + context inline; click row to see them on separate lines. #}

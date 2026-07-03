@@ -25,10 +25,10 @@
     </td>
 
     {% set sourceLabel = item.category ?: 'unknown' %}
-    <td class="truncate" data-column="category" title="{{ sourceLabel }}">{{ sourceLabel }}</td>
+    <td class="truncate" data-column="category" title="{{ sourceLabel|e }}">{{ sourceLabel|e }}</td>
 
     <td class="nowrap" data-column="user">
-        {{ (item.userLabel ?? item.user) ?: 'System'|t('logging-library') }}
+        {{ ((item.userLabel ?? '') ?: 'System'|t('logging-library'))|e }}
     </td>
 
     {% set previewText = item.message ~ ((item.context and item.context not in ['[]', '']) ? ' ' ~ item.context : '') %}
@@ -38,7 +38,7 @@
 </tr>
 
 <tr class="lr-context-row" data-entry-id="{{ rowIndex }}" style="display: none;">
-    <td colspan="5">
+    <td colspan="{{ colspan }}">
         <div class="lr-context-content">
             <pre class="lr-log-pre">{{ item.message|e }}</pre>
 
