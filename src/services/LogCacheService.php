@@ -742,7 +742,7 @@ class LogCacheService extends Component
             $counts[$category] = ($counts[$category] ?? 0) + 1;
         }
 
-        ksort($counts, SORT_NATURAL | SORT_FLAG_CASE);
+        uksort($counts, static fn(string $a, string $b): int => strcasecmp($a, $b));
         return $counts;
     }
 

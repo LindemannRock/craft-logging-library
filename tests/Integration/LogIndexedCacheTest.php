@@ -83,6 +83,19 @@ final class LogIndexedCacheTest extends TestCase
         LoggingLibrary::getInstance()->logCache->invalidateLogCache($path);
     }
 
+    public function testFallbackCategoryCountsUseIndexedCaseInsensitiveSort(): void
+    {
+        $method = new \ReflectionMethod(LoggingLibrary::getInstance()->logCache, '_countCategories');
+
+        $counts = $method->invoke(LoggingLibrary::getInstance()->logCache, [
+            ['category' => 'job-2'],
+            ['category' => 'job-10'],
+            ['category' => 'Apple'],
+        ]);
+
+        self::assertSame(['Apple', 'job-10', 'job-2'], array_keys($counts));
+    }
+
     public function testIndexedPageUsesTranslatedSystemLabelForLogsWithoutUser(): void
     {
         $path = $this->seedLogFile(
