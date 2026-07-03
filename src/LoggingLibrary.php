@@ -938,7 +938,7 @@ class LoggingLibrary extends Plugin
             return trim($value) !== '';
         }
 
-        return $value !== null;
+        return $value !== null && $value !== false;
     }
 
     /**

@@ -37,6 +37,23 @@ final class EnvironmentDetectionTest extends TestCase
         }
     }
 
+    public function testFalseServdProjectSlugDoesNotCountAsEdgeEnvironment(): void
+    {
+        $previous = $_SERVER['SERVD_PROJECT_SLUG'] ?? null;
+
+        try {
+            $_SERVER['SERVD_PROJECT_SLUG'] = 'false';
+
+            self::assertFalse($this->detectEdgeEnvironment());
+        } finally {
+            if ($previous === null) {
+                unset($_SERVER['SERVD_PROJECT_SLUG']);
+            } else {
+                $_SERVER['SERVD_PROJECT_SLUG'] = $previous;
+            }
+        }
+    }
+
     public function testNonBlankServdProjectSlugCountsAsEdgeEnvironment(): void
     {
         $previous = $_SERVER['SERVD_PROJECT_SLUG'] ?? null;
