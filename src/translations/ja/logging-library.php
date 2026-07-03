@@ -67,6 +67,7 @@ return [
     'Warning' => '警告',
     'Info' => '情報',
     'Debug' => 'デバッグ',
+    'Unknown' => '不明',
 
     // Log sources
     'All Sources' => 'すべてのソース',

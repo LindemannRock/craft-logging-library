@@ -292,7 +292,8 @@
        For php-errors and plugin-specific logs the value is uniform across rows. #}
     {% if (isStandalone and supportsCategoryFilter) or isRuntime %}
         {% set sourceLabel = item.category ?: (selectedFile.source ?? 'unknown') %}
-        <td class="truncate" title="{{ sourceLabel|e }}">{{ sourceLabel|e }}</td>
+        {% set sourceDisplay = sourceLabel == 'unknown' ? 'Unknown'|t('logging-library') : sourceLabel %}
+        <td class="truncate" title="{{ sourceDisplay|e }}">{{ sourceDisplay|e }}</td>
     {% endif %}
 
     {# User #}

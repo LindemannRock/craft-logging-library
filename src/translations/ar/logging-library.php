@@ -67,6 +67,7 @@ return [
     'Warning' => 'تحذير',
     'Info' => 'معلومات',
     'Debug' => 'تصحيح',
+    'Unknown' => 'غير معروف',
 
     // Log sources
     'All Sources' => 'جميع المصادر',

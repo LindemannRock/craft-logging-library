@@ -20,7 +20,8 @@
     </td>
 
     {% set sourceLabel = item.category ?: 'unknown' %}
-    <td class="truncate" data-column="category" title="{{ sourceLabel|e }}">{{ sourceLabel|e }}</td>
+    {% set sourceDisplay = sourceLabel == 'unknown' ? 'Unknown'|t('logging-library') : sourceLabel %}
+    <td class="truncate" data-column="category" title="{{ sourceDisplay|e }}">{{ sourceDisplay|e }}</td>
 
     <td class="nowrap" data-column="user">
         {{ ((item.userLabel ?? '') ?: 'System'|t('logging-library'))|e }}

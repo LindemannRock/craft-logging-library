@@ -67,6 +67,7 @@ return [
     'Warning' => 'Waarschuwing',
     'Info' => 'Info',
     'Debug' => 'Debug',
+    'Unknown' => 'Onbekend',
 
     // Log sources
     'All Sources' => 'Alle bronnen',

@@ -635,6 +635,7 @@ class LogsController extends Controller
                     'queue' => Craft::t('logging-library', 'Queue'),
                     'php-errors' => Craft::t('logging-library', 'PHP Errors'),
                     'other' => Craft::t('logging-library', 'Other'),
+                    'unknown' => Craft::t('logging-library', 'Unknown'),
                     default => ucwords(str_replace('-', ' ', $source)),
                 };
                 $sources[$source] = $displayName;
@@ -804,6 +805,7 @@ class LogsController extends Controller
             'warning' => Craft::t('logging-library', 'Warning'),
             'info' => Craft::t('logging-library', 'Info'),
             'debug' => Craft::t('logging-library', 'Debug'),
+            'unknown' => Craft::t('logging-library', 'Unknown'),
         ];
     }
 
