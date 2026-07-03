@@ -452,11 +452,11 @@
 
             {% if canClearRuntimeLogs ?? false %}
                 <div class="log-config-item" style="grid-template-columns: 1fr; padding: 8px 0;">
-                    <form method="post" accept-charset="UTF-8">
+                    <form method="post" accept-charset="UTF-8" onsubmit="return confirm('{{ 'Clear recent runtime logs? This cannot be undone.'|t('logging-library')|e('js') }}');">
                         {{ csrfInput() }}
                         {{ actionInput('logging-library/logs/clear-runtime') }}
                         {{ redirectInput(craft.app.request.url) }}
-                        <button type="submit" class="btn fullwidth" data-confirm="{{ 'Clear recent runtime logs? This cannot be undone.'|t('logging-library')|e }}">
+                        <button type="submit" class="btn fullwidth">
                             {{ "Clear Runtime Logs"|t('logging-library') }}
                         </button>
                     </form>
