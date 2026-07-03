@@ -60,6 +60,36 @@ final class LogFilesDiscoveryTest extends TestCase
         self::assertStringEndsWith("{$handleA}-2026-05-16.log", $first['path']);
     }
 
+    public function testGetLogFilesCacheKeyChangesWhenHandleFileSetChanges(): void
+    {
+        $handle = self::TEST_HANDLE_PREFIX . 'plugin-cached';
+        $logPath = Craft::$app->getPath()->getLogPath();
+
+        $this->seedLogFile(
+            "{$handle}-2026-05-16.log",
+            "2026-05-16 10:00:00 [user:1][INFO][{$handle}] cached listing\n",
+        );
+
+        $method = new \ReflectionMethod(LoggingLibrary::class, '_logFilesCacheKey');
+        $logFiles = glob($logPath . '/' . $handle . '-*.log') ?: [];
+        $cacheKey = $method->invoke(null, $logPath, $handle, $logFiles);
+
+        Craft::$app->getCache()->delete($cacheKey);
+        LoggingLibrary::getLogFiles($handle);
+
+        self::assertIsArray(Craft::$app->getCache()->get($cacheKey));
+
+        $this->seedLogFile(
+            "{$handle}-2026-05-17.log",
+            "2026-05-17 10:00:00 [user:1][INFO][{$handle}] changed listing\n",
+        );
+
+        $changedLogFiles = glob($logPath . '/' . $handle . '-*.log') ?: [];
+        $changedCacheKey = $method->invoke(null, $logPath, $handle, $changedLogFiles);
+
+        self::assertNotSame($cacheKey, $changedCacheKey);
+    }
+
     public function testGetAllLogFilesSkipsTinyFilesAndClassifiesPluginSource(): void
     {
         $handle = self::TEST_HANDLE_PREFIX . 'gamma';

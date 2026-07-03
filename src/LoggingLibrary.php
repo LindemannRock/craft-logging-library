@@ -700,10 +700,19 @@ class LoggingLibrary extends Plugin
     {
         $logPath = Craft::$app->getPath()->getLogPath();
         $files = [];
+        $cacheKey = null;
 
         if (is_dir($logPath)) {
             $pattern = $logPath . '/' . $handle . '-*.log';
             $logFiles = glob($pattern) ?: [];
+            $cacheKey = self::_logFilesCacheKey($logPath, $handle, $logFiles);
+            try {
+                $cached = Craft::$app->getCache()->get($cacheKey);
+                if (is_array($cached)) {
+                    return $cached;
+                }
+            } catch (\Throwable) {
+            }
 
             foreach ($logFiles as $file) {
                 if (preg_match('/' . preg_quote($handle, '/') . '-(\d{4}-\d{2}-\d{2})\.log$/', basename($file), $matches)) {
@@ -722,7 +731,16 @@ class LoggingLibrary extends Plugin
         // Sort by date descending
         krsort($files);
 
-        return array_values($files);
+        $files = array_values($files);
+
+        if ($cacheKey !== null) {
+            try {
+                Craft::$app->getCache()->set($cacheKey, $files, self::ALL_LOG_FILES_CACHE_TTL);
+            } catch (\Throwable) {
+            }
+        }
+
+        return $files;
     }
 
     /**
@@ -857,6 +875,14 @@ class LoggingLibrary extends Plugin
         sort($filenames, SORT_STRING);
 
         return 'logging-library:all-log-files:' . sha1($logPath . '|' . implode('|', $filenames));
+    }
+
+    private static function _logFilesCacheKey(string $logPath, string $handle, array $logFiles): string
+    {
+        $filenames = array_map('basename', $logFiles);
+        sort($filenames, SORT_STRING);
+
+        return 'logging-library:log-files:' . sha1($logPath . '|' . $handle . '|' . implode('|', $filenames));
     }
 
     private static function _logFileDateSortValue(array $fileInfo): int
