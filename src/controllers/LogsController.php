@@ -315,7 +315,7 @@ class LogsController extends Controller
             'runtimeMaxEntries' => $context['runtimeMaxEntries'],
             'runtimeRefreshInterval' => $context['runtimeRefreshInterval'],
             'runtimeStoredTotal' => $context['runtimeStoredTotal'],
-            'runtimeUsesRedisCache' => Craft::$app->getCache() instanceof \yii\redis\Cache,
+            'runtimeUsesRedisCache' => is_a(Craft::$app->getCache(), 'yii\\redis\\Cache'),
             'canClearRuntimeLogs' => $user->checkPermission(LoggingLibrary::PERMISSION_CLEAR_CACHE),
             'logConfig' => null,
         ]);
