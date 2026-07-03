@@ -1,5 +1,57 @@
 # Changelog
 
+## [5.14.0](https://github.com/LindemannRock/craft-logging-library/compare/v5.13.1...v5.14.0) (2026-07-03)
+
+
+### Added
+
+* add max message and context byte limits to runtime config ([82123bd](https://github.com/LindemannRock/craft-logging-library/commit/82123bd4e41f0a3abb2353754a3d8bfae07acca0))
+* add TTL filtering for runtime log records ([4c576c3](https://github.com/LindemannRock/craft-logging-library/commit/4c576c3993437c65d6ad51bebdddc0f35e551575))
+* cache all log files directory listing with TTL ([435d04c](https://github.com/LindemannRock/craft-logging-library/commit/435d04ce6a89eeb821fd241de9b4c15828f14d0d))
+* enhance log pagination and user label attachment ([73a0980](https://github.com/LindemannRock/craft-logging-library/commit/73a098056c9578a05e410545b76282db9b310c29))
+* **helpers:** add LogLevelHelper for canonicalizing log levels ([0433c8b](https://github.com/LindemannRock/craft-logging-library/commit/0433c8b32e7e16c5a70f18069d3f01d605840ede))
+* **helpers:** add UserLabelHelper to attach user labels to log entries ([6a4a409](https://github.com/LindemannRock/craft-logging-library/commit/6a4a409fcd2c8acf51e3ccf625089c31bd7ea307))
+* **helpers:** sort category options in a case-insensitive manner ([b687224](https://github.com/LindemannRock/craft-logging-library/commit/b687224cecc1e499f3c664083486ba5f7db9fb8a))
+* **i18n:** add 'Plugins' translation key across multiple locales ([1a937be](https://github.com/LindemannRock/craft-logging-library/commit/1a937be3019e436fbbe15374f81c514d06b86501))
+* **i18n:** add 'Request User' translation across multiple locales ([685edbc](https://github.com/LindemannRock/craft-logging-library/commit/685edbc786be45b46d33acedf8e9b9c27d4c78c4))
+* **i18n:** add 'unknown' category and level translations ([8ddbd4a](https://github.com/LindemannRock/craft-logging-library/commit/8ddbd4a2ae577f46be495cbc752bdad8e4b6d88c))
+* **i18n:** add runtime log translations across multiple locales ([e83506e](https://github.com/LindemannRock/craft-logging-library/commit/e83506e95fd75fda3c1262457509d3df1392177d))
+* **logging:** add edge environment detection and logging handle auto-detection tests ([ed15b7d](https://github.com/LindemannRock/craft-logging-library/commit/ed15b7d41e02d2c74ce6065e855d6102abe41c2a))
+* **logging:** enhance runtime log store with error handling and category options ([9d3330b](https://github.com/LindemannRock/craft-logging-library/commit/9d3330b3a16a03e5ba1d6dc9271d1887b48564f8))
+* **logging:** implement caching for log file retrieval ([8489fc3](https://github.com/LindemannRock/craft-logging-library/commit/8489fc3792ab0b0f076331de741c3fe378fae464))
+* **logging:** treat trace level as debug for sorting and stats ([c139077](https://github.com/LindemannRock/craft-logging-library/commit/c1390777fbbb1a519fe3021df14316f914bc98cb))
+* **logs:** add colspan attribute to log entry and empty row templates ([eb2755c](https://github.com/LindemannRock/craft-logging-library/commit/eb2755c95778c20cd968df879ed12234e6178c43))
+* **logs:** add getLogEntryCount method to LogCacheService ([118e8a5](https://github.com/LindemannRock/craft-logging-library/commit/118e8a5c2cc643a1faf9ccfb7e3b0160041ae66f))
+* **logs:** add permission check for clearing runtime logs ([cb197a6](https://github.com/LindemannRock/craft-logging-library/commit/cb197a650e29056d64aa8a642d1859bd5a5aff1e))
+* **logs:** add runtime Redis cache usage detection in logs index ([07db95e](https://github.com/LindemannRock/craft-logging-library/commit/07db95e714815147fdb3a7b6ad68a71248758405))
+* **logs:** add runtime stored total to log entries and update messages ([6b57dff](https://github.com/LindemannRock/craft-logging-library/commit/6b57dff105ad3b638b19795c0073b273ddabc47c))
+* **logs:** add sorting functionality with sequence tiebreaker for log entries ([39d18cb](https://github.com/LindemannRock/craft-logging-library/commit/39d18cb5da95e964cad97aacba01dec1099b551f))
+* **logs:** attach user labels to log entries without per-row queries ([7683c7b](https://github.com/LindemannRock/craft-logging-library/commit/7683c7bf2c29d5dfb15c6aac5274a912c215567f))
+* **logs:** replace hardcoded log levels with dynamic labels from method ([f02cce0](https://github.com/LindemannRock/craft-logging-library/commit/f02cce0e21477aedd33ab0488123de4742029008))
+* **logs:** sort dated log files by filename date before mtime ([ae71ff9](https://github.com/LindemannRock/craft-logging-library/commit/ae71ff90f48d20fc75b472d9977ac53529e259aa))
+* **runtime:** replace getRecordCount with storedTotal in log page ([4e30c69](https://github.com/LindemannRock/craft-logging-library/commit/4e30c69e9db732ee9268c45e42a1872986e9fc5b))
+* sort category counts using case-insensitive comparison ([2072910](https://github.com/LindemannRock/craft-logging-library/commit/20729106e06219dee620f5be0e3630fb35b08361))
+* **tests:** add user label resolution and permission check for clearing runtime logs ([7feaeb1](https://github.com/LindemannRock/craft-logging-library/commit/7feaeb1cba344ee7a1cfc9ce03afed44532138aa))
+* update category options to include formatted labels and counts ([97b7297](https://github.com/LindemannRock/craft-logging-library/commit/97b72972c3349afa7d325dae1250f848c1b4fcfe))
+
+
+### Fixed
+
+* correct copyright year in LoggingService.php ([ce27ead](https://github.com/LindemannRock/craft-logging-library/commit/ce27eadf1595fc3f85f80e4dedf7486802f772ed))
+* escape message and context in runtime log templates ([af930d0](https://github.com/LindemannRock/craft-logging-library/commit/af930d029adddee1b6ab9b3370fbf18b5523724c))
+* handle false value in value check condition ([28d0d49](https://github.com/LindemannRock/craft-logging-library/commit/28d0d4982f751465809855751a9db9e90a931b74))
+* **i18n:** correct Portuguese translations for runtime logs ([dec68e3](https://github.com/LindemannRock/craft-logging-library/commit/dec68e3471ab8e4695f18ffa34970c13b33764f5))
+* increase export interval for runtime log target to improve performance ([352d188](https://github.com/LindemannRock/craft-logging-library/commit/352d1889a6eae63b884b51890237b63f30e1e639))
+* **logging:** add error handling for JSON encoding in log messages ([428e291](https://github.com/LindemannRock/craft-logging-library/commit/428e29144527775fcedaf2c6a1a7547b8f930597))
+* **logging:** correct cache type check for runtime logs ([beaa49f](https://github.com/LindemannRock/craft-logging-library/commit/beaa49f7ce9cd837a0d83b5f9571f466d70d8cc5))
+* **logging:** remove case-insensitive sorting from category counts ([fa41cb1](https://github.com/LindemannRock/craft-logging-library/commit/fa41cb1abba9a0bf92ab5467cb0f88d5847c353f))
+* **logs:** add confirmation dialog for clearing recent runtime logs ([2f28e98](https://github.com/LindemannRock/craft-logging-library/commit/2f28e9872392041dc6442a38092c1429ec5059cb))
+* **logs:** correct user field for log entries without user information ([01b0dc9](https://github.com/LindemannRock/craft-logging-library/commit/01b0dc9f7c6dfda664a5063675435f719865f80c))
+* **logs:** correct user label display for log entries ([f8f2efe](https://github.com/LindemannRock/craft-logging-library/commit/f8f2efefe97d7487efa1e496f5075cf4b65de45e))
+* sort category options case insensitively in runtime log store ([01cfea4](https://github.com/LindemannRock/craft-logging-library/commit/01cfea4871bbaaed719e2866a23bb26a98584b7d))
+* update copyright year in LoggingLibrary.php ([d42e1f7](https://github.com/LindemannRock/craft-logging-library/commit/d42e1f7b56afd8be51033b7ed210403f0c43e1f9))
+* update copyright year in LoggingTrait.php ([320779f](https://github.com/LindemannRock/craft-logging-library/commit/320779f04e55b6b17d70070eee2b0d28b57ce57f))
+
 ## [5.13.1](https://github.com/LindemannRock/craft-logging-library/compare/v5.13.0...v5.13.1) - 2026-06-28
 
 
