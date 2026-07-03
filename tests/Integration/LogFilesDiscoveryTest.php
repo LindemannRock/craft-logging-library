@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace lindemannrock\logginglibrary\tests\Integration;
 
+use Craft;
 use lindemannrock\logginglibrary\LoggingLibrary;
 use lindemannrock\logginglibrary\tests\TestCase;
 
@@ -114,6 +115,55 @@ final class LogFilesDiscoveryTest extends TestCase
             array_column($files, 'filename'),
             'Standalone file picker options must follow filename date before mtime.',
         );
+    }
+
+    public function testGetAllLogFilesClassifiesDatedCraftSystemLogsBeforePluginLogs(): void
+    {
+        $webPath = $this->seedLogFile(
+            'web-2099-01-01.log',
+            "2099-01-01 10:00:00 [web.INFO] [application] Future web log\n",
+        );
+
+        $all = LoggingLibrary::getAllLogFiles();
+
+        $byPath = [];
+        foreach ($all as $entry) {
+            $byPath[$entry['path']] = $entry;
+        }
+
+        self::assertArrayHasKey($webPath, $byPath, 'Dated web logs must be included');
+        self::assertSame('craft', $byPath[$webPath]['type']);
+        self::assertSame('web', $byPath[$webPath]['source']);
+        self::assertSame('web', $byPath[$webPath]['category']);
+        self::assertSame('2099-01-01', $byPath[$webPath]['date']);
+    }
+
+    public function testGetAllLogFilesCachesDirectoryListingForCurrentDirectoryState(): void
+    {
+        $this->seedLogFile(
+            self::TEST_HANDLE_PREFIX . 'cached-2026-05-16.log',
+            "2026-05-16 10:00:00 [user:1][INFO][cached] cacheable listing\n",
+        );
+
+        $logPath = Craft::$app->getPath()->getLogPath();
+        $method = new \ReflectionMethod(LoggingLibrary::class, '_allLogFilesCacheKey');
+        $logFiles = glob($logPath . '/*.log*') ?: [];
+        $cacheKey = $method->invoke(null, $logPath, $logFiles);
+
+        Craft::$app->getCache()->delete($cacheKey);
+        LoggingLibrary::getAllLogFiles();
+
+        self::assertIsArray(Craft::$app->getCache()->get($cacheKey));
+
+        $this->seedLogFile(
+            self::TEST_HANDLE_PREFIX . 'cached-extra-2026-05-17.log',
+            "2026-05-17 10:00:00 [user:1][INFO][cached] changed listing\n",
+        );
+
+        $changedLogFiles = glob($logPath . '/*.log*') ?: [];
+        $changedCacheKey = $method->invoke(null, $logPath, $changedLogFiles);
+
+        self::assertNotSame($cacheKey, $changedCacheKey);
     }
 
     public function testGetAllLogFilesClassifiesUndatedSourceLog(): void

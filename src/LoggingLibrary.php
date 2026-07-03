@@ -48,6 +48,7 @@ class LoggingLibrary extends Plugin
     public const PERMISSION_DOWNLOAD_ALL_LOGS = 'loggingLibrary:downloadAllLogs';
     public const PERMISSION_CLEAR_CACHE = 'loggingLibrary:clearCache';
     public const PERMISSION_MANAGE_SETTINGS = 'loggingLibrary:manageSettings';
+    private const ALL_LOG_FILES_CACHE_TTL = 5;
 
     /**
      * @var string Plugin schema version for migrations
@@ -743,6 +744,14 @@ class LoggingLibrary extends Plugin
         }
 
         $allLogFiles = glob($logPath . '/*.log*') ?: [];
+        $cacheKey = self::_allLogFilesCacheKey($logPath, $allLogFiles);
+        try {
+            $cached = Craft::$app->getCache()->get($cacheKey);
+            if (is_array($cached)) {
+                return $cached;
+            }
+        } catch (\Throwable) {
+        }
 
         foreach ($allLogFiles as $file) {
             $basename = basename($file);
@@ -762,17 +771,8 @@ class LoggingLibrary extends Plugin
                 'path' => $file,
             ];
 
-            // Plugin logs: {plugin-handle}-{YYYY-MM-DD}.log
-            if (preg_match('/^([a-z0-9\-]+)-(\d{4}-\d{2}-\d{2})\.log$/', $basename, $matches)) {
-                $pluginHandle = $matches[1];
-                $date = $matches[2];
-                $fileInfo['source'] = $pluginHandle;
-                $fileInfo['type'] = 'plugin';
-                $fileInfo['date'] = $date;
-                $fileInfo['category'] = $pluginHandle;
-            }
             // Craft web logs: web-{YYYY-MM-DD}.log or web.log
-            elseif (preg_match('/^web(-(\d{4}-\d{2}-\d{2}))?\.log(\.\d+)?$/', $basename, $matches)) {
+            if (preg_match('/^web(-(\d{4}-\d{2}-\d{2}))?\.log(\.\d+)?$/', $basename, $matches)) {
                 $date = $matches[2] ?? null;
                 $rotation = $matches[3] ?? null;
                 $fileInfo['source'] = 'web';
@@ -798,6 +798,15 @@ class LoggingLibrary extends Plugin
                 $fileInfo['type'] = 'craft';
                 $fileInfo['date'] = $date ?: 'current';
                 $fileInfo['category'] = 'queue';
+            }
+            // Plugin logs: {plugin-handle}-{YYYY-MM-DD}.log
+            elseif (preg_match('/^([a-z0-9\-]+)-(\d{4}-\d{2}-\d{2})\.log$/', $basename, $matches)) {
+                $pluginHandle = $matches[1];
+                $date = $matches[2];
+                $fileInfo['source'] = $pluginHandle;
+                $fileInfo['type'] = 'plugin';
+                $fileInfo['date'] = $date;
+                $fileInfo['category'] = $pluginHandle;
             }
             // PHP errors: phperrors.log
             elseif ($basename === 'phperrors.log') {
@@ -837,7 +846,20 @@ class LoggingLibrary extends Plugin
             return $b['lastModified'] <=> $a['lastModified'];
         });
 
+        try {
+            Craft::$app->getCache()->set($cacheKey, $files, self::ALL_LOG_FILES_CACHE_TTL);
+        } catch (\Throwable) {
+        }
+
         return $files;
+    }
+
+    private static function _allLogFilesCacheKey(string $logPath, array $allLogFiles): string
+    {
+        $filenames = array_map('basename', $allLogFiles);
+        sort($filenames, SORT_STRING);
+
+        return 'logging-library:all-log-files:' . sha1($logPath . '|' . implode('|', $filenames));
     }
 
     private static function _logFileDateSortValue(array $fileInfo): int
