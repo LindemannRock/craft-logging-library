@@ -32,7 +32,7 @@
     </td>
 
     {% set previewText = item.message ~ ((item.context and item.context not in ['[]', '']) ? ' ' ~ item.context : '') %}
-    <td class="truncate" data-column="message" title="{{ previewText }}">
+    <td class="truncate" data-column="message" title="{{ previewText|e }}">
         {{ previewText|e }}
     </td>
 </tr>

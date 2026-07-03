@@ -73,6 +73,7 @@ class RuntimeLogStoreTest extends TestCase
         $page = $this->store->getLogPage('warning', 'runtime-alpha', 'needle', 'timestamp', 'desc', 1, 10);
 
         self::assertSame(1, $page['total']);
+        self::assertSame(2, $page['storedTotal']);
         self::assertSame('Needle warning message', $page['entries'][0]['message']);
         self::assertSame('runtime-alpha', $page['category']);
         self::assertSame(['all', 'runtime-alpha'], array_column($page['categoryOptions'], 'value'));
@@ -120,6 +121,7 @@ class RuntimeLogStoreTest extends TestCase
         $page = $this->store->getLogPage('all', 'all', '', 'timestamp', 'desc', 1, 10, 60);
 
         self::assertSame(1, $page['total']);
+        self::assertSame(1, $page['storedTotal']);
         self::assertSame('Recent runtime event', $page['entries'][0]['message']);
         self::assertSame(['all', 'runtime-alpha'], array_column($page['categoryOptions'], 'value'));
     }

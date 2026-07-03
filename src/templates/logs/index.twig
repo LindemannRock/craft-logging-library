@@ -302,7 +302,7 @@
 
     {# Message + context inline; click row to see them on separate lines. #}
     {% set previewText = item.message ~ ((item.context and item.context not in ['[]', '']) ? ' ' ~ item.context : '') %}
-    <td class="truncate" title="{{ previewText }}">
+    <td class="truncate" title="{{ previewText|e }}">
         {{ previewText|e }}
     </td>
 {% endblock %}
