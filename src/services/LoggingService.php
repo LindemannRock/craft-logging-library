@@ -90,6 +90,7 @@ class LoggingService extends Component
                 'warning' => 0,
                 'info' => 0,
                 'debug' => 0,
+                'unknown' => 0,
             ],
         ];
 
@@ -232,6 +233,7 @@ class LoggingService extends Component
             'warning' => 0,
             'info' => 0,
             'debug' => 0,
+            'unknown' => 0,
         ];
 
         if (!file_exists($filePath)) {

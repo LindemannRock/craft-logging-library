@@ -48,6 +48,19 @@ final class LogIndexedCacheTest extends TestCase
         LoggingLibrary::getInstance()->logCache->invalidateLogCache($path);
     }
 
+    public function testIndexedEntryCountDoesNotMaterializeArrayQuery(): void
+    {
+        $path = $this->seedLogFile(
+            self::TEST_HANDLE_PREFIX . 'indexed-count-2026-05-25.log',
+            "2026-05-25 10:00:00 [user:1][INFO][indexed] first\n" .
+            "2026-05-25 10:00:01 [user:1][ERROR][indexed] second\n",
+        );
+
+        self::assertSame(2, LoggingLibrary::getInstance()->logCache->getLogEntryCount($path));
+
+        LoggingLibrary::getInstance()->logCache->invalidateLogCache($path);
+    }
+
     public function testIndexedPageFiltersByLevelSearchAndCategory(): void
     {
         $path = $this->seedLogFile(

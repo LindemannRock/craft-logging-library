@@ -542,7 +542,7 @@ class LogsController extends Controller
         }
 
         LoggingLibrary::getInstance()->logCache->invalidateLogCache($logPath);
-        $entryCount = LoggingLibrary::getInstance()->logCache->getLogs($logPath)->count();
+        $entryCount = LoggingLibrary::getInstance()->logCache->getLogEntryCount($logPath);
 
         if ($request->getAcceptsJson()) {
             return $this->asJson([

@@ -12,6 +12,7 @@ namespace lindemannrock\logginglibrary\tests\Integration;
 
 use lindemannrock\logginglibrary\LoggingLibrary;
 use lindemannrock\logginglibrary\services\LogCacheService;
+use lindemannrock\logginglibrary\services\LoggingService;
 use lindemannrock\logginglibrary\tests\TestCase;
 
 /**
@@ -183,6 +184,19 @@ final class LogParsingTest extends TestCase
         self::assertSame('unknown', $logs[0]['level']);
         self::assertSame(self::TEST_HANDLE_PREFIX . 'fallback', $logs[0]['category']);
         self::assertSame('plain message without bracketed metadata', $logs[0]['message']);
+    }
+
+    public function testLogStatsCountsUnknownLevels(): void
+    {
+        $handle = self::TEST_HANDLE_PREFIX . 'stats';
+        $this->seedLogFile(
+            "{$handle}-2026-05-17.log",
+            "2026-05-17 10:00:00 plain message without bracketed metadata\n",
+        );
+
+        $stats = LoggingService::getLogStats($handle);
+
+        self::assertSame(1, $stats['levels']['unknown']);
     }
 
     public function testBracketLevelPluginLogParsesLevelAndContext(): void

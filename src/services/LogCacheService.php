@@ -28,7 +28,7 @@ use yii2mod\query\ArrayQuery;
  */
 class LogCacheService extends Component
 {
-    private const PARSER_CACHE_VERSION = '2026-06-23-undated-monolog-source-logs';
+    private const PARSER_CACHE_VERSION = '2026-07-03-system-user-fallback';
     private const INDEX_SCHEMA_VERSION = 1;
 
     /**
@@ -241,6 +241,32 @@ class LogCacheService extends Component
 
         if (file_exists($indexFile)) {
             @unlink($indexFile);
+        }
+    }
+
+    /**
+     * Count entries for a log file without materializing the full parsed row set when possible.
+     *
+     * @since 5.14.0
+     */
+    public function getLogEntryCount(string $logFile): int
+    {
+        if (!file_exists($logFile)) {
+            return 0;
+        }
+
+        if (!self::supportsIndexedCache()) {
+            return $this->getLogs($logFile)->count();
+        }
+
+        try {
+            $pdo = $this->_getIndexConnection($logFile);
+
+            return $this->_getIndexedCount($pdo, '', []);
+        } catch (\Throwable $e) {
+            Craft::warning('Falling back to legacy log count because indexed cache failed: ' . $e->getMessage(), 'logging-library');
+
+            return $this->getLogs($logFile)->count();
         }
     }
 
@@ -765,7 +791,12 @@ class LogCacheService extends Component
                 return;
             }
 
-            if (!@rename($tmpFile, $indexFile) && !file_exists($indexFile)) {
+            if (!@rename($tmpFile, $indexFile)) {
+                if (file_exists($indexFile)) {
+                    @unlink($tmpFile);
+                    return;
+                }
+
                 throw new \RuntimeException('Unable to move indexed log cache into place.');
             }
         } catch (\Throwable $e) {
