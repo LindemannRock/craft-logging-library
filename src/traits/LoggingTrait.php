@@ -5,7 +5,7 @@
  * Reusable logging trait for consistent logging across plugins
  *
  * @link      https://lindemannrock.com
- * @copyright Copyright (c) 2025 LindemannRock
+ * @copyright Copyright (c) 2025-2026 LindemannRock
  */
 
 namespace lindemannrock\logginglibrary\traits;
