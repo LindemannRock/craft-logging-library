@@ -18,9 +18,10 @@
         } only %}
     </td>
 
-    {% set sourceLabel = item.category ?: 'unknown' %}
+    {% set sourceLabel = ((item.categoryLabel ?? '') ?: (item.category ?: 'unknown')) %}
+    {% set sourceTitle = item.category is defined and item.category != sourceLabel ? item.category : sourceLabel %}
     {% set sourceDisplay = sourceLabel == 'unknown' ? 'Unknown'|t('logging-library') : sourceLabel %}
-    <td class="truncate" data-column="category" title="{{ sourceDisplay|e }}">{{ sourceDisplay|e }}</td>
+    <td class="truncate" data-column="category" title="{{ sourceTitle|e }}">{{ sourceDisplay|e }}</td>
 
     <td class="nowrap" data-column="user">
         {{ ((item.userLabel ?? '') ?: 'System'|t('logging-library'))|e }}
