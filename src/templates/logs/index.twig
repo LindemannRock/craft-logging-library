@@ -323,26 +323,6 @@
 {% block scripts %}
     {% if isRuntime %}
         <script>
-        function toggleRuntimeLogRow(row, event) {
-            if (!row || row.dataset.runtimeRefreshRow !== 'true') {
-                return;
-            }
-
-            if (event.target.closest('.checkbox') || event.target.tagName === 'A' || event.target.tagName === 'BUTTON' || event.target.closest('button')) {
-                return;
-            }
-
-            const entryId = row.dataset.entryId;
-            const contextRow = document.querySelector('.lr-context-row[data-entry-id="' + entryId + '"]');
-            if (!contextRow) {
-                return;
-            }
-
-            const isVisible = contextRow.style.display !== 'none';
-            contextRow.style.display = isVisible ? 'none' : 'table-row';
-            row.classList.toggle('lr-row-expanded', !isVisible);
-        }
-
         document.addEventListener('lr:refresh', function(e) {
             const data = e.detail || {};
             const tbody = document.getElementById('lr-table-body');
@@ -359,15 +339,6 @@
                 }
             }
             window.lrViewSettings?.apply?.();
-        });
-
-        document.getElementById('lr-table-body')?.addEventListener('click', function(event) {
-            const row = event.target.closest('.lr-clickable-row');
-            if (!row || !this.contains(row)) {
-                return;
-            }
-
-            toggleRuntimeLogRow(row, event);
         });
         </script>
     {% endif %}
