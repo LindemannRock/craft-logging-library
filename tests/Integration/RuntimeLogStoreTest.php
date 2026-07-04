@@ -109,6 +109,103 @@ class RuntimeLogStoreTest extends TestCase
         self::assertSame(['all', 'Apple', 'job-10', 'job-2'], array_column($page['categoryOptions'], 'value'));
     }
 
+    public function testRuntimeCategoryOptionsGroupPluginHandlesAndClassCategories(): void
+    {
+        $this->store->appendMessages([
+            ['Explicit handle event', Logger::LEVEL_INFO, 'logging-library', strtotime('2026-07-02 10:00:00'), [], 100],
+            ['Plugin class event', Logger::LEVEL_INFO, 'lindemannrock\logginglibrary\LoggingLibrary::init', strtotime('2026-07-02 10:01:00'), [], 100],
+            ['System event', Logger::LEVEL_INFO, 'yii\db\Command::query', strtotime('2026-07-02 10:02:00'), [], 100],
+        ], $this->settings());
+
+        $page = $this->store->getLogPage('all', 'plugin:logging-library', '', 'timestamp', 'desc', 1, 10);
+
+        self::assertSame('plugin:logging-library', $page['category']);
+        self::assertSame('Logging Library', $page['categoryLabel']);
+        self::assertSame(2, $page['total']);
+        self::assertSame([
+            'lindemannrock\logginglibrary\LoggingLibrary::init',
+            'logging-library',
+        ], array_column($page['entries'], 'category'));
+        self::assertSame(['Logging Library', 'Logging Library'], array_column($page['entries'], 'categoryLabel'));
+
+        $optionValues = array_column($page['categoryOptions'], 'value');
+        self::assertContains('plugin:logging-library', $optionValues);
+        self::assertContains('system:db-command:query', $optionValues);
+
+        $pluginIndex = array_search('plugin:logging-library', $optionValues, true);
+        self::assertSame('Logging Library', $page['categoryOptions'][$pluginIndex]['label']);
+        self::assertSame('(2)', $page['categoryOptions'][$pluginIndex]['extra']);
+
+        $systemIndex = array_search('system:db-command:query', $optionValues, true);
+        self::assertSame('DB Queries', $page['categoryOptions'][$systemIndex]['label']);
+
+        $legacyPage = $this->store->getLogPage('all', 'logging-library', '', 'timestamp', 'desc', 1, 10);
+
+        self::assertSame('plugin:logging-library', $legacyPage['category']);
+        self::assertSame(2, $legacyPage['total']);
+    }
+
+    public function testRuntimeCategoryOptionsGroupCommonSystemCategories(): void
+    {
+        $this->store->appendMessages([
+            ['DB query event', Logger::LEVEL_INFO, 'yii\db\Command::query', strtotime('2026-07-02 10:00:00'), [], 100],
+            ['DB execute event', Logger::LEVEL_INFO, 'yii\db\Command::execute', strtotime('2026-07-02 10:01:00'), [], 100],
+            ['DB connection event', Logger::LEVEL_INFO, 'yii\db\Connection::open', strtotime('2026-07-02 10:02:00'), [], 100],
+            ['Redis connection event', Logger::LEVEL_INFO, 'yii\redis\Connection::open', strtotime('2026-07-02 10:03:00'), [], 100],
+            ['Redis command event', Logger::LEVEL_INFO, 'yii\redis\Connection::executeCommand', strtotime('2026-07-02 10:04:00'), [], 100],
+            ['URL route event', Logger::LEVEL_INFO, 'craft\web\UrlManager::_getMatchedUrlRoute', strtotime('2026-07-02 10:05:00'), [], 100],
+            ['URL rule event', Logger::LEVEL_INFO, 'yii\web\UrlRule::parseRequest', strtotime('2026-07-02 10:06:00'), [], 100],
+            ['Request event', Logger::LEVEL_INFO, 'craft\web\Application::_processActionRequest', strtotime('2026-07-02 10:07:00'), [], 100],
+            ['Controller event', Logger::LEVEL_INFO, 'yii\base\Controller::runAction', strtotime('2026-07-02 10:08:00'), [], 100],
+            ['Queue event', Logger::LEVEL_INFO, 'craft\queue\QueueLogBehavior::beforeExec', strtotime('2026-07-02 10:09:00'), [], 100],
+            ['Session event', Logger::LEVEL_INFO, 'yii\web\Session::open', strtotime('2026-07-02 10:10:00'), [], 100],
+            ['View event', Logger::LEVEL_INFO, 'craft\web\View::renderTemplate', strtotime('2026-07-02 10:11:00'), [], 100],
+            ['Module event', Logger::LEVEL_INFO, 'yii\base\Module::getModule', strtotime('2026-07-02 10:12:00'), [], 100],
+            ['Vite helper event', Logger::LEVEL_INFO, 'nystudio107\pluginvite\helpers\FileHelper::fetchResponse', strtotime('2026-07-02 10:13:00'), [], 100],
+            ['Code editor event', Logger::LEVEL_INFO, 'nystudio107\codeeditor\CodeEditor::bootstrap', strtotime('2026-07-02 10:14:00'), [], 100],
+        ], $this->settings());
+
+        $page = $this->store->getLogPage('all', 'all', '', 'timestamp', 'desc', 1, 20);
+        $optionsByValue = array_column($page['categoryOptions'], null, 'value');
+
+        self::assertSame('DB Queries', $optionsByValue['system:db-command:query']['label']);
+        self::assertSame('DB Commands', $optionsByValue['system:db-command:execute']['label']);
+        self::assertSame('DB Connection', $optionsByValue['system:db-connection:open']['label']);
+        self::assertSame('Redis Connection', $optionsByValue['system:redis-connection:open']['label']);
+        self::assertSame('Redis Commands', $optionsByValue['system:redis-connection:executeCommand']['label']);
+        self::assertSame('URL Routing', $optionsByValue['system:url-routing']['label']);
+        self::assertSame('(2)', $optionsByValue['system:url-routing']['extra']);
+        self::assertSame('Web Request', $optionsByValue['system:web-request']['label']);
+        self::assertSame('(2)', $optionsByValue['system:web-request']['extra']);
+        self::assertSame('Queue', $optionsByValue['system:queue']['label']);
+        self::assertSame('Session', $optionsByValue['system:session']['label']);
+        self::assertSame('Template Rendering', $optionsByValue['system:view-rendering']['label']);
+        self::assertSame('Modules', $optionsByValue['system:modules']['label']);
+        self::assertSame('Vite', $optionsByValue['plugin:vite']['label']);
+        self::assertSame('Code Editor', $optionsByValue['package:codeeditor']['label']);
+
+        $filteredPage = $this->store->getLogPage('all', 'system:url-routing', '', 'timestamp', 'desc', 1, 20);
+
+        self::assertSame('system:url-routing', $filteredPage['category']);
+        self::assertSame('URL Routing', $filteredPage['categoryLabel']);
+        self::assertSame(2, $filteredPage['total']);
+        self::assertSame(['URL Routing', 'URL Routing'], array_column($filteredPage['entries'], 'categoryLabel'));
+    }
+
+    public function testStandaloneSourceLabelsUsePluginDisplayNames(): void
+    {
+        $controller = Craft::createObject(LogsController::class, ['logs', Craft::$app]);
+        $method = new \ReflectionMethod(LogsController::class, '_extractSources');
+
+        $sources = $method->invoke($controller, [
+            ['source' => 'web'],
+            ['source' => 'logging-library'],
+        ]);
+
+        self::assertSame('Web', $sources['web']);
+        self::assertSame('Logging Library', $sources['logging-library']);
+    }
+
     public function testRuntimePageFiltersRecordsOlderThanTtl(): void
     {
         $now = time();

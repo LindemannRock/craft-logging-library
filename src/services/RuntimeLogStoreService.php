@@ -13,7 +13,7 @@ namespace lindemannrock\logginglibrary\services;
 use Craft;
 use craft\base\Component;
 use craft\helpers\Json;
-use lindemannrock\logginglibrary\helpers\CategoryOptionsHelper;
+use lindemannrock\logginglibrary\helpers\RuntimeCategoryOptionsHelper;
 use lindemannrock\logginglibrary\helpers\UserLabelHelper;
 use yii\helpers\VarDumper;
 use yii\log\Logger;
@@ -81,7 +81,7 @@ class RuntimeLogStoreService extends Component
     /**
      * Return a filtered, sorted, paginated page of runtime records.
      *
-     * @return array{entries: array, total: int, storedTotal: int, category: string, categoryOptions: array}
+     * @return array{entries: array, total: int, storedTotal: int, category: string, categoryLabel: string, categoryOptions: array}
      */
     public function getLogPage(string $level, string $category, string $search, string $sort, string $dir, int $page, int $limit, ?int $ttl = null): array
     {
@@ -121,13 +121,17 @@ class RuntimeLogStoreService extends Component
             }
         }
 
-        if ($category !== 'all' && !isset($categoryCounts[$category])) {
+        $groupedCategoryOptions = RuntimeCategoryOptionsHelper::groupedOptions($categoryCounts);
+        $category = RuntimeCategoryOptionsHelper::resolveSelectedValue($category, $groupedCategoryOptions);
+
+        if ($category !== 'all' && !isset($groupedCategoryOptions['rawCategoriesByValue'][$category])) {
             $category = 'all';
         }
 
         if ($category !== 'all') {
-            $records = array_values(array_filter($records, function(array $record) use ($category): bool {
-                return ($record['category'] ?? '') === $category;
+            $selectedRawCategories = $groupedCategoryOptions['rawCategoriesByValue'][$category] ?? [];
+            $records = array_values(array_filter($records, function(array $record) use ($selectedRawCategories): bool {
+                return in_array((string)($record['category'] ?? ''), $selectedRawCategories, true);
             }));
         }
 
@@ -139,11 +143,12 @@ class RuntimeLogStoreService extends Component
         $entries = array_slice($records, $offset, $limit);
 
         return [
-            'entries' => UserLabelHelper::withUserLabels($entries),
+            'entries' => UserLabelHelper::withUserLabels(RuntimeCategoryOptionsHelper::withRecordLabels($entries, $groupedCategoryOptions)),
             'total' => $total,
             'storedTotal' => $storedTotal,
             'category' => $category,
-            'categoryOptions' => CategoryOptionsHelper::options($categoryCounts),
+            'categoryLabel' => $groupedCategoryOptions['labelsByValue'][$category] ?? Craft::t('logging-library', 'Source'),
+            'categoryOptions' => $groupedCategoryOptions['options'],
         ];
     }
 
