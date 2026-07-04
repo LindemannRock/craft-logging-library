@@ -13,6 +13,7 @@ namespace lindemannrock\logginglibrary\controllers;
 use Craft;
 use craft\web\Controller;
 use lindemannrock\base\helpers\CpNavHelper;
+use lindemannrock\base\helpers\PluginHelper;
 use lindemannrock\logginglibrary\LoggingLibrary;
 use lindemannrock\logginglibrary\models\Settings;
 use yii\web\ForbiddenHttpException;
@@ -292,6 +293,7 @@ class LogsController extends Controller
             'sources' => [],
             'sourceGroups' => [],
             'categoryOptions' => $logPage['categoryOptions'],
+            'categoryLabel' => $logPage['categoryLabel'],
             'logEntries' => $logPage['entries'],
             'canDownload' => false,
             'filters' => [
@@ -639,7 +641,7 @@ class LogsController extends Controller
                     'php-errors' => Craft::t('logging-library', 'PHP Errors'),
                     'other' => Craft::t('logging-library', 'Other'),
                     'unknown' => Craft::t('logging-library', 'Unknown'),
-                    default => ucwords(str_replace('-', ' ', $source)),
+                    default => PluginHelper::getPluginName($source, ucwords(str_replace('-', ' ', $source))),
                 };
                 $sources[$source] = $displayName;
             }
@@ -757,6 +759,7 @@ class LogsController extends Controller
             'runtimeStoredTotal' => $logPage['storedTotal'],
             'level' => $level,
             'category' => $logPage['category'],
+            'categoryLabel' => $logPage['categoryLabel'],
             'search' => $search,
             'sort' => $sort,
             'dir' => $dir,
