@@ -1,5 +1,19 @@
 # Changelog
 
+## [5.15.0](https://github.com/LindemannRock/craft-logging-library/compare/v5.14.0...v5.15.0) - 2026-07-05
+
+
+### Added
+
+* **controllers:** add categoryLabel to log page data and improve source display names ([0523380](https://github.com/LindemannRock/craft-logging-library/commit/0523380bdc4fb657ac64b3e64e2348636bc3f1a2))
+* **logging:** enhance runtime log category handling and labels ([122a89b](https://github.com/LindemannRock/craft-logging-library/commit/122a89bf5e02d56fb88d75647c3d3c0a9ba2634b))
+* **logs:** improve category label handling in runtime log rows ([ae6100a](https://github.com/LindemannRock/craft-logging-library/commit/ae6100a7f385f0766c15c0844d1c47c72b1231e2))
+
+
+### Fixed
+
+* **logs:** use row toggle function from base ([77dc6e1](https://github.com/LindemannRock/craft-logging-library/commit/77dc6e15a4bf988711550ac7e8fc7e69f1826c42))
+
 ## [5.14.0](https://github.com/LindemannRock/craft-logging-library/compare/v5.13.1...v5.14.0) - 2026-07-03
 
 
