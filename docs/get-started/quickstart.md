@@ -2,11 +2,11 @@
 
 Get Logging Library running in under 5 minutes. By the end of this guide you'll have dedicated log files and a built-in log viewer for your plugin.
 
-## 1. Install the Plugin
+## Before you start
 
-> See [Installation](installation.md) for full details including DDEV options.
+Install [Logging Library](installation.md) first.
 
-## 2. Add the Trait and Configure Logging
+## 1. Add the trait and configure logging
 
 In your plugin's main class, add `LoggingTrait` and call `LoggingLibrary::configure()`:
 
@@ -33,7 +33,7 @@ class YourPlugin extends Plugin
 }
 ```
 
-## 3. Log Your First Message
+## 2. Log your first message
 
 In any service or controller that uses the trait:
 
@@ -41,7 +41,7 @@ In any service or controller that uses the trait:
 $this->logInfo('Export completed', ['count' => 42]);
 ```
 
-## 4. Verify It Works
+## 3. Verify it works
 
 Navigate to **Logging Library → All Logs** in the Control Panel. If the Logging Library CP section has been hidden in plugin settings, open the standalone viewer directly at `/admin/logging-library/logs/system` instead. Select today's log file for your plugin — you should see the log entry you just created.
 
@@ -49,7 +49,7 @@ Navigate to **Logging Library → All Logs** in the Control Panel. If the Loggin
 
 The file-based viewer is enabled by default on normal file-backed environments. On detected edge/ephemeral platforms such as Servd, it is hidden unless you explicitly [force-enable it](../feature-tour/settings.md). Force-enabling only retries local file reading; it does not connect the viewer to Servd's hosted log feed.
 
-## What's Next
+## What's next
 
 - [Configuration Options](../feature-tour/configuration-options.md) — all available `configure()` parameters
 - [Feature Tour](../feature-tour/overview.md) — explore everything Logging Library can do
