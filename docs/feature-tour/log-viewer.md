@@ -2,7 +2,7 @@
 
 The built-in log viewer provides a web interface for browsing, filtering, searching, and downloading log files — directly within each plugin's Control Panel section.
 
-![Built-in log viewer inside a plugin's CP section, showing the level filter, search box, and a sortable table of log entries](images/log-viewer-cp.webp)
+![Built-in log viewer inside a plugin's CP section, showing the level filter, search box, and a sortable table of log entries](../images/log-viewer-cp.webp)
 
 ## How It Works
 

@@ -2,7 +2,7 @@
 
 Logging Library has its own settings area in the Control Panel for the things that aren't tied to a single plugin's integration — the display name, whether the consolidated viewer appears in the main menu, how many entries the standalone viewer shows per page, and how timestamps are formatted. Per-plugin logging behaviour (log level, retention, per-plugin permissions) is still configured in code with [`LoggingLibrary::configure()`](configuration-options.md); this page covers the library's *own* settings.
 
-![Logging Library General settings page showing the Plugin Name field and the Show Main Menu toggle](images/settings-general.webp)
+![Logging Library General settings page showing the Plugin Name field and the Show Main Menu toggle](../images/settings-general.webp)
 
 ## Where to find it
 

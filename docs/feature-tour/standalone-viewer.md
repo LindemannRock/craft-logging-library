@@ -2,7 +2,7 @@
 
 The standalone viewer provides a centralized interface for browsing all log files in `storage/logs/` — plugin logs, Craft logs, and PHP error logs — from a single page.
 
-![Standalone All Logs viewer showing the source sidebar and a paginated, filterable table of log entries](images/standalone-viewer-all-logs.webp)
+![Standalone All Logs viewer showing the source sidebar and a paginated, filterable table of log entries](../images/standalone-viewer-all-logs.webp)
 
 ## Accessing the Viewer
 
