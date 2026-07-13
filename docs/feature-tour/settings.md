@@ -29,11 +29,11 @@ The Interface tab only appears when a viewer is available (see the note above).
 
 | Setting | What it does | Default |
 |---------|--------------|---------|
-| **Items Per Page** | How many entries the standalone **All Logs** viewer shows per page (10–500). | 100 |
+| **Items Per Page** | How many entries the standalone **All Logs** and **Runtime Logs** viewers show per page (10–500). | 100 |
 | **Time Format** | 12-hour (AM/PM) or 24-hour clock for log timestamps. | Inherits base |
 | **Show Seconds** | Whether timestamps include seconds. | Inherits base |
 
-**Items Per Page** applies to the standalone viewer only. Each plugin's own viewer uses the `itemsPerPage` it passes to `configure()` (default 50) — see [Configuration Options](configuration-options.md).
+**Items Per Page** applies to Logging Library's own views — the standalone **All Logs** viewer and [Runtime Logs](runtime-logs.md). Each plugin's own viewer uses the `itemsPerPage` it passes to `configure()` (default 50) — see [Configuration Options](configuration-options.md).
 
 **Time Format** and **Show Seconds** cascade from the base plugin. If they're set in `config/lindemannrock-base.php`, that value wins and the field is locked here. The remaining date settings (month format, date order, separator) are global — they live only in the base config, not on this page. See [Log Viewer → Adaptive Timestamps](log-viewer.md) for how timestamps render.
 
@@ -56,12 +56,20 @@ return [
         // Force-enable file-based viewers even on edge/ephemeral hosting
         'forceEnableLogViewer' => false,
 
+        // Cache-backed recent runtime log store (config-only, no CP fields)
+        // — see the Runtime Logs page for the full option reference
+        'runtimeLogStore' => [
+            'enabled' => false,
+        ],
+
         // Base-plugin time overrides (optional — leave out to inherit base)
         // 'timeFormat'  => '24',  // '12' or '24'
         // 'showSeconds' => false,
     ],
 ];
 ```
+
+The `runtimeLogStore` block configures the [Runtime Logs](runtime-logs.md) view. Unlike the settings above, it has no Control Panel equivalent — it's config-file only.
 
 When a setting is present in this file, the matching Control Panel field is **disabled** and shows a notice that it's being overridden by `config/logging-library.php`. The full resolution order, highest priority first:
 

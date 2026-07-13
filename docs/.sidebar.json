@@ -19,6 +19,7 @@
             "feature-tour/logging-service",
             "feature-tour/log-viewer",
             "feature-tour/standalone-viewer",
+            "feature-tour/runtime-logs",
             "feature-tour/settings",
             "feature-tour/caching",
             "feature-tour/edge-detection",

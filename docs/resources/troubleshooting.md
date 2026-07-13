@@ -35,7 +35,16 @@
 
 On Servd, Logging Library can only show files that exist in the current Craft `storage/logs/` path. Servd collects Craft logs centrally for its dashboard, but that hosted log feed is not imported into the Logging Library interface.
 
-**Fix:** Use Servd's **Logs** page, or Servd's Papertrail/Datadog integrations, for the complete hosted log history. Only enable **Force Enable Log Viewers** if `storage/logs/` is backed by persistent shared storage. Without that, the dropdown may be empty, stale, or limited to whichever application instance handled the request.
+**Fix:** For recent activity in the CP, enable [Runtime Logs](../feature-tour/runtime-logs.md) — it captures log messages into Craft's cache as they happen, so it doesn't depend on files in `storage/logs/`. Use Servd's **Logs** page, or Servd's Papertrail/Datadog integrations, for the complete hosted log history. Only enable **Force Enable Log Viewers** if `storage/logs/` is backed by persistent shared storage. Without that, the dropdown may be empty, stale, or limited to whichever application instance handled the request.
+
+## Runtime Logs is missing or empty
+
+1. Confirm `runtimeLogStore.enabled` is `true` in `config/logging-library.php` — there is no Control Panel toggle
+2. Check the user has `loggingLibrary:viewAllLogs` and that **Show Main Menu** is on in Logging Library settings
+3. If the view is empty, trigger something that logs at a captured level (`error`, `warning`, or `info` by default) and let the page auto-refresh
+4. Check your `levels`, `categories`, and `except` config — an entry has to match all three to be captured
+
+**Why:** Runtime entries only exist in Craft's cache. They expire with the configured `ttl`, roll off past `maxEntries`, and disappear when the cache is cleared. On load-balanced hosting without a shared cache backend (such as Redis), each instance keeps its own store, so the CP may show only entries captured by the instance serving your request. See [Runtime Logs](../feature-tour/runtime-logs.md).
 
 ## Permission denied when viewing logs
 
@@ -62,7 +71,7 @@ When a setting is overridden in `config/logging-library.php`, the Control Panel 
 
 Undated source logs such as `freeform-email.log` should appear as their own source in the standalone All Logs viewer. If a file still appears under **Other** or its rows show `UNKNOWN`, refresh the log cache for that file from the sidebar.
 
-**Why:** Older parser caches may have been built before undated source logs and bracketed ISO-8601 Monolog lines were recognized. Refreshing the cache forces Logging Library to re-read the file with the current parser.
+**Why:** Older parser caches may have been built before undated source logs and bracketed ISO-8601 Monolog lines were recognized. Plugin updates that improve the parser invalidate old caches automatically on the next view, so this usually resolves itself after updating; the manual **Refresh Cache** button covers the remaining cases by forcing a re-read with the current parser.
 
 ## Duplicate log entries
 

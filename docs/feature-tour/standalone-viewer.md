@@ -11,7 +11,9 @@ When it's surfaced in the main navigation, the standalone viewer lives at **Cont
 The main-menu item appears only when **both** of these are true:
 
 - **Show Main Menu** is on in [Settings → General](settings.md), and
-- a file-based viewer is available — i.e. you're not on a detected edge/ephemeral environment, or you've turned on **Force Enable Log Viewers** to override it (see [Edge Detection](edge-detection.md)).
+- at least one log view is available: a file-based viewer (you're not on a detected edge/ephemeral environment, or **Force Enable Log Viewers** overrides it — see [Edge Detection](edge-detection.md)), or the [runtime log store](runtime-logs.md) is enabled.
+
+The **All Logs** subnav item itself still requires a file-based viewer; when only the runtime store is enabled (for example, on an edge environment), the menu shows **Runtime Logs** instead.
 
 If **Show Main Menu** is off, the main **Logging Library** item opens to Settings instead, and the viewer is no longer linked from the navigation — but the page itself remains reachable at `/admin/logging-library/logs/system` for anyone with the `loggingLibrary:viewAllLogs` permission. On an edge/ephemeral environment with no override, file-based viewers are hidden entirely.
 

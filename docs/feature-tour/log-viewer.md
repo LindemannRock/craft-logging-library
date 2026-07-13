@@ -11,7 +11,7 @@ When a plugin calls `LoggingLibrary::configure()`, the log viewer becomes availa
 ## Features
 
 - **Date Selection** — pick a specific log file by date from the available files
-- **Level Filtering** — filter by Error, Warning, Info, or Debug
+- **Level Filtering** — filter by Error, Warning, Info, Debug, or Unknown (lines whose level couldn't be parsed)
 - **Full-Text Search** — search across messages and context data
 - **Sorting** — sort by timestamp, level, user, category, or message
 - **Pagination** — configurable entries per page. Per-plugin viewers default to 50 (set via `configure()`); the standalone All Logs viewer uses the **Items Per Page** setting on the Interface settings page (default 100)
@@ -55,7 +55,7 @@ When `viewSystemLogsPermissions` is empty, any logged-in user can view logs. Whe
 
 | Filter | Options | Description |
 |--------|---------|-------------|
-| Level | All Levels, Error, Warning, Info, Debug | Filter entries by log level |
+| Level | All Levels, Error, Warning, Info, Debug, Unknown | Filter entries by log level (Unknown catches lines whose level couldn't be parsed) |
 | Source | All Sources, System, Plugins | Filter the standalone All Logs view by log source |
 | Category | Categories found in selected Craft channel files | Filter web, queue, and console files by parsed log category, such as `application`, plugin handles, or class names |
 | Search | Free text | Case-insensitive search across message and context |

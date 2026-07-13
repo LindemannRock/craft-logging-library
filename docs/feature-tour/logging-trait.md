@@ -26,7 +26,7 @@ protected function logDebug(string $message, array $params = []): void
 
 ## Usage in Plugin Classes
 
-In a plugin's main class, the trait auto-detects `$this->handle` for routing:
+In a plugin's main class, the trait auto-detects the plugin handle (via `getHandle()`) for routing:
 
 ```php
 use lindemannrock\logginglibrary\traits\LoggingTrait;
@@ -74,8 +74,9 @@ class YourService extends Component
 The trait determines the plugin handle in this order:
 
 1. Manually set via `$this->setLoggingHandle('your-plugin')`
-2. Auto-detected from `$this->handle` (available in Plugin classes)
-3. Fallback: derived from the class name in kebab-case
+2. Auto-detected from a `getHandle()` method returning a non-empty string (this is how Plugin classes are detected — Craft's `$plugin->handle` is an alias of `getHandle()`)
+3. Auto-detected from a real `handle` property, if the class defines one
+4. Fallback: derived from the class name in kebab-case
 
 ## Message Formatting
 
@@ -88,6 +89,8 @@ $this->logInfo('User exported data', ['userId' => 1, 'format' => 'csv']);
 $this->logError('Connection failed');
 // Log: "Connection failed"
 ```
+
+If the params can't be encoded as JSON (for example, invalid UTF-8 or circular references), the message is still logged with `| [context encoding failed]` in place of the context — a bad payload never suppresses the log entry itself.
 
 > [!TIP]
 > Always use the `$params` array for variable data instead of string concatenation. Structured context is easier to search, filter, and parse with external log tools.

@@ -22,7 +22,7 @@ LoggingService::log('Custom message', 'info', 'your-plugin', [
 | `$message` | `string` | (required) | The log message |
 | `$level` | `string` | `'info'` | Log level: `'debug'`, `'info'`, `'warning'`, `'error'` |
 | `$pluginHandle` | `string` | (required) | Plugin handle for routing to the correct log file |
-| `$context` | `array` | `[]` | Additional context data, appended as JSON |
+| `$context` | `array` | `[]` | Additional context data, appended as JSON. If the data can't be encoded, the entry is still logged with `[context encoding failed]` as the context |
 
 ## Log Statistics
 
@@ -41,7 +41,7 @@ Returns an array with:
 | `formattedSize` | `string` | Human-readable size (e.g., "2.4 MB") |
 | `oldestDate` | `string\|null` | Oldest log file date (`YYYY-MM-DD`) |
 | `newestDate` | `string\|null` | Newest log file date (`YYYY-MM-DD`) |
-| `levels` | `array` | Breakdown by level: `['error' => 5, 'warning' => 12, 'info' => 230, 'debug' => 0]` |
+| `levels` | `array` | Breakdown by level: `['error' => 5, 'warning' => 12, 'info' => 230, 'debug' => 0, 'unknown' => 0]` — `unknown` counts lines whose level couldn't be parsed |
 
 ## Recent Entries
 

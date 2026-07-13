@@ -22,15 +22,15 @@ Only verified platforms are included. Additional platforms will be added after r
 
 When `enableLogViewer` is not explicitly set in the `configure()` call, the library checks for known environment variables. If a match is found, `enableLogViewer` defaults to `false`.
 
-When a file-based viewer is disabled, Logging Library hides the related CP navigation and controller actions return a 404 for direct viewer URLs. Logging still works normally — only the file-based web viewer is unavailable.
-
-Logging itself still works normally — messages are routed through Craft's PSR-3 system and appear in the platform's native log dashboard.
+When a file-based viewer is disabled, Logging Library hides the related CP navigation and controller actions return a 404 for direct viewer URLs. Logging still works normally — messages are routed through Craft's PSR-3 system and appear in the platform's native log dashboard. Only the file-based web viewer is unavailable. (If the [runtime log store](runtime-logs.md) is enabled, the **Logging Library** CP section stays visible with the **Runtime Logs** view — it doesn't depend on log files.)
 
 ## Servd Live Log Feed
 
 Servd adds its own Craft log target and collects logs centrally for the **Logs** page in the Servd dashboard. Logging Library does not query that hosted feed or import it into Craft; the built-in CP viewer only reads files that exist in the current Craft `storage/logs/` path.
 
 That distinction matters when you enable **Force Enable Log Viewers**. The override only re-enables local file reading. It does not connect to Servd, Papertrail, Datadog, or any other external log source. On Servd without persistent shared storage for `storage/logs/`, the file selector may be empty or show only partial logs from the current instance while the complete logs are still available in Servd.
+
+For CP log visibility on these platforms, [Runtime Logs](runtime-logs.md) is usually the better answer than force-enabling file viewers: it captures recent log activity into Craft's cache as it happens, so it works without any log files on disk.
 
 ## Manual Override
 

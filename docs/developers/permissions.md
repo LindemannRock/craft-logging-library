@@ -1,6 +1,6 @@
 # Permissions
 
-Logging Library registers four permissions — two for the standalone log viewer, one for clearing its caches, and one for managing its settings. Individual plugins register their own log-viewing permissions separately.
+Logging Library registers four permissions — two for its own log views (the standalone All Logs viewer and Runtime Logs), one for clearing its caches, and one for managing its settings. Individual plugins register their own log-viewing permissions separately.
 
 All four appear in the Control Panel under **Settings → Users → (group/user) → Permissions → Logging Library**. Admins always have full access regardless of permission settings.
 
@@ -10,16 +10,16 @@ All four appear in the Control Panel under **Settings → Users → (group/user)
 
 | Permission | Description |
 |------------|-------------|
-| **`loggingLibrary:viewAllLogs`** | Parent — access the standalone "All Logs" viewer |
+| **`loggingLibrary:viewAllLogs`** | Parent — access the standalone "All Logs" viewer and the **Runtime Logs** view |
 | └─ `loggingLibrary:downloadAllLogs` | Download log files from the standalone viewer |
 
-These control access to the centralized viewer at **Logging Library → All Logs** when the CP section is enabled.
+These control access to the centralized viewer at **Logging Library → All Logs** when the CP section is enabled. The same `viewAllLogs` permission also gates the [Runtime Logs](../feature-tour/runtime-logs.md) view when the runtime log store is enabled.
 
 ### Caches & Settings
 
 | Permission | Description |
 |------------|-------------|
-| **`loggingLibrary:clearCache`** | Show the **Logging Library caches** option under **Utilities → Clear Caches** and allow clearing it |
+| **`loggingLibrary:clearCache`** | Show the **Logging Library caches** option under **Utilities → Clear Caches** and allow clearing it; also shows the **Clear Runtime Logs** button in the [Runtime Logs](../feature-tour/runtime-logs.md) view |
 | **`loggingLibrary:manageSettings`** | Access the Logging Library settings pages (**General** and **Interface**) and the **Settings** subnav item |
 
 These two are top-level permissions — they are not nested under `viewAllLogs`. A user can manage settings without being able to read logs, and vice versa.
@@ -69,7 +69,7 @@ To give a user read-only access, grant `loggingLibrary:viewAllLogs` only. For fu
 
 The library checks permissions in several places:
 
-1. **Navigation** — the **All Logs** subnav is hidden unless the user is admin or has `loggingLibrary:viewAllLogs`; the **Settings** subnav requires `loggingLibrary:manageSettings`
+1. **Navigation** — the **All Logs** and **Runtime Logs** subnav items are hidden unless the user is admin or has `loggingLibrary:viewAllLogs`; the **Settings** subnav requires `loggingLibrary:manageSettings`
 2. **Log controller** — `LogsController` checks `viewSystemLogsPermissions` before rendering and `downloadSystemLogsPermissions` before allowing file downloads
 3. **Settings controller** — `SettingsController` requires `loggingLibrary:manageSettings` for every action
 4. **Utilities** — the **Logging Library caches** entry only registers under **Utilities → Clear Caches** when the user has `loggingLibrary:clearCache`
