@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.15.1](https://github.com/LindemannRock/craft-logging-library/compare/v5.15.0...v5.15.1) (2026-07-17)
+
+
+### Fixed
+
+* **settings:** remove unused translation category from error summary ([601bcae](https://github.com/LindemannRock/craft-logging-library/commit/601bcaea2bebd5aaaa4c77e2f7cfd64c931c4116))
+
 ## [5.15.0](https://github.com/LindemannRock/craft-logging-library/compare/v5.14.0...v5.15.0) - 2026-07-05
 
 
