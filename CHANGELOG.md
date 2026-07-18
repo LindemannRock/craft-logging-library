@@ -1,5 +1,17 @@
 # Changelog
 
+## [5.16.0](https://github.com/LindemannRock/craft-logging-library/compare/v5.15.1...v5.16.0) - 2026-07-18
+
+
+### Added
+
+* **tests:** add PostgresDialectSafetyTest for SQL safety checks ([49d4902](https://github.com/LindemannRock/craft-logging-library/commit/49d4902e9eb805b3d953221aefa4179e8dc57f8e))
+
+
+### Fixed
+
+* require base 5.35 for PostgreSQL compatibility ([1e92acf](https://github.com/LindemannRock/craft-logging-library/commit/1e92acf906240a6e2135acd02acc0a421aefc813))
+
 ## [5.15.1](https://github.com/LindemannRock/craft-logging-library/compare/v5.15.0...v5.15.1) - 2026-07-17
 
 
