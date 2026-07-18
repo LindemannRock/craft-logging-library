@@ -1,6 +1,6 @@
 # Changelog
 
-## [5.16.0](https://github.com/LindemannRock/craft-logging-library/compare/v5.15.1...v5.16.0) (2026-07-18)
+## [5.16.0](https://github.com/LindemannRock/craft-logging-library/compare/v5.15.1...v5.16.0) - 2026-07-18
 
 
 ### Added
