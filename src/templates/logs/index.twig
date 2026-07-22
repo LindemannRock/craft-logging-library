@@ -332,11 +332,11 @@
             }
 
             tbody.innerHTML = data.rowsHtml;
-            if (typeof data.totalCount !== 'undefined') {
+            if (typeof data.storedTotal !== 'undefined') {
                 const runtimeLogEntryCount = document.getElementById('runtime-log-entry-count');
                 if (runtimeLogEntryCount) {
                     const formatter = new Intl.NumberFormat();
-                    runtimeLogEntryCount.textContent = formatter.format(data.totalCount) + ' / ' + formatter.format({{ (runtimeMaxEntries ?? 1000)|json_encode|raw }});
+                    runtimeLogEntryCount.textContent = formatter.format(data.storedTotal) + ' / ' + formatter.format({{ (runtimeMaxEntries ?? 1000)|json_encode|raw }});
                 }
             }
             window.lrViewSettings?.apply?.();
@@ -419,7 +419,7 @@
 
             <div class="log-config-item">
                 <div class="label">{{ "Log entries"|t('logging-library') }}</div>
-                <div class="value" id="runtime-log-entry-count">{{ pagination.total|number_format }} / {{ (runtimeMaxEntries ?? 1000)|number_format }}</div>
+                <div class="value" id="runtime-log-entry-count">{{ (runtimeStoredTotal ?? 0)|number_format }} / {{ (runtimeMaxEntries ?? 1000)|number_format }}</div>
             </div>
 
             {% if canClearRuntimeLogs ?? false %}

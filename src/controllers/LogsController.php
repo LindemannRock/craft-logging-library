@@ -367,6 +367,7 @@ class LogsController extends Controller
             'success' => true,
             'rowsHtml' => $rowsHtml,
             'totalCount' => $totalEntries,
+            'storedTotal' => $context['runtimeStoredTotal'],
             'pagination' => [
                 'page' => $context['page'],
                 'limit' => $context['limit'],

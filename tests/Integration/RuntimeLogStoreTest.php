@@ -15,6 +15,8 @@ use craft\config\BaseConfig;
 use craft\console\Request as CraftConsoleRequest;
 use craft\queue\Queue as CraftQueue;
 use craft\services\Config;
+use craft\web\Response as CraftWebResponse;
+use craft\web\View as CraftWebView;
 use lindemannrock\logginglibrary\controllers\LogsController;
 use lindemannrock\logginglibrary\helpers\RuntimeCategoryOptionsHelper;
 use lindemannrock\logginglibrary\helpers\UserLabelHelper;
@@ -468,6 +470,42 @@ class RuntimeLogStoreTest extends TestCase
         }
     }
 
+    public function testRuntimeDataPayloadReportsStoredTotalAlongsideFilteredCount(): void
+    {
+        $user = $this->createTestUser('__logginglibrary_test_');
+        $this->grantPermissions($user, [LoggingLibrary::PERMISSION_VIEW_ALL_LOGS]);
+        $this->actingAs($user);
+
+        $this->store->appendMessages([
+            ['First info event', Logger::LEVEL_INFO, 'runtime-alpha', time() - 10, [], 100],
+            ['Second info event', Logger::LEVEL_INFO, 'runtime-beta', time() - 5, [], 200],
+        ], $this->settings());
+
+        $originalRequest = Craft::$app->getRequest();
+        $originalResponse = Craft::$app->getResponse();
+        $originalConfig = Craft::$app->getConfig();
+        $view = Craft::$app->getView();
+        $originalTemplateMode = $view->getTemplateMode();
+
+        Craft::$app->set('request', new RuntimeLogStoreJsonRequest(['level' => 'error']));
+        Craft::$app->set('response', new CraftWebResponse());
+        Craft::$app->set('config', new RuntimeLogStoreConfig(['enabled' => true]));
+
+        try {
+            $view->setTemplateMode(CraftWebView::TEMPLATE_MODE_CP);
+
+            $response = (new LogsController('logs', LoggingLibrary::getInstance()))->actionRuntimeData();
+
+            self::assertSame(0, $response->data['totalCount']);
+            self::assertSame(2, $response->data['storedTotal']);
+        } finally {
+            $view->setTemplateMode($originalTemplateMode);
+            Craft::$app->set('request', $originalRequest);
+            Craft::$app->set('response', $originalResponse);
+            Craft::$app->set('config', $originalConfig);
+        }
+    }
+
     public function testClearRuntimeStoreReturnsFalseWhenLockCannotBeAcquired(): void
     {
         $lockConstant = (new \ReflectionClass($this->store))->getReflectionConstant('LOCK_KEY');
@@ -752,6 +790,50 @@ final class RuntimeLogStoreWebRequest extends CraftConsoleRequest
     public function getParam(string $name, mixed $defaultValue = null): mixed
     {
         return $defaultValue;
+    }
+}
+
+final class RuntimeLogStoreJsonRequest extends CraftConsoleRequest
+{
+    public function __construct(private array $params = [])
+    {
+        parent::__construct();
+        $this->setIsConsoleRequest(false);
+    }
+
+    public function getPathInfo(): string
+    {
+        return '';
+    }
+
+    public function getAcceptsJson(): bool
+    {
+        return true;
+    }
+
+    public function getScriptUrl(): string
+    {
+        return '/index.php';
+    }
+
+    public function getSegment(int $num): ?string
+    {
+        return null;
+    }
+
+    public function getSegments(): array
+    {
+        return [];
+    }
+
+    public function getPageNum(): int
+    {
+        return 1;
+    }
+
+    public function getParam(string $name, mixed $defaultValue = null): mixed
+    {
+        return $this->params[$name] ?? $defaultValue;
     }
 }
 
