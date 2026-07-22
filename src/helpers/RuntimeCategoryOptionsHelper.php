@@ -217,9 +217,9 @@ class RuntimeCategoryOptionsHelper
         if (str_starts_with($category, 'yii\db\Command::')) {
             $method = self::methodOf($category);
             $label = match ($method) {
-                'query' => 'DB Queries',
-                'execute' => 'DB Commands',
-                default => 'DB Command::' . $method,
+                'query' => Craft::t('logging-library', 'DB Queries'),
+                'execute' => Craft::t('logging-library', 'DB Commands'),
+                default => Craft::t('logging-library', 'DB Command::{method}', ['method' => $method]),
             };
 
             return [
@@ -232,8 +232,8 @@ class RuntimeCategoryOptionsHelper
         if (str_starts_with($category, 'yii\db\Connection::')) {
             $method = self::methodOf($category);
             $label = match ($method) {
-                'open' => 'DB Connection',
-                default => 'DB Connection::' . $method,
+                'open' => Craft::t('logging-library', 'DB Connection'),
+                default => Craft::t('logging-library', 'DB Connection::{method}', ['method' => $method]),
             };
 
             return [
@@ -246,9 +246,9 @@ class RuntimeCategoryOptionsHelper
         if (str_starts_with($category, 'yii\redis\Connection::')) {
             $method = self::methodOf($category);
             $label = match ($method) {
-                'executeCommand' => 'Redis Commands',
-                'open' => 'Redis Connection',
-                default => 'Redis Connection::' . $method,
+                'executeCommand' => Craft::t('logging-library', 'Redis Commands'),
+                'open' => Craft::t('logging-library', 'Redis Connection'),
+                default => Craft::t('logging-library', 'Redis Connection::{method}', ['method' => $method]),
             };
 
             return [
@@ -261,10 +261,12 @@ class RuntimeCategoryOptionsHelper
         if (str_starts_with($category, 'craft\web\UrlManager::')
             || str_starts_with($category, 'yii\web\UrlRule::')
         ) {
+            $label = Craft::t('logging-library', 'URL Routing');
+
             return [
                 'value' => 'system:url-routing',
-                'label' => 'URL Routing',
-                'recordLabel' => 'URL Routing',
+                'label' => $label,
+                'recordLabel' => $label,
             ];
         }
 
@@ -274,10 +276,12 @@ class RuntimeCategoryOptionsHelper
             || str_starts_with($category, 'yii\base\Controller::')
             || str_starts_with($category, 'yii\base\InlineAction::')
         ) {
+            $label = Craft::t('logging-library', 'Web Request');
+
             return [
                 'value' => 'system:web-request',
-                'label' => 'Web Request',
-                'recordLabel' => 'Web Request',
+                'label' => $label,
+                'recordLabel' => $label,
             ];
         }
 
@@ -290,26 +294,32 @@ class RuntimeCategoryOptionsHelper
         }
 
         if (str_starts_with($category, 'yii\web\Session::')) {
+            $label = Craft::t('logging-library', 'Session');
+
             return [
                 'value' => 'system:session',
-                'label' => 'Session',
-                'recordLabel' => 'Session',
+                'label' => $label,
+                'recordLabel' => $label,
             ];
         }
 
         if (str_starts_with($category, 'craft\web\View::')) {
+            $label = Craft::t('logging-library', 'Template Rendering');
+
             return [
                 'value' => 'system:view-rendering',
-                'label' => 'Template Rendering',
-                'recordLabel' => 'Template Rendering',
+                'label' => $label,
+                'recordLabel' => $label,
             ];
         }
 
         if (str_starts_with($category, 'yii\base\Module::')) {
+            $label = Craft::t('logging-library', 'Modules');
+
             return [
                 'value' => 'system:modules',
-                'label' => 'Modules',
-                'recordLabel' => 'Modules',
+                'label' => $label,
+                'recordLabel' => $label,
             ];
         }
 
@@ -330,10 +340,12 @@ class RuntimeCategoryOptionsHelper
         }
 
         if ($category === 'integration-service') {
+            $label = Craft::t('logging-library', 'Integration Service');
+
             return [
                 'value' => 'integration-service',
-                'label' => 'Integration Service',
-                'recordLabel' => 'Integration Service',
+                'label' => $label,
+                'recordLabel' => $label,
             ];
         }
 
