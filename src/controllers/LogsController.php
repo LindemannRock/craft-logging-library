@@ -202,11 +202,13 @@ class LogsController extends Controller
 
             $logEntries = $logPage['entries'];
             $totalEntries = $logPage['total'];
+            $storedEntries = $logPage['storedTotal'];
             $category = $logPage['category'];
             $categoryOptions = $logPage['categoryOptions'];
         } else {
             $logEntries = [];
             $totalEntries = 0;
+            $storedEntries = 0;
             $categoryOptions = [];
         }
 
@@ -241,6 +243,7 @@ class LogsController extends Controller
                 'currentPage' => $page,
                 'totalPages' => $totalPages,
             ],
+            'logStoredTotal' => $storedEntries,
             'levels' => $this->_logLevelLabels(),
             'logConfig' => $config,
         ]);
@@ -859,7 +862,7 @@ class LogsController extends Controller
     /**
      * Get filtered, sorted, paginated log entries plus category metadata in one pass.
      *
-     * @return array{entries: array, total: int, category: string, categoryOptions: array}
+     * @return array{entries: array, total: int, storedTotal: int, category: string, categoryOptions: array}
      */
     private function _getLogPageFromFile(string $filePath, string $level, string $category, string $search, string $sort, string $dir, int $page, int $limit): array
     {
@@ -867,6 +870,7 @@ class LogsController extends Controller
             return [
                 'entries' => [],
                 'total' => 0,
+                'storedTotal' => 0,
                 'category' => 'all',
                 'categoryOptions' => [],
             ];
