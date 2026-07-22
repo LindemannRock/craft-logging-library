@@ -16,6 +16,7 @@ use craft\console\Request as CraftConsoleRequest;
 use craft\queue\Queue as CraftQueue;
 use craft\services\Config;
 use lindemannrock\logginglibrary\controllers\LogsController;
+use lindemannrock\logginglibrary\helpers\RuntimeCategoryOptionsHelper;
 use lindemannrock\logginglibrary\helpers\UserLabelHelper;
 use lindemannrock\logginglibrary\log\targets\RuntimeLogTarget;
 use lindemannrock\logginglibrary\LoggingLibrary;
@@ -170,6 +171,29 @@ class RuntimeLogStoreTest extends TestCase
 
         self::assertSame('plugin:logging-library', $legacyPage['category']);
         self::assertSame(2, $legacyPage['total']);
+    }
+
+    public function testRuntimeCategoryOptionsPreferMostSpecificPluginNamespace(): void
+    {
+        $method = new \ReflectionMethod(RuntimeCategoryOptionsHelper::class, 'pluginGroupForCategory');
+        $group = $method->invoke(null, 'vendor\package\feature\Service::run', [
+            [
+                'handle' => 'broad-plugin',
+                'namespace' => 'vendor\package',
+                'label' => 'Broad Plugin',
+            ],
+            [
+                'handle' => 'specific-plugin',
+                'namespace' => 'vendor\package\feature',
+                'label' => 'Specific Plugin',
+            ],
+        ]);
+
+        self::assertSame([
+            'value' => 'plugin:specific-plugin',
+            'label' => 'Specific Plugin',
+            'recordLabel' => 'Specific Plugin',
+        ], $group);
     }
 
     public function testRuntimeCategoryOptionsGroupCommonSystemCategories(): void

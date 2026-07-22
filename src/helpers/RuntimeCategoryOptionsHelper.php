@@ -30,9 +30,10 @@ class RuntimeCategoryOptionsHelper
         $groups = [];
         $valuesByRawCategory = [];
         $labelsByRawCategory = [];
+        $pluginMetadata = self::pluginMetadata();
 
         foreach ($categoryCounts as $category => $count) {
-            $group = self::groupForCategory((string)$category);
+            $group = self::groupForCategory((string)$category, $pluginMetadata);
             $value = $group['value'];
 
             if (!isset($groups[$value])) {
@@ -120,11 +121,12 @@ class RuntimeCategoryOptionsHelper
     }
 
     /**
+     * @param array<int, array{handle: string, namespace: string, label: string}> $pluginMetadata
      * @return array{value: string, label: string, recordLabel: string}
      */
-    private static function groupForCategory(string $category): array
+    private static function groupForCategory(string $category, array $pluginMetadata): array
     {
-        $pluginGroup = self::pluginGroupForCategory($category);
+        $pluginGroup = self::pluginGroupForCategory($category, $pluginMetadata);
         if ($pluginGroup !== null) {
             return $pluginGroup;
         }
@@ -144,36 +146,67 @@ class RuntimeCategoryOptionsHelper
     }
 
     /**
-     * @return array{value: string, label: string, recordLabel: string}|null
+     * @return array<int, array{handle: string, namespace: string, label: string}>
      */
-    private static function pluginGroupForCategory(string $category): ?array
+    private static function pluginMetadata(): array
     {
         try {
             $plugins = Craft::$app->getPlugins()->getAllPlugins();
         } catch (\Throwable) {
-            return null;
+            return [];
         }
 
+        $metadata = [];
         foreach ($plugins as $handle => $plugin) {
             $handle = (string)$handle;
-            if ($category !== $handle && !str_starts_with($category, $handle . ':')) {
-                $class = get_class($plugin);
-                $namespace = self::namespaceOf($class);
-                if ($namespace === '' || !str_starts_with($category, $namespace . '\\')) {
-                    continue;
-                }
-            }
-
-            $label = self::pluginLabel($plugin, $handle);
-
-            return [
-                'value' => 'plugin:' . $handle,
-                'label' => $label,
-                'recordLabel' => $label,
+            $metadata[] = [
+                'handle' => $handle,
+                'namespace' => self::namespaceOf(get_class($plugin)),
+                'label' => self::pluginLabel($plugin, $handle),
             ];
         }
 
-        return null;
+        return $metadata;
+    }
+
+    /**
+     * @param array<int, array{handle: string, namespace: string, label: string}> $pluginMetadata
+     * @return array{value: string, label: string, recordLabel: string}|null
+     */
+    private static function pluginGroupForCategory(string $category, array $pluginMetadata): ?array
+    {
+        foreach ($pluginMetadata as $plugin) {
+            if ($category === $plugin['handle'] || str_starts_with($category, $plugin['handle'] . ':')) {
+                return self::pluginGroup($plugin);
+            }
+        }
+
+        $bestMatch = null;
+        foreach ($pluginMetadata as $plugin) {
+            $namespace = $plugin['namespace'];
+            if ($namespace === '' || !str_starts_with($category, $namespace . '\\')) {
+                continue;
+            }
+
+            if ($bestMatch === null || strlen($namespace) > strlen($bestMatch['namespace'])) {
+                $bestMatch = $plugin;
+            }
+        }
+
+        return $bestMatch === null ? null : self::pluginGroup($bestMatch);
+    }
+
+    /**
+     * @param array{handle: string, namespace: string, label: string} $plugin
+     * @return array{value: string, label: string, recordLabel: string}
+     */
+    private static function pluginGroup(array $plugin): array
+    {
+        return [
+            'value' => 'plugin:' . $plugin['handle'],
+            'label' => $plugin['label'],
+            'recordLabel' => $plugin['label'],
+        ];
     }
 
     /**
