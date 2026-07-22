@@ -28,6 +28,8 @@ return [
         // Store recent runtime log records in Craft cache for edge/ephemeral environments
         'runtimeLogStore' => [
             'enabled' => false,
+            'skipConsoleRequests' => true,
+            'skipQueueRequests' => true,
             'ttl' => 86400,
             'maxEntries' => 1000,
             'refreshInterval' => 5,

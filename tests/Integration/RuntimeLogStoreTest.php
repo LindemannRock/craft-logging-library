@@ -11,7 +11,10 @@ declare(strict_types=1);
 namespace lindemannrock\logginglibrary\tests\Integration;
 
 use Craft;
+use craft\config\BaseConfig;
 use craft\console\Request as CraftConsoleRequest;
+use craft\queue\Queue as CraftQueue;
+use craft\services\Config;
 use lindemannrock\logginglibrary\controllers\LogsController;
 use lindemannrock\logginglibrary\helpers\UserLabelHelper;
 use lindemannrock\logginglibrary\log\targets\RuntimeLogTarget;
@@ -43,6 +46,30 @@ class RuntimeLogStoreTest extends TestCase
         $this->store->clear();
 
         parent::cleanupExternalState();
+    }
+
+    public function testRuntimeConfigDefaultsSkipConsoleAndQueueRequests(): void
+    {
+        $config = require dirname(__DIR__, 2) . '/src/config.php';
+
+        self::assertTrue($config['*']['runtimeLogStore']['skipConsoleRequests']);
+        self::assertTrue($config['*']['runtimeLogStore']['skipQueueRequests']);
+
+        $this->withRuntimeConfig([], function(array $runtimeConfig): void {
+            self::assertTrue($runtimeConfig['skipConsoleRequests']);
+            self::assertTrue($runtimeConfig['skipQueueRequests']);
+        });
+    }
+
+    public function testRuntimeConfigPreservesExplicitFalseSkipValues(): void
+    {
+        $this->withRuntimeConfig([
+            'skipConsoleRequests' => false,
+            'skipQueueRequests' => false,
+        ], function(array $runtimeConfig): void {
+            self::assertFalse($runtimeConfig['skipConsoleRequests']);
+            self::assertFalse($runtimeConfig['skipQueueRequests']);
+        });
     }
 
     public function testRuntimeMessagesAreStoredNewestFirst(): void
@@ -444,8 +471,12 @@ class RuntimeLogStoreTest extends TestCase
         $logger = Craft::getLogger();
         $dispatcher = $logger->dispatcher;
         $logger->messages = [];
+        $originalRequest = Craft::$app->getRequest();
+        $originalRequestedRoute = Craft::$app->requestedRoute;
 
         try {
+            Craft::$app->set('request', new RuntimeLogStoreWebRequest());
+            Craft::$app->requestedRoute = 'site/index';
             $dispatcher->targets[] = $target;
             $target->init();
 
@@ -462,6 +493,121 @@ class RuntimeLogStoreTest extends TestCase
                 fn($registeredTarget) => $registeredTarget !== $target
             ));
             $logger->messages = [];
+            Craft::$app->requestedRoute = $originalRequestedRoute;
+            Craft::$app->set('request', $originalRequest);
+        }
+    }
+
+    public function testRuntimeTargetSkipsConsoleRequestsBeforeAppend(): void
+    {
+        $store = new RecordingRuntimeLogStoreService();
+        $this->swapPluginComponent('logging-library', 'runtimeLogStore', $store);
+
+        $target = $this->target($this->settings());
+        $target->export();
+
+        self::assertSame(0, $store->appendCalls);
+    }
+
+    public function testRuntimeTargetSkipsActiveCraftQueueExecution(): void
+    {
+        $store = new RecordingRuntimeLogStoreService();
+        $this->swapPluginComponent('logging-library', 'runtimeLogStore', $store);
+
+        $queue = Craft::$app->getQueue();
+        self::assertInstanceOf(CraftQueue::class, $queue);
+
+        $workerPid = new \ReflectionProperty(\yii\queue\cli\Queue::class, '_workerPid');
+        $originalWorkerPid = $workerPid->getValue($queue);
+        $workerPid->setValue($queue, 12345);
+
+        try {
+            $target = $this->target($this->settings([
+                'skipConsoleRequests' => false,
+                'skipQueueRequests' => true,
+            ]));
+            $target->export();
+
+            self::assertSame(0, $store->appendCalls);
+        } finally {
+            $workerPid->setValue($queue, $originalWorkerPid);
+        }
+    }
+
+    public function testRuntimeTargetSkipsQueueExecutionRoutesWithoutWorkerPid(): void
+    {
+        $store = new RecordingRuntimeLogStoreService();
+        $this->swapPluginComponent('logging-library', 'runtimeLogStore', $store);
+
+        $queue = Craft::$app->getQueue();
+        self::assertInstanceOf(CraftQueue::class, $queue);
+
+        $workerPid = new \ReflectionProperty(\yii\queue\cli\Queue::class, '_workerPid');
+        $originalWorkerPid = $workerPid->getValue($queue);
+        $originalRequest = Craft::$app->getRequest();
+        $originalRequestedRoute = Craft::$app->requestedRoute;
+
+        try {
+            $workerPid->setValue($queue, null);
+            Craft::$app->set('request', new RuntimeLogStoreWebRequest());
+
+            foreach (['queue/run', 'queue/listen', 'queue/exec', 'queue/retry', 'queue/retry-all'] as $requestedRoute) {
+                Craft::$app->requestedRoute = $requestedRoute;
+                $this->target($this->settings())->export();
+            }
+
+            self::assertSame(0, $store->appendCalls);
+        } finally {
+            $workerPid->setValue($queue, $originalWorkerPid);
+            Craft::$app->requestedRoute = $originalRequestedRoute;
+            Craft::$app->set('request', $originalRequest);
+        }
+    }
+
+    public function testRuntimeTargetStillSkipsRuntimeAjaxEndpoint(): void
+    {
+        $store = new RecordingRuntimeLogStoreService();
+        $this->swapPluginComponent('logging-library', 'runtimeLogStore', $store);
+        $originalRequest = Craft::$app->getRequest();
+        $originalRequestedRoute = Craft::$app->requestedRoute;
+
+        try {
+            Craft::$app->set('request', new RuntimeLogStoreWebRequest('logging-library/logs/runtime-data'));
+            Craft::$app->requestedRoute = 'logging-library/logs/runtime-data';
+            $target = $this->target($this->settings());
+            $target->export();
+
+            self::assertSame(0, $store->appendCalls);
+        } finally {
+            Craft::$app->requestedRoute = $originalRequestedRoute;
+            Craft::$app->set('request', $originalRequest);
+        }
+    }
+
+    private function target(array $settings): RuntimeLogTarget
+    {
+        $target = new RuntimeLogTarget([
+            'runtimeSettings' => $settings,
+        ]);
+        $target->messages = [
+            ['Runtime target test message', Logger::LEVEL_WARNING, 'runtime-target-test', microtime(true), [], 100],
+        ];
+
+        return $target;
+    }
+
+    /**
+     * @param callable(array): void $assertions
+     */
+    private function withRuntimeConfig(array $runtimeConfig, callable $assertions): void
+    {
+        $originalConfig = Craft::$app->getConfig();
+        Craft::$app->set('config', new RuntimeLogStoreConfig($runtimeConfig));
+
+        try {
+            $assertions(LoggingLibrary::getRuntimeLogStoreConfig());
+        } finally {
+            Craft::$app->set('config', $originalConfig);
         }
     }
 
@@ -485,5 +631,51 @@ final class RuntimeLogStorePostRequest extends CraftConsoleRequest
     public function getIsPost(): bool
     {
         return true;
+    }
+}
+
+final class RuntimeLogStoreWebRequest extends CraftConsoleRequest
+{
+    public function __construct(private string $pathInfo = '')
+    {
+        parent::__construct();
+        $this->setIsConsoleRequest(false);
+    }
+
+    public function getPathInfo(): string
+    {
+        return $this->pathInfo;
+    }
+
+    public function getParam(string $name, mixed $defaultValue = null): mixed
+    {
+        return $defaultValue;
+    }
+}
+
+final class RuntimeLogStoreConfig extends Config
+{
+    public function __construct(private array $runtimeConfig)
+    {
+        parent::__construct();
+    }
+
+    public function getConfigFromFile(string $filename): array|callable|BaseConfig
+    {
+        if ($filename === 'logging-library') {
+            return ['runtimeLogStore' => $this->runtimeConfig];
+        }
+
+        return parent::getConfigFromFile($filename);
+    }
+}
+
+final class RecordingRuntimeLogStoreService extends RuntimeLogStoreService
+{
+    public int $appendCalls = 0;
+
+    public function appendMessages(array $messages, array $settings): void
+    {
+        $this->appendCalls++;
     }
 }

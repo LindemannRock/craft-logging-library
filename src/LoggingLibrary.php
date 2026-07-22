@@ -419,6 +419,8 @@ class LoggingLibrary extends Plugin
     {
         $defaults = [
             'enabled' => false,
+            'skipConsoleRequests' => true,
+            'skipQueueRequests' => true,
             'ttl' => 86400,
             'maxEntries' => 1000,
             'refreshInterval' => 5,
@@ -444,6 +446,8 @@ class LoggingLibrary extends Plugin
 
         $runtimeConfig = array_merge($defaults, $runtimeConfig);
         $runtimeConfig['privacy'] = array_merge($defaults['privacy'], $runtimeConfig['privacy'] ?? []);
+        $runtimeConfig['skipConsoleRequests'] = (bool)($runtimeConfig['skipConsoleRequests'] ?? $defaults['skipConsoleRequests']);
+        $runtimeConfig['skipQueueRequests'] = (bool)($runtimeConfig['skipQueueRequests'] ?? $defaults['skipQueueRequests']);
         $runtimeConfig['levels'] = self::_normalizeRuntimeLevels($runtimeConfig['levels'] ?? $defaults['levels']);
         $runtimeConfig['maxEntries'] = min(10000, max(1, (int)($runtimeConfig['maxEntries'] ?? $defaults['maxEntries'])));
         $runtimeConfig['refreshInterval'] = max(0, (int)($runtimeConfig['refreshInterval'] ?? $defaults['refreshInterval']));

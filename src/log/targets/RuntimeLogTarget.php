@@ -21,6 +21,14 @@ use yii\log\Target;
  */
 class RuntimeLogTarget extends Target
 {
+    private const QUEUE_EXECUTION_ROUTES = [
+        'queue/run',
+        'queue/listen',
+        'queue/exec',
+        'queue/retry',
+        'queue/retry-all',
+    ];
+
     /**
      * @var array Runtime log store settings.
      */
@@ -41,11 +49,68 @@ class RuntimeLogTarget extends Target
      */
     public function export(): void
     {
-        if ($this->_isRuntimeRefreshRequest()) {
-            return;
+        try {
+            if ($this->_shouldSkipCapture()) {
+                return;
+            }
+
+            LoggingLibrary::getInstance()?->runtimeLogStore->appendMessages($this->messages, $this->runtimeSettings);
+        } catch (\Throwable) {
+            // Runtime logging must never break the request, console command, or queue job.
+        }
+    }
+
+    /**
+     * Skip beta capture in conservative execution contexts.
+     */
+    private function _shouldSkipCapture(): bool
+    {
+        try {
+            $request = Craft::$app->getRequest();
+
+            if (($this->runtimeSettings['skipConsoleRequests'] ?? true) && $request->getIsConsoleRequest()) {
+                return true;
+            }
+
+            if (($this->runtimeSettings['skipQueueRequests'] ?? true) && $this->_isQueueExecution()) {
+                return true;
+            }
+
+            return $this->_isRuntimeRefreshRequest();
+        } catch (\Throwable) {
+            return true;
+        }
+    }
+
+    /**
+     * Detect active Craft queue execution without instantiating the queue.
+     */
+    private function _isQueueExecution(): bool
+    {
+        $requestedRoute = trim((string)(Craft::$app->requestedRoute ?? ''), '/');
+        if (in_array($requestedRoute, self::QUEUE_EXECUTION_ROUTES, true)) {
+            return true;
         }
 
-        LoggingLibrary::getInstance()?->runtimeLogStore->appendMessages($this->messages, $this->runtimeSettings);
+        try {
+            if (Craft::$app->has('queue', true)) {
+                $queue = Craft::$app->get('queue');
+                if (method_exists($queue, 'getWorkerPid') && $queue->getWorkerPid() !== null) {
+                    return true;
+                }
+            }
+        } catch (\Throwable) {
+            // Fall through to the narrow message-category check.
+        }
+
+        foreach ($this->messages as $message) {
+            $category = (string)($message[2] ?? '');
+            if (preg_match('/^craft\\\\queue\\\\QueueLogBehavior::(?:beforeExec|afterExec|afterError)$/', $category)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
