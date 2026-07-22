@@ -588,6 +588,84 @@ class RuntimeLogStoreTest extends TestCase
         }
     }
 
+    public function testRuntimeTargetSkipsEntireMixedBatchWhenQueueCategoryDetected(): void
+    {
+        $store = new RecordingRuntimeLogStoreService();
+        $plugin = LoggingLibrary::getInstance();
+        $originalStore = $plugin->runtimeLogStore;
+        $queue = Craft::$app->getQueue();
+        self::assertInstanceOf(CraftQueue::class, $queue);
+
+        $workerPid = new \ReflectionProperty(\yii\queue\cli\Queue::class, '_workerPid');
+        $originalWorkerPid = $workerPid->getValue($queue);
+        $originalRequest = Craft::$app->getRequest();
+        $originalRequestedRoute = Craft::$app->requestedRoute;
+        $messages = [
+            ['Normal request message', Logger::LEVEL_INFO, 'runtime-target-test', microtime(true), [], 100],
+            ['Queue execution started', Logger::LEVEL_INFO, 'craft\queue\QueueLogBehavior::beforeExec', microtime(true), [], 200],
+        ];
+
+        try {
+            $workerPid->setValue($queue, null);
+            Craft::$app->set('request', new RuntimeLogStoreWebRequest());
+            Craft::$app->requestedRoute = 'site/index';
+            $plugin->set('runtimeLogStore', $store);
+
+            $target = $this->target($this->settings([
+                'skipQueueRequests' => true,
+            ]));
+            $target->messages = $messages;
+            $target->export();
+
+            self::assertSame(0, $store->appendCalls);
+            self::assertSame([], $store->appendedBatches);
+        } finally {
+            $plugin->set('runtimeLogStore', $originalStore);
+            Craft::$app->requestedRoute = $originalRequestedRoute;
+            Craft::$app->set('request', $originalRequest);
+            $workerPid->setValue($queue, $originalWorkerPid);
+        }
+    }
+
+    public function testRuntimeTargetAppendsEntireMixedBatchWhenQueueSkippingIsDisabled(): void
+    {
+        $store = new RecordingRuntimeLogStoreService();
+        $plugin = LoggingLibrary::getInstance();
+        $originalStore = $plugin->runtimeLogStore;
+        $queue = Craft::$app->getQueue();
+        self::assertInstanceOf(CraftQueue::class, $queue);
+
+        $workerPid = new \ReflectionProperty(\yii\queue\cli\Queue::class, '_workerPid');
+        $originalWorkerPid = $workerPid->getValue($queue);
+        $originalRequest = Craft::$app->getRequest();
+        $originalRequestedRoute = Craft::$app->requestedRoute;
+        $messages = [
+            ['Normal request message', Logger::LEVEL_INFO, 'runtime-target-test', microtime(true), [], 100],
+            ['Queue execution started', Logger::LEVEL_INFO, 'craft\queue\QueueLogBehavior::beforeExec', microtime(true), [], 200],
+        ];
+
+        try {
+            $workerPid->setValue($queue, null);
+            Craft::$app->set('request', new RuntimeLogStoreWebRequest());
+            Craft::$app->requestedRoute = 'site/index';
+            $plugin->set('runtimeLogStore', $store);
+
+            $target = $this->target($this->settings([
+                'skipQueueRequests' => false,
+            ]));
+            $target->messages = $messages;
+            $target->export();
+
+            self::assertSame(1, $store->appendCalls);
+            self::assertSame([$messages], $store->appendedBatches);
+        } finally {
+            $plugin->set('runtimeLogStore', $originalStore);
+            Craft::$app->requestedRoute = $originalRequestedRoute;
+            Craft::$app->set('request', $originalRequest);
+            $workerPid->setValue($queue, $originalWorkerPid);
+        }
+    }
+
     public function testRuntimeTargetStillSkipsRuntimeAjaxEndpoint(): void
     {
         $store = new RecordingRuntimeLogStoreService();
@@ -698,8 +776,11 @@ final class RecordingRuntimeLogStoreService extends RuntimeLogStoreService
 {
     public int $appendCalls = 0;
 
+    public array $appendedBatches = [];
+
     public function appendMessages(array $messages, array $settings): void
     {
         $this->appendCalls++;
+        $this->appendedBatches[] = $messages;
     }
 }

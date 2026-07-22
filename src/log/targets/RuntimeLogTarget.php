@@ -51,6 +51,7 @@ class RuntimeLogTarget extends Target
     {
         try {
             if ($this->_shouldSkipCapture()) {
+                // Queue detection is intentionally batch-level: any queue signal skips this entire buffered export batch.
                 return;
             }
 

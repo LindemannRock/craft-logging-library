@@ -60,6 +60,8 @@ return [
         // — see the Runtime Logs page for the full option reference
         'runtimeLogStore' => [
             'enabled' => false,
+            'skipConsoleRequests' => true,
+            'skipQueueRequests' => true,
         ],
 
         // Base-plugin time overrides (optional — leave out to inherit base)
@@ -69,7 +71,7 @@ return [
 ];
 ```
 
-The `runtimeLogStore` block configures the [Runtime Logs](runtime-logs.md) view. Unlike the settings above, it has no Control Panel equivalent — it's config-file only.
+The `runtimeLogStore` block configures the [Runtime Logs](runtime-logs.md) view. Unlike the settings above, it has no Control Panel equivalent — it's config-file only. Its conservative defaults skip runtime capture for console requests and detected queue execution; the Runtime Logs page explains when to change both safeguards temporarily.
 
 When a setting is present in this file, the matching Control Panel field is **disabled** and shows a notice that it's being overridden by `config/logging-library.php`. The full resolution order, highest priority first:
 

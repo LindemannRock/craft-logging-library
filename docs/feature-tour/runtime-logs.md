@@ -21,6 +21,8 @@ return [
     '*' => [
         'runtimeLogStore' => [
             'enabled' => true,
+            'skipConsoleRequests' => true,
+            'skipQueueRequests' => true,
         ],
     ],
 ];
@@ -53,6 +55,8 @@ All options live under the `runtimeLogStore` key in `config/logging-library.php`
 ```php
 'runtimeLogStore' => [
     'enabled' => false,
+    'skipConsoleRequests' => true,
+    'skipQueueRequests' => true,
     'ttl' => 86400,
     'maxEntries' => 1000,
     'refreshInterval' => 5,
@@ -70,6 +74,8 @@ All options live under the `runtimeLogStore` key in `config/logging-library.php`
 | Option | What it does | Default |
 |--------|--------------|---------|
 | `enabled` | Turns the runtime store (and the **Runtime Logs** CP view) on. | `false` |
+| `skipConsoleRequests` | Excludes runtime capture for console requests. This affects only Runtime Logs. | `true` |
+| `skipQueueRequests` | Excludes runtime capture when Craft queue execution is detected. Queue exclusion applies to the current buffered export batch as a whole. | `true` |
 | `ttl` | How long entries live, in seconds. Older entries are dropped from the view and the cache entry expires. | `86400` (24 hours) |
 | `maxEntries` | Rolling window size — the newest N entries are kept (capped at 10,000). | `1000` |
 | `refreshInterval` | Seconds between CP auto-refreshes. Set `0` to disable auto-refresh. | `5` |
@@ -81,6 +87,22 @@ All options live under the `runtimeLogStore` key in `config/logging-library.php`
 | `privacy.includeUserId` | Record which logged-in user triggered each entry. Off by default so no user IDs are written to cache; when off, the Request User column shows **System**. | `false` |
 
 Out-of-range values are clamped to their limits rather than rejected, so a typo can't break log capture.
+
+## Console and queue safeguards
+
+`skipConsoleRequests` and `skipQueueRequests` default to `true`. These are conservative safeguards that keep Runtime Logs cache work out of commands and queue jobs. Craft queue workers normally run as console requests, so capturing their runtime logs generally requires setting **both** options to `false`:
+
+```php
+'runtimeLogStore' => [
+    'enabled' => true,
+    'skipConsoleRequests' => false,
+    'skipQueueRequests' => false,
+],
+```
+
+Queue detection is applied to the current buffered runtime export batch. If one message signals queue execution, that whole batch is skipped, so nearby non-queue messages may also be absent from Runtime Logs. This is an intentional best-effort tradeoff: Runtime Logs avoids cache writes during detected queue execution rather than filtering and writing individual messages from the same batch.
+
+These exclusions affect only Runtime Logs. Craft's file logs and hosted log feeds such as Servd's remain unchanged. For temporary diagnosis, disable the relevant exclusions, reproduce the issue, and then restore the defaults. Capturing command or queue traffic—especially debug-level output—can fill the bounded runtime buffer quickly and add cache traffic.
 
 ### Checking availability in code
 

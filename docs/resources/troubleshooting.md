@@ -46,6 +46,24 @@ On Servd, Logging Library can only show files that exist in the current Craft `s
 
 **Why:** Runtime entries only exist in Craft's cache. They expire with the configured `ttl`, roll off past `maxEntries`, and disappear when the cache is cleared. On load-balanced hosting without a shared cache backend (such as Redis), each instance keeps its own store, so the CP may show only entries captured by the instance serving your request. See [Runtime Logs](../feature-tour/runtime-logs.md).
 
+## Console or queue entries are missing from Runtime Logs
+
+1. Check `runtimeLogStore.skipConsoleRequests` and `runtimeLogStore.skipQueueRequests` in `config/logging-library.php`; both default to `true`
+2. Remember that Craft queue workers normally run as console requests, so changing only the queue option may still leave worker entries excluded
+3. Check the configured `levels`, especially before enabling debug-level capture for a busy command or worker
+
+**Fix:** For temporary diagnosis, disable both safeguards, reproduce the issue, and then restore them to `true`:
+
+```php
+'runtimeLogStore' => [
+    'enabled' => true,
+    'skipConsoleRequests' => false,
+    'skipQueueRequests' => false,
+],
+```
+
+**Why:** The defaults avoid Runtime Logs cache work inside commands and queue jobs. Queue detection skips the current buffered runtime export batch as a whole, so nearby non-queue messages in that batch may also be absent. These options affect only Runtime Logs; Craft file logs and hosted feeds such as Servd's continue unchanged. Capturing console or queue traffic, especially debug output, can fill the bounded runtime buffer quickly and add cache traffic.
+
 ## Permission denied when viewing logs
 
 1. Ensure the user has the required permission (e.g., `yourPlugin:viewLogs`)
