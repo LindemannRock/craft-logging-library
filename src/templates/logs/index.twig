@@ -454,7 +454,7 @@
 
             <div class="log-config-item">
                 <div class="label">{{ "Log entries"|t('logging-library') }}</div>
-                <div class="value">{{ pagination.total|number_format }}</div>
+                <div class="value">{{ (logStoredTotal ?? 0)|number_format }}</div>
             </div>
 
             <div class="log-config-item" style="grid-template-columns: 1fr; padding: 8px 0;">

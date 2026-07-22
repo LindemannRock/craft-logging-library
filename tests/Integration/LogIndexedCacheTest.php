@@ -74,6 +74,7 @@ final class LogIndexedCacheTest extends TestCase
         $page = LoggingLibrary::getInstance()->logCache->getLogPage($path, 'error', 'application', 'Needle', 'timestamp', 'asc', 1, 10);
 
         self::assertSame(1, $page['total']);
+        self::assertSame(3, $page['storedTotal']);
         self::assertSame('application', $page['category']);
         self::assertSame(['Needle failure'], array_column($page['entries'], 'message'));
 

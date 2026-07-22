@@ -69,7 +69,7 @@ class LogCacheService extends Component
      * The CP viewer uses this indexed cache path. The older `getLogs()` method
      * remains available for public API callers that expect an ArrayQuery.
      *
-     * @return array{entries: array, total: int, category: string, categoryOptions: array}
+     * @return array{entries: array, total: int, storedTotal: int, category: string, categoryOptions: array}
      * @since 5.9.0
      */
     public function getLogPage(string $logFile, string $level, string $category, string $search, string $sort, string $dir, int $page, int $limit): array
@@ -78,6 +78,7 @@ class LogCacheService extends Component
             return [
                 'entries' => [],
                 'total' => 0,
+                'storedTotal' => 0,
                 'category' => 'all',
                 'categoryOptions' => [],
             ];
@@ -124,6 +125,7 @@ class LogCacheService extends Component
         return [
             'entries' => UserLabelHelper::withUserLabels($entries),
             'total' => $total,
+            'storedTotal' => $this->_getIndexedCount($pdo, '', []),
             'category' => $category,
             'categoryOptions' => CategoryOptionsHelper::options($categoryCounts),
         ];
@@ -664,11 +666,12 @@ class LogCacheService extends Component
     /**
      * Legacy full-array page builder used when PDO SQLite is unavailable.
      *
-     * @return array{entries: array, total: int, category: string, categoryOptions: array}
+     * @return array{entries: array, total: int, storedTotal: int, category: string, categoryOptions: array}
      */
     private function _getArrayQueryLogPage(string $filePath, string $level, string $category, string $search, string $sort, string $dir, int $page, int $limit): array
     {
         $logs = $this->getLogs($filePath)->all();
+        $storedTotal = count($logs);
 
         if ($level !== 'all') {
             $logs = array_values(array_filter($logs, function($log) use ($level): bool {
@@ -715,6 +718,7 @@ class LogCacheService extends Component
         return [
             'entries' => UserLabelHelper::withUserLabels($entries),
             'total' => $totalCount,
+            'storedTotal' => $storedTotal,
             'category' => $category,
             'categoryOptions' => CategoryOptionsHelper::options($categoryCounts),
         ];
