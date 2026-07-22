@@ -1,5 +1,23 @@
 # Changelog
 
+## [5.17.0](https://github.com/LindemannRock/craft-logging-library/compare/v5.16.0...v5.17.0) - 2026-07-22
+
+
+### Added
+
+* **logs:** add configuration options to skip console and queue requests ([c062966](https://github.com/LindemannRock/craft-logging-library/commit/c0629665662f5d70439c4087b0384a659ec2c1f3))
+* **logs:** include stored total in runtime data response ([40aa189](https://github.com/LindemannRock/craft-logging-library/commit/40aa189ac16c59c2b04253d1b8f06de798fae5ae))
+* **logs:** report stored total alongside filtered count in runtime data payload ([ac2ddba](https://github.com/LindemannRock/craft-logging-library/commit/ac2ddba2b1082c64c6fac8ceea0a0df8e8c198b4))
+
+
+### Fixed
+
+* correct docblock for runtime capture method ([b732582](https://github.com/LindemannRock/craft-logging-library/commit/b732582ce2e020b8cee9f994635119f4c36a5a9d))
+* **logs:** document runtime queue batch safeguards ([570c296](https://github.com/LindemannRock/craft-logging-library/commit/570c2960d0f97b06e3a942266428612d4453df3a))
+* **logs:** group runtime categories under the most specific plugin ([29eb19b](https://github.com/LindemannRock/craft-logging-library/commit/29eb19b6d0129dbe5cc82f143f712181629e766a))
+* **logs:** include stored total in log page response structure ([a9fa21c](https://github.com/LindemannRock/craft-logging-library/commit/a9fa21c76444d1166259aede8a19fc53f0fbc33d))
+* **logs:** localize runtime source labels ([deb6616](https://github.com/LindemannRock/craft-logging-library/commit/deb6616a235b522630e2cc09627a7feb797670aa))
+
 ## [5.16.0](https://github.com/LindemannRock/craft-logging-library/compare/v5.15.1...v5.16.0) - 2026-07-18
 
 
