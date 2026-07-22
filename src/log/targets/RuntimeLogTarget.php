@@ -62,7 +62,7 @@ class RuntimeLogTarget extends Target
     }
 
     /**
-     * Skip beta capture in conservative execution contexts.
+     * Skip runtime capture in conservative execution contexts.
      */
     private function _shouldSkipCapture(): bool
     {
