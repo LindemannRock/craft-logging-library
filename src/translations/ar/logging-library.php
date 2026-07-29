@@ -137,6 +137,7 @@ return [
     'Redis (SELECT disabled)' => 'Redis (تم تعطيل SELECT)',
     'Redis database {database}' => 'قاعدة بيانات Redis {database}',
     'Runtime Location' => 'موقع وقت التشغيل',
+    'Dedicated Redis key' => 'مفتاح Redis مخصص',
     'Recent runtime logs use a bounded diagnostic store and are not complete log history.' => 'تستخدم سجلات وقت التشغيل الحديثة مخزنًا تشخيصيًا محدودًا ولا تمثل سجلًا كاملاً للسجلات.',
 
     // Config overrides

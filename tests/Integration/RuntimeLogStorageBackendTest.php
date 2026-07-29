@@ -479,10 +479,45 @@ final class RuntimeLogStorageBackendTest extends TestCase
         self::assertSame('craft.app.cache', $locationMethod->invoke($controller, [
             'backend' => 'generic-cache',
         ]));
-        self::assertSame('owned-runtime-key', $locationMethod->invoke($controller, [
+        self::assertSame('Dedicated Redis key', $locationMethod->invoke($controller, [
             'backend' => 'redis',
             'ownedKeys' => ['owned-runtime-key'],
         ]));
+
+        $titleMethod = new \ReflectionMethod(LogsController::class, '_runtimeLocationTitle');
+        self::assertSame('', $titleMethod->invoke($controller, [
+            'backend' => 'generic-cache',
+        ]));
+        self::assertSame('owned-runtime-key', $titleMethod->invoke($controller, [
+            'backend' => 'redis',
+            'ownedKeys' => ['owned-runtime-key'],
+        ]));
+        self::assertNotSame(
+            $locationMethod->invoke($controller, [
+                'backend' => 'redis',
+                'ownedKeys' => ['owned-runtime-key'],
+            ]),
+            $titleMethod->invoke($controller, [
+                'backend' => 'redis',
+                'ownedKeys' => ['owned-runtime-key'],
+            ]),
+        );
+
+        $connection = new RecordingRedisConnection(['database' => 7]);
+        $connection->failCommand = 'LPUSH';
+        $storage = new RedisRuntimeLogStorage($connection, 'owned-recovery-key', 'literal');
+        $storage->append([['id' => 'dropped']], 10, 60);
+
+        self::assertSame('Redis unavailable', $method->invoke($controller, $storage->status()));
+        self::assertSame('Dedicated Redis key', $locationMethod->invoke($controller, $storage->status()));
+        self::assertSame('owned-recovery-key', $titleMethod->invoke($controller, $storage->status()));
+
+        $connection->failCommand = null;
+        $storage->append([['id' => 'accepted']], 10, 60);
+
+        self::assertSame('Redis database 7', $method->invoke($controller, $storage->status()));
+        self::assertSame('Dedicated Redis key', $locationMethod->invoke($controller, $storage->status()));
+        self::assertSame('owned-recovery-key', $titleMethod->invoke($controller, $storage->status()));
     }
 
     public function testGenericReadFailurePerformsNoSetOrDelete(): void

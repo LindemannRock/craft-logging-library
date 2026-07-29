@@ -323,6 +323,7 @@ class LogsController extends Controller
             'runtimeStoredTotal' => $context['runtimeStoredTotal'],
             'runtimeStoreLabel' => $this->_runtimeStoreLabel($context['runtimeStorage']),
             'runtimeLocationLabel' => $this->_runtimeLocationLabel($context['runtimeStorage']),
+            'runtimeLocationTitle' => $this->_runtimeLocationTitle($context['runtimeStorage']),
             'canClearRuntimeLogs' => $user->checkPermission(LoggingLibrary::PERMISSION_CLEAR_CACHE),
             'logConfig' => null,
         ]);
@@ -375,6 +376,7 @@ class LogsController extends Controller
             'storedTotal' => $context['runtimeStoredTotal'],
             'runtimeStoreLabel' => $this->_runtimeStoreLabel($context['runtimeStorage']),
             'runtimeLocationLabel' => $this->_runtimeLocationLabel($context['runtimeStorage']),
+            'runtimeLocationTitle' => $this->_runtimeLocationTitle($context['runtimeStorage']),
             'pagination' => [
                 'page' => $context['page'],
                 'limit' => $context['limit'],
@@ -801,12 +803,24 @@ class LogsController extends Controller
     }
 
     /**
-     * Format the concrete Runtime Logs storage location for the status UI.
+     * Format the concise Runtime Logs storage location for the status UI.
      */
     private function _runtimeLocationLabel(array $storage): string
     {
         if (($storage['backend'] ?? '') !== 'redis') {
             return 'craft.app.cache';
+        }
+
+        return Craft::t('logging-library', 'Dedicated Redis key');
+    }
+
+    /**
+     * Return the exact owned Redis key as secondary technical metadata.
+     */
+    private function _runtimeLocationTitle(array $storage): string
+    {
+        if (($storage['backend'] ?? '') !== 'redis') {
+            return '';
         }
 
         $ownedKeys = $storage['ownedKeys'] ?? [];

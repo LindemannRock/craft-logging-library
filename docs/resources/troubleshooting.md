@@ -56,7 +56,7 @@ When Craft cache is Yii Redis, Redis is the only authoritative Runtime Logs back
 4. Confirm the endpoint supports the configured Redis database; a rejected `SELECT` fails closed
 5. Restart long-running web and queue processes after correcting configuration
 
-The affected batch is dropped fail-soft. Logging Library does not switch to Craft cache, write a generic Runtime key in database `0`, or make entries alternate between storage families. A later operation can reconnect to the same authoritative Redis backend. The sidebar's Runtime Store and Runtime Location values update during AJAX refresh, so recovery or continued unavailability is visible without reloading the page.
+The affected batch is dropped fail-soft. Logging Library does not switch to Craft cache, write a generic Runtime key in database `0`, or make entries alternate between storage families. A later operation can reconnect to the same authoritative Redis backend. The sidebar's **Runtime Store** value, concise **Runtime Location** value, and exact-key tooltip update during AJAX refresh, so recovery or continued unavailability is visible without reloading the page.
 
 An explicit `'database' => null` sends no `SELECT` and is intended only for compatible cluster-style endpoints. Logical Redis databases provide namespace and administrative separation, not separate CPU, memory, network, eviction, or server contention.
 

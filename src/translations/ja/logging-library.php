@@ -137,6 +137,7 @@ return [
     'Redis (SELECT disabled)' => 'Redis（SELECT 無効）',
     'Redis database {database}' => 'Redis データベース {database}',
     'Runtime Location' => 'ランタイムの場所',
+    'Dedicated Redis key' => '専用 Redis キー',
     'Recent runtime logs use a bounded diagnostic store and are not complete log history.' => '最近のランタイムログには上限のある診断ストアが使用され、完全なログ履歴ではありません。',
 
     // Config overrides

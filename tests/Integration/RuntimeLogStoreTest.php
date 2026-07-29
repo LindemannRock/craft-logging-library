@@ -504,6 +504,7 @@ class RuntimeLogStoreTest extends TestCase
             self::assertSame(2, $response->data['storedTotal']);
             self::assertSame('Craft cache', $response->data['runtimeStoreLabel']);
             self::assertSame('craft.app.cache', $response->data['runtimeLocationLabel']);
+            self::assertSame('', $response->data['runtimeLocationTitle']);
         } finally {
             $view->setTemplateMode($originalTemplateMode);
             Craft::$app->set('request', $originalRequest);
@@ -541,18 +542,36 @@ class RuntimeLogStoreTest extends TestCase
             $templateBehavior = $initialResponse->getBehavior('template');
             self::assertInstanceOf(TemplateResponseBehavior::class, $templateBehavior);
             self::assertSame('Redis unavailable', $templateBehavior->variables['runtimeStoreLabel']);
-            self::assertSame('owned-unavailable-key', $templateBehavior->variables['runtimeLocationLabel']);
+            self::assertSame('Dedicated Redis key', $templateBehavior->variables['runtimeLocationLabel']);
+            self::assertSame('owned-unavailable-key', $templateBehavior->variables['runtimeLocationTitle']);
+            self::assertNotSame(
+                $templateBehavior->variables['runtimeLocationTitle'],
+                $templateBehavior->variables['runtimeLocationLabel'],
+            );
 
             Craft::$app->set('response', new CraftWebResponse());
             $ajaxResponse = $controller->actionRuntimeData();
             self::assertSame('Redis unavailable', $ajaxResponse->data['runtimeStoreLabel']);
-            self::assertSame('owned-unavailable-key', $ajaxResponse->data['runtimeLocationLabel']);
+            self::assertSame('Dedicated Redis key', $ajaxResponse->data['runtimeLocationLabel']);
+            self::assertSame('owned-unavailable-key', $ajaxResponse->data['runtimeLocationTitle']);
         } finally {
             $view->setTemplateMode($originalTemplateMode);
             Craft::$app->set('request', $originalRequest);
             Craft::$app->set('response', $originalResponse);
             Craft::$app->set('config', $originalConfig);
         }
+    }
+
+    public function testRuntimeTemplateRendersAndRefreshesLocationTextAndTitleSeparately(): void
+    {
+        $template = file_get_contents(dirname(__DIR__, 2) . '/src/templates/logs/index.twig');
+
+        self::assertIsString($template);
+        self::assertStringContainsString('runtimeLocationLabel.textContent = data.runtimeLocationLabel;', $template);
+        self::assertStringContainsString("runtimeLocationLabel.setAttribute('title', data.runtimeLocationTitle);", $template);
+        self::assertStringContainsString("runtimeLocationLabel.removeAttribute('title');", $template);
+        self::assertStringContainsString('title="{{ runtimeLocationTitle|e }}"', $template);
+        self::assertStringContainsString("{{ (runtimeLocationLabel ?? 'craft.app.cache')|e }}", $template);
     }
 
     public function testGenericClearReturnsFalseWhenLockCannotBeAcquired(): void

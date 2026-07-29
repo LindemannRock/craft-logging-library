@@ -349,6 +349,11 @@
                 const runtimeLocationLabel = document.getElementById('runtime-location-label');
                 if (runtimeLocationLabel) {
                     runtimeLocationLabel.textContent = data.runtimeLocationLabel;
+                    if (typeof data.runtimeLocationTitle === 'string' && data.runtimeLocationTitle !== '') {
+                        runtimeLocationLabel.setAttribute('title', data.runtimeLocationTitle);
+                    } else if (typeof data.runtimeLocationTitle === 'string') {
+                        runtimeLocationLabel.removeAttribute('title');
+                    }
                 }
             }
             window.lrViewSettings?.apply?.();
@@ -539,7 +544,7 @@
             <div class="value">
                 <code style="font-size: 10px; line-height: 1.5; color: #606d7b; word-break: break-all; display: block;">
                     {% if isRuntime %}
-                        <span id="runtime-location-label">{{ runtimeLocationLabel ?? 'craft.app.cache' }}</span>
+                        <span id="runtime-location-label"{% if runtimeLocationTitle ?? '' %} title="{{ runtimeLocationTitle|e }}"{% endif %}>{{ (runtimeLocationLabel ?? 'craft.app.cache')|e }}</span>
                     {% elseif isStandalone %}
                         storage/logs/
                     {% else %}

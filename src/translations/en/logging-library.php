@@ -137,6 +137,7 @@ return [
     'Redis (SELECT disabled)' => 'Redis (SELECT disabled)',
     'Redis database {database}' => 'Redis database {database}',
     'Runtime Location' => 'Runtime Location',
+    'Dedicated Redis key' => 'Dedicated Redis key',
     'Recent runtime logs use a bounded diagnostic store and are not complete log history.' => 'Recent runtime logs use a bounded diagnostic store and are not complete log history.',
 
     // Config overrides

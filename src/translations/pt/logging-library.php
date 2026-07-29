@@ -137,6 +137,7 @@ return [
     'Redis (SELECT disabled)' => 'Redis (SELECT desativado)',
     'Redis database {database}' => 'Base de dados Redis {database}',
     'Runtime Location' => 'Localização de runtime',
+    'Dedicated Redis key' => 'Chave Redis dedicada',
     'Recent runtime logs use a bounded diagnostic store and are not complete log history.' => 'Os registos de runtime recentes usam um armazenamento de diagnóstico limitado e não constituem um histórico completo de registos.',
 
     // Config overrides

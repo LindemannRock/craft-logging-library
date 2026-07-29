@@ -45,7 +45,12 @@ Go to **Logging Library → Runtime Logs**. The view works like the [All Logs vi
 - **Sort** any column: Timestamp, Level, Source, Request User, or Message
 - **Expand a row** to read the full message and its context (a trace excerpt and memory usage, when Craft provides them)
 
-The page **auto-refreshes** every few seconds (5 by default) and pauses while you have a row expanded, so entries don't shift under you mid-read. The sidebar shows the live state: the configured capture level, the effective backend and Redis database or unavailable state, the backend's owned storage location, and how many entries are held versus the configured maximum. Both **Runtime Store** and **Runtime Location** refresh with the table, so a Redis failure isn't hidden behind the status from the initial page load.
+The page **auto-refreshes** every few seconds (5 by default) and pauses while you have a row expanded, so entries don't shift under you mid-read. The sidebar shows the live state: the configured capture level, how many entries are held versus the configured maximum, and two storage details:
+
+- **Runtime Store** shows the effective backend and state: **Redis database N**, **Redis (SELECT disabled)**, **Redis unavailable**, or **Craft cache**.
+- **Runtime Location** keeps the primary display concise. Redis shows **Dedicated Redis key**; hover that value to inspect the exact application-namespaced Redis key in a technical tooltip. A generic non-Redis cache shows `craft.app.cache`.
+
+The store text, location text, and Redis key tooltip all refresh with the table, so a Redis failure or recovery isn't hidden behind the status from the initial page load.
 
 **Clear Runtime Logs** in the sidebar empties the store after a confirmation. The button only appears with the `loggingLibrary:clearCache` permission. Redis clearing issues an exact delete for Logging Library's application-namespaced Runtime Logs key; it never flushes a Redis database or scans/deletes wildcard keys. Log files, unrelated Redis data, and the [file viewer cache](caching.md) are untouched.
 
