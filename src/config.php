@@ -25,7 +25,7 @@ return [
         // Force-enable file-based log viewers even when an edge/ephemeral environment is detected
         'forceEnableLogViewer' => false,
 
-        // Store recent runtime log records in Craft cache for edge/ephemeral environments
+        // Store bounded recent runtime log records for edge/ephemeral environments
         'runtimeLogStore' => [
             'enabled' => false,
             'skipConsoleRequests' => true,
@@ -38,6 +38,11 @@ return [
             'levels' => ['error', 'warning', 'info'],
             'categories' => [],
             'except' => [],
+            'redis' => [
+                // Omit to inherit Craft cache's Redis database.
+                // Use null to disable SELECT for compatible cluster-style endpoints.
+                // 'database' => '$LOGGING_LIBRARY_RUNTIME_REDIS_DB',
+            ],
             'privacy' => [
                 'includeUserId' => false,
             ],

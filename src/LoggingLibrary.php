@@ -399,7 +399,7 @@ class LoggingLibrary extends Plugin
     }
 
     /**
-     * Whether the cache-backed recent runtime log store is enabled.
+     * Whether the bounded recent runtime log store is enabled.
      *
      * @since 5.14.0
      */
@@ -429,6 +429,7 @@ class LoggingLibrary extends Plugin
             'levels' => ['error', 'warning', 'info'],
             'categories' => [],
             'except' => [],
+            'redis' => [],
             'privacy' => [
                 'includeUserId' => false,
             ],

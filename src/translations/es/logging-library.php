@@ -133,9 +133,11 @@ return [
     'Log Location' => 'Ubicación del registro',
     'Runtime Store' => 'Almacén de tiempo de ejecución',
     'Craft cache' => 'caché de Craft',
-    'Redis ({cache})' => 'Redis ({cache})',
+    'Redis unavailable' => 'Redis no disponible',
+    'Redis (SELECT disabled)' => 'Redis (SELECT desactivado)',
+    'Redis database {database}' => 'Base de datos Redis {database}',
     'Runtime Location' => 'Ubicación de tiempo de ejecución',
-    'Recent runtime logs are stored in Craft cache and are intended for short-lived diagnostics, not complete log history.' => 'Los registros recientes de tiempo de ejecución se almacenan en la caché de Craft y están pensados para diagnósticos efímeros, no para el historial completo de registros.',
+    'Recent runtime logs use a bounded diagnostic store and are not complete log history.' => 'Los registros recientes de tiempo de ejecución usan un almacén de diagnóstico limitado y no constituyen un historial completo de registros.',
 
     // Config overrides
     'This is being overridden by the <code>forceEnableLogViewer</code> setting in <code>config/logging-library.php</code>.' => 'Este valor está siendo anulado por la configuración <code>forceEnableLogViewer</code> en <code>config/logging-library.php</code>.',

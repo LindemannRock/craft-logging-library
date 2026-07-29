@@ -238,7 +238,7 @@
     {% if isRuntime %}
         <div class="info-box-table-wrapper">
             {% include 'lindemannrock-base/_components/info-box' with {
-                message: 'Recent runtime logs are stored in Craft cache and are intended for short-lived diagnostics, not complete log history.'|t('logging-library'),
+                message: 'Recent runtime logs use a bounded diagnostic store and are not complete log history.'|t('logging-library'),
                 type: 'tip',
                 margin: 'none',
                 stretch: true,
@@ -339,6 +339,18 @@
                     runtimeLogEntryCount.textContent = formatter.format(data.storedTotal) + ' / ' + formatter.format({{ (runtimeMaxEntries ?? 1000)|json_encode|raw }});
                 }
             }
+            if (typeof data.runtimeStoreLabel === 'string') {
+                const runtimeStoreLabel = document.getElementById('runtime-store-label');
+                if (runtimeStoreLabel) {
+                    runtimeStoreLabel.textContent = data.runtimeStoreLabel;
+                }
+            }
+            if (typeof data.runtimeLocationLabel === 'string') {
+                const runtimeLocationLabel = document.getElementById('runtime-location-label');
+                if (runtimeLocationLabel) {
+                    runtimeLocationLabel.textContent = data.runtimeLocationLabel;
+                }
+            }
             window.lrViewSettings?.apply?.();
         });
         </script>
@@ -414,7 +426,7 @@
 
             <div class="log-config-item">
                 <div class="label">{{ "Runtime Store"|t('logging-library') }}</div>
-                <div class="value">{{ (runtimeUsesRedisCache ?? false) ? 'Redis ({cache})'|t('logging-library', {cache: "Craft cache"|t('logging-library')}) : "Craft cache"|t('logging-library') }}</div>
+                <div class="value" id="runtime-store-label">{{ runtimeStoreLabel ?? "Craft cache"|t('logging-library') }}</div>
             </div>
 
             <div class="log-config-item">
@@ -527,7 +539,7 @@
             <div class="value">
                 <code style="font-size: 10px; line-height: 1.5; color: #606d7b; word-break: break-all; display: block;">
                     {% if isRuntime %}
-                        craft.app.cache
+                        <span id="runtime-location-label">{{ runtimeLocationLabel ?? 'craft.app.cache' }}</span>
                     {% elseif isStandalone %}
                         storage/logs/
                     {% else %}

@@ -133,9 +133,11 @@ return [
     'Log Location' => 'Localização do log',
     'Runtime Store' => 'Armazenamento de runtime',
     'Craft cache' => 'cache Craft',
-    'Redis ({cache})' => 'Redis ({cache})',
+    'Redis unavailable' => 'Redis indisponível',
+    'Redis (SELECT disabled)' => 'Redis (SELECT desativado)',
+    'Redis database {database}' => 'Base de dados Redis {database}',
     'Runtime Location' => 'Localização de runtime',
-    'Recent runtime logs are stored in Craft cache and are intended for short-lived diagnostics, not complete log history.' => 'Os registos de runtime recentes são armazenados na cache Craft e destinam-se a diagnósticos de curta duração, não ao histórico completo de registos.',
+    'Recent runtime logs use a bounded diagnostic store and are not complete log history.' => 'Os registos de runtime recentes usam um armazenamento de diagnóstico limitado e não constituem um histórico completo de registos.',
 
     // Config overrides
     'This is being overridden by the <code>forceEnableLogViewer</code> setting in <code>config/logging-library.php</code>.' => 'Isto está a ser substituído pela definição <code>forceEnableLogViewer</code> em <code>config/logging-library.php</code>.',

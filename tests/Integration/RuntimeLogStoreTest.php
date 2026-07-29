@@ -16,6 +16,7 @@ use craft\console\Request as CraftConsoleRequest;
 use craft\queue\Queue as CraftQueue;
 use craft\services\Config;
 use craft\web\Response as CraftWebResponse;
+use craft\web\TemplateResponseBehavior;
 use craft\web\View as CraftWebView;
 use lindemannrock\logginglibrary\controllers\LogsController;
 use lindemannrock\logginglibrary\helpers\RuntimeCategoryOptionsHelper;
@@ -23,7 +24,10 @@ use lindemannrock\logginglibrary\helpers\UserLabelHelper;
 use lindemannrock\logginglibrary\log\targets\RuntimeLogTarget;
 use lindemannrock\logginglibrary\LoggingLibrary;
 use lindemannrock\logginglibrary\services\RuntimeLogStoreService;
+use lindemannrock\logginglibrary\services\runtime\GenericCacheRuntimeLogStorage;
 use lindemannrock\logginglibrary\tests\TestCase;
+use yii\caching\ArrayCache;
+use yii\mutex\Mutex;
 use yii\web\ForbiddenHttpException;
 use yii\log\Logger;
 
@@ -498,6 +502,8 @@ class RuntimeLogStoreTest extends TestCase
 
             self::assertSame(0, $response->data['totalCount']);
             self::assertSame(2, $response->data['storedTotal']);
+            self::assertSame('Craft cache', $response->data['runtimeStoreLabel']);
+            self::assertSame('craft.app.cache', $response->data['runtimeLocationLabel']);
         } finally {
             $view->setTemplateMode($originalTemplateMode);
             Craft::$app->set('request', $originalRequest);
@@ -506,20 +512,57 @@ class RuntimeLogStoreTest extends TestCase
         }
     }
 
-    public function testClearRuntimeStoreReturnsFalseWhenLockCannotBeAcquired(): void
+    public function testInitialAndAjaxStatusReportUnavailableRedisAuthoritatively(): void
     {
-        $lockConstant = (new \ReflectionClass($this->store))->getReflectionConstant('LOCK_KEY');
-        self::assertNotNull($lockConstant);
-        $lockKey = (string)$lockConstant->getValue();
-        $mutex = Craft::$app->getMutex();
+        $user = $this->createTestUser('__logginglibrary_test_');
+        $this->grantPermissions($user, [LoggingLibrary::PERMISSION_VIEW_ALL_LOGS]);
+        $this->actingAs($user);
+        $this->swapPluginComponent(
+            'logging-library',
+            'runtimeLogStore',
+            new UnavailableStatusRuntimeLogStoreService(),
+        );
 
-        self::assertTrue($mutex->acquire($lockKey, 1));
+        $originalRequest = Craft::$app->getRequest();
+        $originalResponse = Craft::$app->getResponse();
+        $originalConfig = Craft::$app->getConfig();
+        $view = Craft::$app->getView();
+        $originalTemplateMode = $view->getTemplateMode();
+
+        Craft::$app->set('request', new RuntimeLogStoreJsonRequest());
+        Craft::$app->set('response', new CraftWebResponse());
+        Craft::$app->set('config', new RuntimeLogStoreConfig(['enabled' => true]));
 
         try {
-            self::assertFalse($this->store->clear());
+            $view->setTemplateMode(CraftWebView::TEMPLATE_MODE_CP);
+            $controller = new LogsController('logs', LoggingLibrary::getInstance());
+
+            $initialResponse = $controller->actionRuntime();
+            $templateBehavior = $initialResponse->getBehavior('template');
+            self::assertInstanceOf(TemplateResponseBehavior::class, $templateBehavior);
+            self::assertSame('Redis unavailable', $templateBehavior->variables['runtimeStoreLabel']);
+            self::assertSame('owned-unavailable-key', $templateBehavior->variables['runtimeLocationLabel']);
+
+            Craft::$app->set('response', new CraftWebResponse());
+            $ajaxResponse = $controller->actionRuntimeData();
+            self::assertSame('Redis unavailable', $ajaxResponse->data['runtimeStoreLabel']);
+            self::assertSame('owned-unavailable-key', $ajaxResponse->data['runtimeLocationLabel']);
         } finally {
-            $mutex->release($lockKey);
+            $view->setTemplateMode($originalTemplateMode);
+            Craft::$app->set('request', $originalRequest);
+            Craft::$app->set('response', $originalResponse);
+            Craft::$app->set('config', $originalConfig);
         }
+    }
+
+    public function testGenericClearReturnsFalseWhenLockCannotBeAcquired(): void
+    {
+        $storage = new GenericCacheRuntimeLogStorage(
+            new ArrayCache(),
+            new RuntimeLogStoreUnavailableMutex(),
+        );
+
+        self::assertFalse($storage->clear());
     }
 
     public function testRuntimeTargetCapturesDirectCraftLogCalls(): void
@@ -564,11 +607,19 @@ class RuntimeLogStoreTest extends TestCase
     {
         $store = new RecordingRuntimeLogStoreService();
         $this->swapPluginComponent('logging-library', 'runtimeLogStore', $store);
+        $mutex = new RuntimeLogStoreRecordingMutex();
+        $originalMutex = Craft::$app->getMutex();
 
-        $target = $this->target($this->settings());
-        $target->export();
+        try {
+            Craft::$app->set('mutex', $mutex);
+            $target = $this->target($this->settings());
+            $target->export();
 
-        self::assertSame(0, $store->appendCalls);
+            self::assertSame(0, $store->appendCalls);
+            self::assertSame(0, $mutex->acquireCalls);
+        } finally {
+            Craft::$app->set('mutex', $originalMutex);
+        }
     }
 
     public function testRuntimeTargetSkipsActiveCraftQueueExecution(): void
@@ -581,9 +632,12 @@ class RuntimeLogStoreTest extends TestCase
 
         $workerPid = new \ReflectionProperty(\yii\queue\cli\Queue::class, '_workerPid');
         $originalWorkerPid = $workerPid->getValue($queue);
+        $originalMutex = Craft::$app->getMutex();
+        $mutex = new RuntimeLogStoreRecordingMutex();
         $workerPid->setValue($queue, 12345);
 
         try {
+            Craft::$app->set('mutex', $mutex);
             $target = $this->target($this->settings([
                 'skipConsoleRequests' => false,
                 'skipQueueRequests' => true,
@@ -591,7 +645,9 @@ class RuntimeLogStoreTest extends TestCase
             $target->export();
 
             self::assertSame(0, $store->appendCalls);
+            self::assertSame(0, $mutex->acquireCalls);
         } finally {
+            Craft::$app->set('mutex', $originalMutex);
             $workerPid->setValue($queue, $originalWorkerPid);
         }
     }
@@ -710,15 +766,20 @@ class RuntimeLogStoreTest extends TestCase
         $this->swapPluginComponent('logging-library', 'runtimeLogStore', $store);
         $originalRequest = Craft::$app->getRequest();
         $originalRequestedRoute = Craft::$app->requestedRoute;
+        $originalMutex = Craft::$app->getMutex();
+        $mutex = new RuntimeLogStoreRecordingMutex();
 
         try {
+            Craft::$app->set('mutex', $mutex);
             Craft::$app->set('request', new RuntimeLogStoreWebRequest('logging-library/logs/runtime-data'));
             Craft::$app->requestedRoute = 'logging-library/logs/runtime-data';
             $target = $this->target($this->settings());
             $target->export();
 
             self::assertSame(0, $store->appendCalls);
+            self::assertSame(0, $mutex->acquireCalls);
         } finally {
+            Craft::$app->set('mutex', $originalMutex);
             Craft::$app->requestedRoute = $originalRequestedRoute;
             Craft::$app->set('request', $originalRequest);
         }
@@ -864,5 +925,63 @@ final class RecordingRuntimeLogStoreService extends RuntimeLogStoreService
     {
         $this->appendCalls++;
         $this->appendedBatches[] = $messages;
+    }
+}
+
+/**
+ * Deterministic unavailable Redis status fixture.
+ *
+ * @since 5.18.0
+ */
+final class UnavailableStatusRuntimeLogStoreService extends RuntimeLogStoreService
+{
+    public function getLogPage(string $level, string $category, string $search, string $sort, string $dir, int $page, int $limit, ?int $ttl = null): array
+    {
+        return [
+            'entries' => [],
+            'total' => 0,
+            'storedTotal' => 0,
+            'category' => 'all',
+            'categoryLabel' => 'Source',
+            'categoryOptions' => [],
+            'storage' => [
+                'backend' => 'redis',
+                'available' => false,
+                'database' => 7,
+                'databaseMode' => 'literal',
+                'failureReason' => 'redis-command-failure',
+                'ownedKeys' => ['owned-unavailable-key'],
+            ],
+        ];
+    }
+}
+
+final class RuntimeLogStoreUnavailableMutex extends Mutex
+{
+    protected function acquireLock($name, $timeout = 0): bool
+    {
+        return false;
+    }
+
+    protected function releaseLock($name): bool
+    {
+        return true;
+    }
+}
+
+final class RuntimeLogStoreRecordingMutex extends Mutex
+{
+    public int $acquireCalls = 0;
+
+    protected function acquireLock($name, $timeout = 0): bool
+    {
+        $this->acquireCalls++;
+
+        return true;
+    }
+
+    protected function releaseLock($name): bool
+    {
+        return true;
     }
 }

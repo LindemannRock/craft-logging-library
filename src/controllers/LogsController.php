@@ -16,6 +16,7 @@ use lindemannrock\base\helpers\CpNavHelper;
 use lindemannrock\base\helpers\PluginHelper;
 use lindemannrock\logginglibrary\LoggingLibrary;
 use lindemannrock\logginglibrary\models\Settings;
+use lindemannrock\logginglibrary\services\runtime\RedisRuntimeLogStorage;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
@@ -320,7 +321,8 @@ class LogsController extends Controller
             'runtimeMaxEntries' => $context['runtimeMaxEntries'],
             'runtimeRefreshInterval' => $context['runtimeRefreshInterval'],
             'runtimeStoredTotal' => $context['runtimeStoredTotal'],
-            'runtimeUsesRedisCache' => is_a(Craft::$app->getCache(), 'yii\\redis\\Cache'),
+            'runtimeStoreLabel' => $this->_runtimeStoreLabel($context['runtimeStorage']),
+            'runtimeLocationLabel' => $this->_runtimeLocationLabel($context['runtimeStorage']),
             'canClearRuntimeLogs' => $user->checkPermission(LoggingLibrary::PERMISSION_CLEAR_CACHE),
             'logConfig' => null,
         ]);
@@ -371,6 +373,8 @@ class LogsController extends Controller
             'rowsHtml' => $rowsHtml,
             'totalCount' => $totalEntries,
             'storedTotal' => $context['runtimeStoredTotal'],
+            'runtimeStoreLabel' => $this->_runtimeStoreLabel($context['runtimeStorage']),
+            'runtimeLocationLabel' => $this->_runtimeLocationLabel($context['runtimeStorage']),
             'pagination' => [
                 'page' => $context['page'],
                 'limit' => $context['limit'],
@@ -761,6 +765,7 @@ class LogsController extends Controller
             'runtimeMaxEntries' => max(1, (int)($runtimeConfig['maxEntries'] ?? 1000)),
             'runtimeRefreshInterval' => max(0, (int)($runtimeConfig['refreshInterval'] ?? 5)),
             'runtimeStoredTotal' => $logPage['storedTotal'],
+            'runtimeStorage' => $logPage['storage'],
             'level' => $level,
             'category' => $logPage['category'],
             'categoryLabel' => $logPage['categoryLabel'],
@@ -771,6 +776,44 @@ class LogsController extends Controller
             'limit' => $limit,
             'logPage' => $logPage,
         ];
+    }
+
+    /**
+     * Format the effective Runtime Logs backend and Redis database for the status UI.
+     */
+    private function _runtimeStoreLabel(array $storage): string
+    {
+        if (($storage['backend'] ?? '') !== 'redis') {
+            return Craft::t('logging-library', 'Craft cache');
+        }
+
+        if (!($storage['available'] ?? false)) {
+            return Craft::t('logging-library', 'Redis unavailable');
+        }
+
+        if (($storage['database'] ?? null) === null) {
+            return Craft::t('logging-library', 'Redis (SELECT disabled)');
+        }
+
+        return Craft::t('logging-library', 'Redis database {database}', [
+            'database' => $storage['database'],
+        ]);
+    }
+
+    /**
+     * Format the concrete Runtime Logs storage location for the status UI.
+     */
+    private function _runtimeLocationLabel(array $storage): string
+    {
+        if (($storage['backend'] ?? '') !== 'redis') {
+            return 'craft.app.cache';
+        }
+
+        $ownedKeys = $storage['ownedKeys'] ?? [];
+
+        return is_string($ownedKeys[0] ?? null)
+            ? $ownedKeys[0]
+            : RedisRuntimeLogStorage::ownedKey(Craft::$app->id);
     }
 
     /**

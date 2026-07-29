@@ -62,6 +62,9 @@ return [
             'enabled' => false,
             'skipConsoleRequests' => true,
             'skipQueueRequests' => true,
+            'redis' => [
+                // 'database' => '$LOGGING_LIBRARY_RUNTIME_REDIS_DB',
+            ],
         ],
 
         // Base-plugin time overrides (optional — leave out to inherit base)
@@ -71,7 +74,7 @@ return [
 ];
 ```
 
-The `runtimeLogStore` block configures the [Runtime Logs](runtime-logs.md) view. Unlike the settings above, it has no Control Panel equivalent — it's config-file only. Its conservative defaults skip runtime capture for console requests and detected queue execution; the Runtime Logs page explains when to change both safeguards temporarily.
+The `runtimeLogStore` block configures the [Runtime Logs](runtime-logs.md) view. Unlike the settings above, it has no Control Panel equivalent — it's config-file only. Its conservative defaults skip runtime capture for console requests and detected queue execution. The optional nested `redis.database` setting can inherit Craft's Redis database, select an assigned non-negative database, resolve an environment reference, or explicitly disable `SELECT`; the Runtime Logs page documents the strict resolution rules. Restart long-running queue workers after changing this block because existing targets retain their startup configuration.
 
 When a setting is present in this file, the matching Control Panel field is **disabled** and shows a notice that it's being overridden by `config/logging-library.php`. The full resolution order, highest priority first:
 

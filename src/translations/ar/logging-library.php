@@ -133,9 +133,11 @@ return [
     'Log Location' => 'موقع السجل',
     'Runtime Store' => 'مخزن وقت التشغيل',
     'Craft cache' => 'Cache الخاص بـ Craft',
-    'Redis ({cache})' => 'Redis ({cache})',
+    'Redis unavailable' => 'Redis غير متاح',
+    'Redis (SELECT disabled)' => 'Redis (تم تعطيل SELECT)',
+    'Redis database {database}' => 'قاعدة بيانات Redis {database}',
     'Runtime Location' => 'موقع وقت التشغيل',
-    'Recent runtime logs are stored in Craft cache and are intended for short-lived diagnostics, not complete log history.' => 'يتم تخزين سجلات وقت التشغيل الحديثة في Cache الخاص بـ Craft وهي مخصصة للتشخيصات قصيرة الأجل، وليس لسجل السجلات الكامل.',
+    'Recent runtime logs use a bounded diagnostic store and are not complete log history.' => 'تستخدم سجلات وقت التشغيل الحديثة مخزنًا تشخيصيًا محدودًا ولا تمثل سجلًا كاملاً للسجلات.',
 
     // Config overrides
     'This is being overridden by the <code>forceEnableLogViewer</code> setting in <code>config/logging-library.php</code>.' => 'يتم تجاوز هذا الإعداد بواسطة الإعداد <code>forceEnableLogViewer</code> في <code>config/logging-library.php</code>.',

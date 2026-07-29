@@ -2,7 +2,7 @@
 /**
  * Logging Library for Craft CMS
  *
- * Cache-backed recent runtime log store for edge/ephemeral environments.
+ * Bounded recent runtime log store for edge/ephemeral environments.
  *
  * @link      https://lindemannrock.com
  * @copyright Copyright (c) 2026 LindemannRock
@@ -15,18 +15,24 @@ use craft\base\Component;
 use craft\helpers\Json;
 use lindemannrock\logginglibrary\helpers\RuntimeCategoryOptionsHelper;
 use lindemannrock\logginglibrary\helpers\UserLabelHelper;
+use lindemannrock\logginglibrary\LoggingLibrary;
+use lindemannrock\logginglibrary\services\runtime\GenericCacheRuntimeLogStorage;
+use lindemannrock\logginglibrary\services\runtime\RedisRuntimeLogStorage;
+use lindemannrock\logginglibrary\services\runtime\RuntimeLogRedisConnectionFactory;
+use lindemannrock\logginglibrary\services\runtime\RuntimeLogStorageInterface;
+use lindemannrock\logginglibrary\services\runtime\UnavailableRedisRuntimeLogStorage;
 use yii\helpers\VarDumper;
 use yii\log\Logger;
+use yii\redis\Cache as RedisCache;
+use yii\redis\Connection as RedisConnection;
 
 /**
- * Stores recent normalized runtime log records in Craft cache.
+ * Stores recent normalized runtime log records in Redis or Craft cache.
  *
  * @since 5.14.0
  */
 class RuntimeLogStoreService extends Component
 {
-    private const CACHE_KEY = 'logging-library:runtime-log-store:v1';
-    private const LOCK_KEY = 'logging-library:runtime-log-store:v1:lock';
     private const MAX_ENTRIES_LIMIT = 10000;
     /**
      * @since 5.14.0
@@ -34,6 +40,8 @@ class RuntimeLogStoreService extends Component
     public const MAX_BYTES_LIMIT = 65536;
 
     private bool $_writing = false;
+    private ?RuntimeLogStorageInterface $_storage = null;
+    private string $_storageSignature = '';
 
     /**
      * Append Yii log messages to the bounded runtime store.
@@ -57,20 +65,8 @@ class RuntimeLogStoreService extends Component
             $maxEntries = min(self::MAX_ENTRIES_LIMIT, max(1, (int)($settings['maxEntries'] ?? 1000)));
             $ttl = max(1, (int)($settings['ttl'] ?? 86400));
 
-            $mutex = Craft::$app->getMutex();
-            if (!$mutex->acquire(self::LOCK_KEY, 2)) {
-                return;
-            }
-
-            try {
-                $existing = $this->_getRecords();
-                $records = array_slice(array_merge($records, $existing), 0, $maxEntries);
-                if (!Craft::$app->getCache()->set(self::CACHE_KEY, $records, $ttl)) {
-                    Craft::$app->getCache()->delete(self::CACHE_KEY);
-                }
-            } finally {
-                $mutex->release(self::LOCK_KEY);
-            }
+            // A failed backend batch is deliberately dropped without changing storage families.
+            $this->_storage($settings)->append($records, $maxEntries, $ttl);
         } catch (\Throwable) {
             // Runtime logging must never break the request or recurse into logging.
         } finally {
@@ -81,11 +77,15 @@ class RuntimeLogStoreService extends Component
     /**
      * Return a filtered, sorted, paginated page of runtime records.
      *
-     * @return array{entries: array, total: int, storedTotal: int, category: string, categoryLabel: string, categoryOptions: array}
+     * @return array{entries: array, total: int, storedTotal: int, category: string, categoryLabel: string, categoryOptions: array, storage: array}
      */
     public function getLogPage(string $level, string $category, string $search, string $sort, string $dir, int $page, int $limit, ?int $ttl = null): array
     {
-        $records = $this->_getRecords();
+        $runtimeSettings = LoggingLibrary::getRuntimeLogStoreConfig();
+        $storage = $this->_storage($runtimeSettings);
+        $records = $storage->read();
+
+        $records = $this->_normalizeRecords($records);
         if ($ttl !== null) {
             $records = $this->_filterByTtl($records, $ttl);
         }
@@ -149,6 +149,7 @@ class RuntimeLogStoreService extends Component
             'category' => $category,
             'categoryLabel' => $groupedCategoryOptions['labelsByValue'][$category] ?? Craft::t('logging-library', 'Source'),
             'categoryOptions' => $groupedCategoryOptions['options'],
+            'storage' => $storage->status(),
         ];
     }
 
@@ -157,18 +158,10 @@ class RuntimeLogStoreService extends Component
      */
     public function clear(): bool
     {
-        $mutex = Craft::$app->getMutex();
-        if (!$mutex->acquire(self::LOCK_KEY, 5)) {
-            return false;
-        }
-
         try {
-            Craft::$app->getCache()->delete(self::CACHE_KEY);
-            return true;
+            return $this->_storage(LoggingLibrary::getRuntimeLogStoreConfig())->clear();
         } catch (\Throwable) {
             return false;
-        } finally {
-            $mutex->release(self::LOCK_KEY);
         }
     }
 
@@ -220,18 +213,106 @@ class RuntimeLogStoreService extends Component
         ];
     }
 
-    private function _getRecords(): array
+    private function _storage(array $settings): RuntimeLogStorageInterface
     {
-        try {
-            $records = Craft::$app->getCache()->get(self::CACHE_KEY);
-        } catch (\Throwable) {
-            return [];
+        $cache = Craft::$app->getCache();
+        $redisConfig = $settings['redis'] ?? [];
+        $signature = implode(':', [
+            (string)spl_object_id($cache),
+            (string)spl_object_id(Craft::$app->getMutex()),
+            hash('sha256', serialize($redisConfig)),
+            hash('sha256', Craft::$app->id),
+        ]);
+
+        if ($this->_storage !== null && $this->_storageSignature === $signature) {
+            return $this->_storage;
         }
 
-        if (!is_array($records)) {
-            return [];
+        $this->_storageSignature = $signature;
+
+        if (!$cache instanceof RedisCache) {
+            return $this->_genericStorage($signature);
         }
 
+        $ownedKey = RedisRuntimeLogStorage::ownedKey(Craft::$app->id);
+
+        if (!$cache->redis instanceof RedisConnection) {
+            return $this->_unavailableRedisStorage(
+                $ownedKey,
+                null,
+                null,
+                'unsupported-redis-connection',
+            );
+        }
+
+        if (!is_array($redisConfig)) {
+            return $this->_unavailableRedisStorage(
+                $ownedKey,
+                null,
+                null,
+                'invalid-redis-config',
+            );
+        }
+
+        $database = RuntimeLogRedisConnectionFactory::resolveDatabase($redisConfig, $cache->redis->database);
+        if (!$database['valid']) {
+            return $this->_unavailableRedisStorage(
+                $ownedKey,
+                $database['database'],
+                $database['mode'],
+                $database['error'] ?? 'invalid-database',
+            );
+        }
+
+        $connection = RuntimeLogRedisConnectionFactory::create($cache->redis, $database['database']);
+        $this->_storage = new RedisRuntimeLogStorage(
+            $connection,
+            $ownedKey,
+            $database['mode'],
+        );
+
+        return $this->_storage;
+    }
+
+    private function _genericStorage(?string $signature = null): RuntimeLogStorageInterface
+    {
+        if (
+            $this->_storage instanceof GenericCacheRuntimeLogStorage
+            && ($signature === null || $this->_storageSignature === $signature)
+        ) {
+            return $this->_storage;
+        }
+
+        if ($signature !== null) {
+            $this->_storageSignature = $signature;
+        }
+
+        $this->_storage = new GenericCacheRuntimeLogStorage(
+            Craft::$app->getCache(),
+            Craft::$app->getMutex(),
+        );
+
+        return $this->_storage;
+    }
+
+    private function _unavailableRedisStorage(
+        string $ownedKey,
+        ?int $database,
+        ?string $databaseMode,
+        string $failureReason,
+    ): RuntimeLogStorageInterface {
+        $this->_storage = new UnavailableRedisRuntimeLogStorage(
+            $ownedKey,
+            $database,
+            $databaseMode,
+            $failureReason,
+        );
+
+        return $this->_storage;
+    }
+
+    private function _normalizeRecords(array $records): array
+    {
         return array_values(array_map(function(array $record): array {
             $canonicalLevel = (string)($record['canonicalLevel'] ?? $record['level'] ?? '');
             $levelClass = (string)($record['levelClass'] ?? '');

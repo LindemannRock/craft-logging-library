@@ -133,9 +133,11 @@ return [
     'Log Location' => 'Loglocatie',
     'Runtime Store' => 'Runtimeopslag',
     'Craft cache' => 'Craft-cache',
-    'Redis ({cache})' => 'Redis ({cache})',
+    'Redis unavailable' => 'Redis niet beschikbaar',
+    'Redis (SELECT disabled)' => 'Redis (SELECT uitgeschakeld)',
+    'Redis database {database}' => 'Redis-database {database}',
     'Runtime Location' => 'Runtimelocatie',
-    'Recent runtime logs are stored in Craft cache and are intended for short-lived diagnostics, not complete log history.' => 'Recente runtime-logboeken worden opgeslagen in Craft-cache en zijn bedoeld voor kortstondige diagnose, niet voor volledige logboekgeschiedenis.',
+    'Recent runtime logs use a bounded diagnostic store and are not complete log history.' => 'Recente runtime-logboeken gebruiken een begrensde diagnostische opslag en vormen geen volledige logboekgeschiedenis.',
 
     // Config overrides
     'This is being overridden by the <code>forceEnableLogViewer</code> setting in <code>config/logging-library.php</code>.' => 'Dit wordt overschreven door de instelling <code>forceEnableLogViewer</code> in <code>config/logging-library.php</code>.',

@@ -2,7 +2,7 @@
 
 Logging Library uses file-based caching to parse log files once and serve subsequent requests efficiently. This is handled by the `LogCacheService`.
 
-This page covers the parsed-log-entry cache behind the file-based viewers. Two smaller caches exist alongside it: the log **file listing** is cached in Craft's cache for 5 seconds (so a file created a moment ago can take up to 5 seconds to appear in the file selector), and [Runtime Logs](runtime-logs.md) entries are stored in Craft's cache entirely — they never touch the caches described here.
+This page covers the parsed-log-entry cache behind the file-based viewers. The log **file listing** is also cached in Craft's cache for 5 seconds, so a file created a moment ago can take up to 5 seconds to appear in the file selector. [Runtime Logs](runtime-logs.md) uses its authoritative bounded Redis list when Craft cache is Redis, or a generic Craft-cache value only when Craft cache is non-Redis, and never touches the parsed-file caches described here.
 
 ## How It Works
 

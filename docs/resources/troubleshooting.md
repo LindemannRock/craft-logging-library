@@ -35,7 +35,7 @@
 
 On Servd, Logging Library can only show files that exist in the current Craft `storage/logs/` path. Servd collects Craft logs centrally for its dashboard, but that hosted log feed is not imported into the Logging Library interface.
 
-**Fix:** For recent activity in the CP, enable [Runtime Logs](../feature-tour/runtime-logs.md) — it captures log messages into Craft's cache as they happen, so it doesn't depend on files in `storage/logs/`. Use Servd's **Logs** page, or Servd's Papertrail/Datadog integrations, for the complete hosted log history. Only enable **Force Enable Log Viewers** if `storage/logs/` is backed by persistent shared storage. Without that, the dropdown may be empty, stale, or limited to whichever application instance handled the request.
+**Fix:** For recent activity in the CP, enable [Runtime Logs](../feature-tour/runtime-logs.md) — it captures log messages into a bounded Redis list, or a bounded generic value when Craft cache is non-Redis, so it doesn't depend on files in `storage/logs/`. Use Servd's **Logs** page, or Servd's Papertrail/Datadog integrations, for the complete hosted log history. Only enable **Force Enable Log Viewers** if `storage/logs/` is backed by persistent shared storage. Without that, the dropdown may be empty, stale, or limited to whichever application instance handled the request.
 
 ## Runtime Logs is missing or empty
 
@@ -44,7 +44,27 @@ On Servd, Logging Library can only show files that exist in the current Craft `s
 3. If the view is empty, trigger something that logs at a captured level (`error`, `warning`, or `info` by default) and let the page auto-refresh
 4. Check your `levels`, `categories`, and `except` config — an entry has to match all three to be captured
 
-**Why:** Runtime entries only exist in Craft's cache. They expire with the configured `ttl`, roll off past `maxEntries`, and disappear when the cache is cleared. On load-balanced hosting without a shared cache backend (such as Redis), each instance keeps its own store, so the CP may show only entries captured by the instance serving your request. See [Runtime Logs](../feature-tour/runtime-logs.md).
+**Why:** Runtime entries only exist in their selected diagnostic store. They expire with the configured `ttl`, roll off past `maxEntries`, and disappear when that store is cleared or evicts them. On load-balanced hosting without a shared cache backend (such as Redis), each instance keeps its own fallback store, so the CP may show only entries captured by the instance serving your request. The Runtime Logs sidebar reports the effective backend and Redis database. See [Runtime Logs](../feature-tour/runtime-logs.md).
+
+## Runtime Logs shows Redis unavailable
+
+When Craft cache is Yii Redis, Redis is the only authoritative Runtime Logs backend. The sidebar reports **Redis unavailable** if its database configuration is invalid, `SELECT` is rejected, the independent connection cannot be established, or a Redis operation fails.
+
+1. Confirm Craft cache is configured as `yii\redis\Cache`
+2. If `runtimeLogStore.redis.database` references an environment variable, confirm it exists and contains a non-negative integer
+3. If you supplied a literal value, use an integer such as `4`, not the string `'4'`
+4. Confirm the endpoint supports the configured Redis database; a rejected `SELECT` fails closed
+5. Restart long-running web and queue processes after correcting configuration
+
+The affected batch is dropped fail-soft. Logging Library does not switch to Craft cache, write a generic Runtime key in database `0`, or make entries alternate between storage families. A later operation can reconnect to the same authoritative Redis backend. The sidebar's Runtime Store and Runtime Location values update during AJAX refresh, so recovery or continued unavailability is visible without reloading the page.
+
+An explicit `'database' => null` sends no `SELECT` and is intended only for compatible cluster-style endpoints. Logical Redis databases provide namespace and administrative separation, not separate CPU, memory, network, eviction, or server contention.
+
+## Runtime Logs uses Craft cache
+
+This is expected only when Craft's configured cache is genuinely non-Redis. The generic backend keeps one bounded value in that cache and uses a zero-wait mutex. A busy mutex drops the current batch rather than delaying the request. Cache read failures do not replace the existing value, and failed writes leave the previous buffer intact.
+
+With a local or otherwise non-shared cache, each application instance has a separate Runtime Logs buffer. Use a shared cache when the CP must see entries captured by multiple instances.
 
 ## Console or queue entries are missing from Runtime Logs
 
@@ -63,6 +83,8 @@ On Servd, Logging Library can only show files that exist in the current Craft `s
 ```
 
 **Why:** The defaults avoid Runtime Logs cache work inside commands and queue jobs. Queue detection skips the current buffered runtime export batch as a whole, so nearby non-queue messages in that batch may also be absent. These options affect only Runtime Logs; Craft file logs and hosted feeds such as Servd's continue unchanged. Capturing console or queue traffic, especially debug output, can fill the bounded runtime buffer quickly and add cache traffic.
+
+Restart long-running queue workers after changing these options. A running worker keeps the Runtime Logs target configuration captured when its application started.
 
 ## Permission denied when viewing logs
 
