@@ -11,6 +11,7 @@
 namespace lindemannrock\logginglibrary\services\runtime;
 
 use craft\helpers\App;
+use lindemannrock\base\helpers\YiiRedisConnectionHelper;
 use yii\redis\Connection;
 
 /**
@@ -21,22 +22,6 @@ use yii\redis\Connection;
  */
 final class RuntimeLogRedisConnectionFactory
 {
-    private const CONNECTION_PROPERTIES = [
-        'hostname',
-        'scheme',
-        'redirectConnectionString',
-        'port',
-        'unixSocket',
-        'username',
-        'password',
-        'connectionTimeout',
-        'dataTimeout',
-        'useSSL',
-        'contextOptions',
-        'retryInterval',
-        'redisCommands',
-    ];
-
     /**
      * Resolve the configured database without ever coercing invalid input to database 0.
      *
@@ -84,21 +69,13 @@ final class RuntimeLogRedisConnectionFactory
      */
     public static function create(Connection $source, ?int $database): Connection
     {
-        $config = [];
-        foreach (self::CONNECTION_PROPERTIES as $property) {
-            $config[$property] = $source->{$property};
-        }
-
-        // Runtime Logs owns this transport independently. A persistent socket
-        // identity can otherwise be shared with Craft's cache connection.
-        $config['socketClientFlags'] = ($source->socketClientFlags & ~STREAM_CLIENT_PERSISTENT) | STREAM_CLIENT_CONNECT;
-
-        // Redis list appends are one transaction. Yii must not reconnect and
-        // replay an individual queued command outside a lost MULTI context.
-        $config['retries'] = 0;
-        $config['database'] = $database;
-
-        return new Connection($config);
+        return YiiRedisConnectionHelper::createIndependentConnection(
+            source: $source,
+            database: $database,
+            // Redis list appends are one transaction. Yii must not reconnect
+            // and replay an individual queued command outside a lost MULTI context.
+            retries: 0,
+        );
     }
 
     /**

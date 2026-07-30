@@ -359,7 +359,6 @@ final class RuntimeLogStorageBackendTest extends TestCase
         foreach ([
             'hostname',
             'scheme',
-            'redirectConnectionString',
             'port',
             'unixSocket',
             'username',
@@ -374,6 +373,7 @@ final class RuntimeLogStorageBackendTest extends TestCase
             self::assertSame($source->{$property}, $dedicated->{$property}, $property);
         }
 
+        self::assertNull($dedicated->redirectConnectionString);
         self::assertSame(
             STREAM_CLIENT_ASYNC_CONNECT | STREAM_CLIENT_CONNECT,
             $dedicated->socketClientFlags,
@@ -382,6 +382,10 @@ final class RuntimeLogStorageBackendTest extends TestCase
         self::assertSame(0, $dedicated->retries);
         self::assertSame(7, $dedicated->database);
         self::assertNotSame($source, $dedicated);
+        self::assertSame('tcp://redirect.internal:6380', $source->redirectConnectionString);
+        self::assertSame(STREAM_CLIENT_PERSISTENT | STREAM_CLIENT_ASYNC_CONNECT, $source->socketClientFlags);
+        self::assertSame(3, $source->retries);
+        self::assertSame(2, $source->database);
     }
 
     #[DataProvider('transactionFailureStageProvider')]
