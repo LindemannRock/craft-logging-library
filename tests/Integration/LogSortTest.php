@@ -10,8 +10,8 @@ declare(strict_types=1);
 
 namespace lindemannrock\logginglibrary\tests\Integration;
 
-use lindemannrock\logginglibrary\services\LogCacheService;
 use lindemannrock\logginglibrary\helpers\UserLabelHelper;
+use lindemannrock\logginglibrary\services\LogCacheService;
 use lindemannrock\logginglibrary\tests\TestCase;
 
 /**

@@ -12,10 +12,10 @@ namespace lindemannrock\logginglibrary\tests\Integration;
 
 use Craft;
 use craft\helpers\App;
-use lindemannrock\logginglibrary\services\RuntimeLogStoreService;
 use lindemannrock\logginglibrary\services\runtime\GenericCacheRuntimeLogStorage;
 use lindemannrock\logginglibrary\services\runtime\RedisRuntimeLogStorage;
 use lindemannrock\logginglibrary\services\runtime\RuntimeLogRedisConnectionFactory;
+use lindemannrock\logginglibrary\services\RuntimeLogStoreService;
 use lindemannrock\logginglibrary\tests\TestCase;
 use Symfony\Component\Process\Process;
 use yii\log\Logger;

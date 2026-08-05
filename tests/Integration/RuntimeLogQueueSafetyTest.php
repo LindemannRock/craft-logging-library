@@ -19,9 +19,9 @@ use lindemannrock\logginglibrary\services\runtime\RuntimeLogRedisConnectionFacto
 use lindemannrock\logginglibrary\tests\Support\RuntimeLogQueueSafetyJob;
 use lindemannrock\logginglibrary\tests\TestCase;
 use Symfony\Component\Process\Process;
+use yii\db\Schema;
 use yii\redis\Cache as RedisCache;
 use yii\redis\Connection;
-use yii\db\Schema;
 
 /**
  * Proves queue safety through a dedicated channel and isolated child execution.
@@ -268,11 +268,13 @@ final class RuntimeLogQueueSafetyTest extends TestCase
         $cache = new RedisCache([
             'redis' => new Connection($this->localRedisConnectionConfig()),
         ]);
+        $redis = $cache->redis;
+        self::assertInstanceOf(Connection::class, $redis);
 
-        $resolved = RuntimeLogRedisConnectionFactory::resolveDatabase([], $cache->redis->database);
+        $resolved = RuntimeLogRedisConnectionFactory::resolveDatabase([], $redis->database);
         self::assertTrue($resolved['valid']);
-        $connection = RuntimeLogRedisConnectionFactory::create($cache->redis, $resolved['database']);
-        $this->cleanupRedis = RuntimeLogRedisConnectionFactory::create($cache->redis, $resolved['database']);
+        $connection = RuntimeLogRedisConnectionFactory::create($redis, $resolved['database']);
+        $this->cleanupRedis = RuntimeLogRedisConnectionFactory::create($redis, $resolved['database']);
         $config = [
             'hostname' => $connection->hostname,
             'scheme' => $connection->scheme,

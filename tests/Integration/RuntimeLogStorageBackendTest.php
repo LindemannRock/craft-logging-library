@@ -14,11 +14,11 @@ use Craft;
 use lindemannrock\logginglibrary\controllers\LogsController;
 use lindemannrock\logginglibrary\log\targets\RuntimeLogTarget;
 use lindemannrock\logginglibrary\LoggingLibrary;
-use lindemannrock\logginglibrary\services\RuntimeLogStoreService;
 use lindemannrock\logginglibrary\services\runtime\GenericCacheRuntimeLogStorage;
 use lindemannrock\logginglibrary\services\runtime\RedisRuntimeLogStorage;
 use lindemannrock\logginglibrary\services\runtime\RuntimeLogRedisConnectionFactory;
 use lindemannrock\logginglibrary\services\runtime\UnavailableRedisRuntimeLogStorage;
+use lindemannrock\logginglibrary\services\RuntimeLogStoreService;
 use lindemannrock\logginglibrary\tests\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use yii\caching\ArrayCache;
@@ -393,8 +393,7 @@ final class RuntimeLogStorageBackendTest extends TestCase
         string $failureCommand,
         bool $failAfterExec,
         bool $expectCommitted,
-    ): void
-    {
+    ): void {
         $source = new RecordingRedisConnection([
             'database' => 0,
             'retries' => 5,

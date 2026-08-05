@@ -52,34 +52,7 @@ final class LoggingTraitTest extends TestCase
     }
 }
 
-final class LoggingTraitMethodHandleStub
-{
-    use LoggingTrait;
-
-    public function getHandle(): string
-    {
-        return 'method-handle';
-    }
-
-    public function loggingHandleForTest(): string
-    {
-        return $this->getLoggingHandle();
-    }
-}
-
-final class LoggingTraitPropertyHandleStub
-{
-    use LoggingTrait;
-
-    public string $handle = 'property-handle';
-
-    public function loggingHandleForTest(): string
-    {
-        return $this->getLoggingHandle();
-    }
-}
-
-final class LoggingTraitFallbackStub
+abstract class LoggingTraitStub
 {
     use LoggingTrait;
 
@@ -92,4 +65,21 @@ final class LoggingTraitFallbackStub
     {
         return $this->formatMessage($message, $params);
     }
+}
+
+final class LoggingTraitMethodHandleStub extends LoggingTraitStub
+{
+    public function getHandle(): string
+    {
+        return 'method-handle';
+    }
+}
+
+final class LoggingTraitPropertyHandleStub extends LoggingTraitStub
+{
+    public string $handle = 'property-handle';
+}
+
+final class LoggingTraitFallbackStub extends LoggingTraitStub
+{
 }
