@@ -7,7 +7,9 @@ declare(strict_types=1);
 
 use yii\redis\Connection;
 
-$projectRoot = dirname(__DIR__, 4);
+$projectRoot = $_SERVER['LOGGING_LIBRARY_TEST_PROJECT_ROOT']
+    ?? $_ENV['LOGGING_LIBRARY_TEST_PROJECT_ROOT']
+    ?? dirname(__DIR__, 4);
 require $projectRoot . '/vendor/autoload.php';
 require $projectRoot . '/vendor/yiisoft/yii2/Yii.php';
 

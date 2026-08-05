@@ -1,0 +1,76 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+PACKAGE_ROOT="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd -P)"
+TMP_ROOT="${TMPDIR:-/tmp}"
+ARCHIVE_ROOT="$(mktemp -d "$TMP_ROOT/logging-library-package-boundary.XXXXXX")"
+ARCHIVE_PATH="$ARCHIVE_ROOT/package.tar"
+MANIFEST_PATH="$ARCHIVE_ROOT/manifest.txt"
+
+cleanup_archive() {
+    case "$ARCHIVE_ROOT" in
+        "$TMP_ROOT"/logging-library-package-boundary.*)
+            rm -rf -- "$ARCHIVE_ROOT"
+            ;;
+        *)
+            echo "Refusing to remove unexpected archive path: $ARCHIVE_ROOT" >&2
+            return 1
+            ;;
+    esac
+}
+trap cleanup_archive EXIT
+
+cd "$PACKAGE_ROOT"
+git archive --format=tar --output="$ARCHIVE_PATH" HEAD
+tar -tf "$ARCHIVE_PATH" > "$MANIFEST_PATH"
+
+if [ "${LOGGING_LIBRARY_PACKAGE_BOUNDARY_FAIL_STAGE:-}" = "after-archive" ]; then
+    echo "Injected package-boundary failure after archive creation." >&2
+    exit 78
+fi
+
+assert_absent() {
+    local path="$1"
+    if awk -v path="$path" '$0 == path || $0 == path "/" || index($0, path "/") == 1 { found = 1 } END { exit found ? 0 : 1 }' "$MANIFEST_PATH"; then
+        echo "Customer archive unexpectedly contains: $path" >&2
+        exit 1
+    fi
+    printf 'excluded: %s\n' "$path"
+}
+
+assert_present() {
+    local path="$1"
+    if ! grep -Fxq "$path" "$MANIFEST_PATH"; then
+        echo "Customer archive is missing required file: $path" >&2
+        exit 1
+    fi
+    printf 'present: %s\n' "$path"
+}
+
+for path in \
+    tests \
+    docs \
+    scripts \
+    .github \
+    .githooks \
+    ecs.php \
+    phpstan.neon \
+    phpunit.xml.dist \
+    release-please-config.json \
+    .release-please-manifest.json; do
+    assert_absent "$path"
+done
+
+for path in \
+    composer.json \
+    README.md \
+    LICENSE.md \
+    CHANGELOG.md \
+    SECURITY.md \
+    src/LoggingLibrary.php \
+    src/services/LoggingService.php \
+    src/templates/logs/index.twig; do
+    assert_present "$path"
+done
+
+echo "Package boundary passed: 10 excluded paths absent; 8 required customer files present."

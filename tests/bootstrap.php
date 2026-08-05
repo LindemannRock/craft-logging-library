@@ -12,7 +12,14 @@
 
 declare(strict_types=1);
 
-$baseBootstrap = dirname(__DIR__, 3) . '/vendor/lindemannrock/craft-plugin-base/src/testing/bootstrap.php';
+$packageRoot = dirname(__DIR__);
+$configuredProjectRoot = $_SERVER['LOGGING_LIBRARY_TEST_PROJECT_ROOT']
+    ?? $_ENV['LOGGING_LIBRARY_TEST_PROJECT_ROOT']
+    ?? null;
+$projectRoot = is_string($configuredProjectRoot) && $configuredProjectRoot !== ''
+    ? $configuredProjectRoot
+    : dirname($packageRoot, 2);
+$baseBootstrap = $projectRoot . '/vendor/lindemannrock/craft-plugin-base/src/testing/bootstrap.php';
 
 if (!file_exists($baseBootstrap)) {
     fwrite(STDERR, "Base plugin testing bootstrap not found at {$baseBootstrap}\n");
@@ -22,4 +29,4 @@ if (!file_exists($baseBootstrap)) {
 
 require_once $baseBootstrap;
 
-\lindemannrock\base\testing\bootstrap();
+\lindemannrock\base\testing\bootstrap($projectRoot);

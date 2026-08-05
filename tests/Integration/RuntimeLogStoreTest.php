@@ -915,6 +915,11 @@ final class RuntimeLogStoreJsonRequest extends CraftConsoleRequest
     {
         return $this->params[$name] ?? $defaultValue;
     }
+
+    public function getQueryParam(string $name, mixed $defaultValue = null): mixed
+    {
+        return $this->params[$name] ?? $defaultValue;
+    }
 }
 
 final class RuntimeLogStoreConfig extends Config
