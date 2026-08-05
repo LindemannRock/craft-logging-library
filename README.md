@@ -31,6 +31,7 @@ On platforms like Servd, Logging Library does not import the host's centralized 
 
 - Craft CMS 5.10+
 - PHP 8.2+
+- [LindemannRock Plugin Base](https://github.com/LindemannRock/craft-plugin-base) 5.37+ (required by Composer)
 
 ## Installation
 
