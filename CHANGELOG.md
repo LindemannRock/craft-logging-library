@@ -1,5 +1,19 @@
 # Changelog
 
+## [5.18.0](https://github.com/LindemannRock/craft-logging-library/compare/v5.17.0...v5.18.0) (2026-08-05)
+
+
+### Added
+
+* **logs:** add atomic Redis storage for runtime logs ([348d976](https://github.com/LindemannRock/craft-logging-library/commit/348d97635e1198e1b283200e50d377c8f9f41632))
+
+
+### Fixed
+
+* **logs:** clarify runtime Redis location display ([406ea6c](https://github.com/LindemannRock/craft-logging-library/commit/406ea6c7865703ffe2eab986f18e7fb863d006f3))
+* remove unused linkMode parameter from error summary ([9d0420d](https://github.com/LindemannRock/craft-logging-library/commit/9d0420de4e30395069136aebf5f3c9152ba3cbe0))
+* require base 5.37 for shared helper updates ([553b16f](https://github.com/LindemannRock/craft-logging-library/commit/553b16ff17b49cb55c7fc023f5b537d70f03720b))
+
 ## [5.17.0](https://github.com/LindemannRock/craft-logging-library/compare/v5.16.0...v5.17.0) - 2026-07-22
 
 
