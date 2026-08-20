@@ -14,10 +14,10 @@ Logging Library is a shared infrastructure plugin that provides centralized logg
 - **LoggingService** — static API for direct logging, log statistics, recent entries, and cleanup
 - **High Performance Caching** — indexed file-based cache for large log viewer pages, with ArrayQuery compatibility for API callers
 - **Multi-Format Parsing** — automatically detects and parses plugin logs, Craft logs, and PHP error logs
-- **Edge Detection** — auto-disables file-based log viewer on edge/CDN platforms like Servd
+- **Edge Detection** — hides file-based viewers when Craft reports ephemeral storage or `SERVD_PROJECT_SLUG` resolves to a non-empty Servd project slug
 - **Permission-Gated Access** — granular permissions for viewing and downloading logs
 
-On edge platforms such as Servd, that support means safe detection and normal Craft log emission. It does not mean the CP viewer imports the host's centralized log feed; the file-based viewers still read local files from Craft's `storage/logs/` path. For CP visibility on those platforms, enable [Runtime Logs](runtime-logs.md) — it captures recent activity in an authoritative Redis list, or a bounded generic value when Craft cache is non-Redis, instead of reading files.
+Craft's ephemeral-host signal and the normalized Servd signal compose with OR behavior. Missing, blank, whitespace-only, null, or normalized false `SERVD_PROJECT_SLUG` values do not detect Servd; a genuine project slug does. On Craft-ephemeral hosts such as Craft Cloud, and on detected Servd projects, detection suppresses file-based viewer presentation only. Craft/Yii logging and dedicated Monolog targets continue unchanged, and the CP viewer does not import the host's centralized log feed. Use `forceEnableLogViewer` when persistent local log storage makes file viewing safe. For file-independent CP visibility, opt into [Runtime Logs](runtime-logs.md) separately in configuration — it remains config-only and disabled by default.
 
 ## How Plugins Use It
 

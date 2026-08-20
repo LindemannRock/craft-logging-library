@@ -953,7 +953,7 @@ class LoggingLibrary extends Plugin
      */
     private static function _detectEdgeEnvironment(): bool
     {
-        return
+        return App::isEphemeral() ||
             self::_hasNonBlankEnv('SERVD_PROJECT_SLUG');        // Servd.host - VERIFIED and tested
             // TODO: Add other platforms after testing actual deployments with Craft CMS
     }

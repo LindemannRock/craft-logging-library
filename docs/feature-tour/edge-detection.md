@@ -1,6 +1,6 @@
 # Edge Detection
 
-Logging Library can automatically detect edge/CDN hosting environments and disable the file-based log viewer where it may not work reliably.
+Logging Library automatically hides file-based log viewers when Craft reports ephemeral storage or Servd identifies the project. This keeps unavailable local files out of the Control Panel without changing log emission.
 
 ## Why It Matters
 
@@ -10,27 +10,34 @@ Edge and CDN platforms use distributed, ephemeral storage. Local log files writt
 - File I/O operations may be restricted
 - The platform typically provides its own centralized log viewer with better filtering
 
-## Supported Platforms
+## Supported signals
 
-| Platform | Detection Method | Status |
-|----------|-----------------|--------|
-| [Servd.host](https://servd.host) | `SERVD_PROJECT_SLUG` environment variable | Verified |
+| Host signal | Detection method | Behaviour |
+|-------------|------------------|-----------|
+| Craft ephemeral storage, including Craft Cloud | Craft's `App::isEphemeral()`, backed by `CRAFT_EPHEMERAL` | Hides file-based viewers when Craft normalizes the value to `true` |
+| [Servd.host](https://servd.host) | Craft-normalized `SERVD_PROJECT_SLUG` resolving to a non-empty project slug | Preserves the existing Servd viewer suppression |
 
-Only verified platforms are included. Additional platforms will be added after real-world testing with Craft CMS deployments.
+The two signals are combined with OR: either one is enough. Servd is detected when `SERVD_PROJECT_SLUG` resolves to a non-empty project slug. Missing, blank, whitespace-only, null, or normalized false values do not enable Servd detection; a genuine Servd project slug does. `CRAFT_EPHEMERAL=false` does not cancel a valid Servd slug. Craft owns the boolean normalization for `CRAFT_EPHEMERAL`; boolean/string `true` values enable that signal, while false, blank, absent, whitespace-only, and invalid values do not.
 
 ## How It Works
 
-When `enableLogViewer` is not explicitly set in the `configure()` call, the library checks for known environment variables. If a match is found, `enableLogViewer` defaults to `false`.
+When `enableLogViewer` is not explicitly set in a plugin's `configure()` call, the detected-host result becomes its default. A match makes `enableLogViewer` default to `false`; an explicit per-plugin `true` or `false` still wins.
 
-When a file-based viewer is disabled, Logging Library hides the related CP navigation and controller actions return a 404 for direct viewer URLs. Logging still works normally — messages are routed through Craft's PSR-3 system and appear in the platform's native log dashboard. Only the file-based web viewer is unavailable. (If the [runtime log store](runtime-logs.md) is enabled, the **Logging Library** CP section stays visible with the **Runtime Logs** view — it doesn't depend on log files.)
+The global **Force Enable Log Viewers** setting restores automatic file-viewer availability for both signals. It remains an escape hatch, not a replacement for explicit per-plugin configuration: an explicit `enableLogViewer` value keeps precedence.
 
-## Servd Live Log Feed
+When file viewers are suppressed, Logging Library removes their navigation and does not register plugin-specific file-viewer routes through `configure()`. The standalone routes still exist so an authorized request to the Logging Library root can resolve safely: it redirects to the first accessible Runtime Logs or Settings route, or returns 404 when no destination is available. That redirect is not a visible main-navigation item. The main item is absent when **Show Main Menu** is off, and also when both file viewers and Runtime Logs are unavailable.
 
-Servd adds its own Craft log target and collects logs centrally for the **Logs** page in the Servd dashboard. Logging Library does not query that hosted feed or import it into Craft; the built-in CP viewer only reads files that exist in the current Craft `storage/logs/` path.
+Logging itself keeps working normally. Craft/Yii logging, Craft's default targets, each configured plugin's dedicated Monolog target, target exclusions, stream logging, and hosted logging feeds are unchanged. This correction controls file-viewer presentation, not log emission or destination configuration.
+
+[Runtime Logs](runtime-logs.md) are independent. They remain disabled unless `runtimeLogStore.enabled` is set in `config/logging-library.php`. When enabled, Runtime Logs can be the only visible log view on an ephemeral host because they do not read log files.
+
+## Hosted log feeds
+
+Logging Library does not query or import Craft Cloud, Servd, or third-party hosted log feeds. The built-in CP viewer only reads files that exist in the current Craft `storage/logs/` path. Servd also adds its own Craft log target and collects logs centrally for the **Logs** page in the Servd dashboard; the viewer-suppression decision does not remove or replace that target.
 
 That distinction matters when you enable **Force Enable Log Viewers**. The override only re-enables local file reading. It does not connect to Servd, Papertrail, Datadog, or any other external log source. On Servd without persistent shared storage for `storage/logs/`, the file selector may be empty or show only partial logs from the current instance while the complete logs are still available in Servd.
 
-For CP log visibility on these platforms, [Runtime Logs](runtime-logs.md) is usually the better answer than force-enabling file viewers: it captures recent log activity into Craft's cache as it happens, so it works without any log files on disk.
+For CP log visibility on these platforms, [Runtime Logs](runtime-logs.md) is usually the better answer than force-enabling file viewers. Enable it explicitly in configuration; Logging Library never enables it automatically just because the host is ephemeral.
 
 ## Manual Override
 

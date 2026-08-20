@@ -27,9 +27,19 @@
 ## Log viewer shows "Log viewer is disabled for this plugin"
 
 1. Check if `enableLogViewer` is explicitly set to `false` in your `configure()` call
-2. Check if you're running on an edge/CDN platform (Servd) — the viewer is auto-disabled
+2. Check whether Craft reports an ephemeral host (including Craft Cloud) or its normalized `SERVD_PROJECT_SLUG` value resolves to a non-empty project slug — the signals compose with OR behavior and either one suppresses automatic file-viewer availability. Missing, blank, whitespace-only, null, and normalized false Servd values do not detect Servd
 
-**Fix:** Set `'enableLogViewer' => true` for that plugin, or enable `forceEnableLogViewer` globally in Logging Library settings/config if persistent log storage is available. See [Edge Detection](../feature-tour/edge-detection.md).
+**Fix:** Set `'enableLogViewer' => true` for that plugin, or enable `forceEnableLogViewer` globally in Logging Library settings/config if persistent log storage is available. An explicit per-plugin `enableLogViewer` value keeps precedence over the automatic default. See [Edge Detection](../feature-tour/edge-detection.md).
+
+**Why:** Viewer suppression only hides file-reading routes and navigation. It does not disable Craft/Yii logging, Logging Library's dedicated Monolog targets, stream logging, or hosted logging feeds.
+
+## Logging Library is missing from the main navigation on an ephemeral host
+
+1. Confirm **Show Main Menu** is on
+2. Check whether file viewers are suppressed because Craft reports an ephemeral host or its normalized `SERVD_PROJECT_SLUG` value resolves to a non-empty project slug. Missing, blank, whitespace-only, null, and normalized false Servd values do not detect Servd
+3. Check whether `runtimeLogStore.enabled` is `true` in `config/logging-library.php`
+
+**Fix:** If persistent shared storage backs `storage/logs/`, use **Force Enable Log Viewers** to restore automatic file-viewer availability. Otherwise, opt into [Runtime Logs](../feature-tour/runtime-logs.md) through configuration. With file viewers suppressed and Runtime Logs disabled, Logging Library intentionally has no main navigation item; a direct root-route redirect to Settings does not make one appear.
 
 ## Servd shows an empty Select File dropdown
 

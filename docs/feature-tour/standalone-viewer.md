@@ -15,7 +15,9 @@ The main-menu item appears only when **both** of these are true:
 
 The **All Logs** subnav item itself still requires a file-based viewer; when only the runtime store is enabled (for example, on an edge environment), the menu shows **Runtime Logs** instead.
 
-If **Show Main Menu** is off, the main **Logging Library** item opens to Settings instead, and the viewer is no longer linked from the navigation — but the page itself remains reachable at `/admin/logging-library/logs/system` for anyone with the `loggingLibrary:viewAllLogs` permission. On an edge/ephemeral environment with no override, file-based viewers are hidden entirely.
+If **Show Main Menu** is off, there is no main **Logging Library** navigation item. On a durable host, the page itself remains reachable at `/admin/logging-library/logs/system` for anyone with the `loggingLibrary:viewAllLogs` permission.
+
+When Craft reports an ephemeral host or Servd is detected and the override is off, **All Logs** is suppressed. An authorized request to the Logging Library root can redirect to the first accessible **Runtime Logs** or **Settings** route, but that direct-route fallback is not visible main navigation. Runtime Logs appear only when separately enabled in `config/logging-library.php`.
 
 ## Source Filtering
 

@@ -6,22 +6,22 @@ Logging Library has its own settings area in the Control Panel for the things th
 
 ## Where to find it
 
-Go to **Logging Library → Settings** in the Control Panel. Settings open on the **General** tab, with **Interface** as a second tab in the sidebar. Access requires the `loggingLibrary:manageSettings` permission (admins always have it) — see [Permissions](../developers/permissions.md).
+When the Logging Library main item is visible, go to **Logging Library → Settings**. You can always reach the plugin settings through Craft's **Settings → Plugins → Logging Library** area when authorized. Settings open on the **General** tab, with **Interface** as a second tab when the standalone file viewer is surfaced. Access requires the `loggingLibrary:manageSettings` permission (admins always have it) — see [Permissions](../developers/permissions.md).
 
 > [!NOTE]
-> When the standalone **All Logs** viewer isn't available (an edge/ephemeral environment with the override off, or **Show Main Menu** turned off), the main **Logging Library** menu item opens straight to Settings, and the **Interface** tab is hidden — its options only matter when there's a viewer to show.
+> The main **Logging Library** navigation item is absent when **Show Main Menu** is off. It is also absent when both file viewers and Runtime Logs are unavailable. If Runtime Logs are enabled while file viewers are suppressed, the main item can remain with **Runtime Logs** instead of **All Logs**. An authorized direct request to the Logging Library root may redirect to Settings; that route behaviour does not create a visible main navigation item. The **Interface** tab is hidden whenever the standalone file viewer is not surfaced.
 
 ## General
 
 | Setting | What it does | Default |
 |---------|--------------|---------|
 | **Plugin Name** | The display name shown for Logging Library in the Control Panel. | `Logging Library` |
-| **Show Main Menu** | Show Logging Library in the main Control Panel navigation as a consolidated **All Logs** view. Turn it off to hide the menu item while keeping each plugin's own **Logs** section. | On |
-| **Force Enable Log Viewers** | Only shown when an edge/ephemeral environment is detected. Force-enables file-based log viewers — both the standalone **All Logs** view and every plugin's dedicated **Logs** section — even though edge detection would normally hide them. | Off |
+| **Show Main Menu** | Allow Logging Library in the main Control Panel navigation when at least one viewer family is available. Turn it off to remove the main item while keeping each plugin's own **Logs** section. | On |
+| **Force Enable Log Viewers** | Only shown when Craft reports an ephemeral host or Servd is detected. Restores automatic file-viewer availability for the standalone **All Logs** view and plugin integrations; an explicit per-plugin `enableLogViewer` value still wins. | Off |
 
-**Force Enable Log Viewers** is the escape hatch for the [edge-detection](edge-detection.md) behaviour. On platforms with ephemeral storage, file-based viewers are hidden by default because logs don't survive a redeploy. If you've attached persistent shared storage at `storage/logs/`, switch this on to bring the viewers back.
+**Force Enable Log Viewers** is the escape hatch for the [edge-detection](edge-detection.md) behaviour. Craft's `App::isEphemeral()` signal and Servd detection compose with OR behavior. Servd is detected when Craft's normalized `SERVD_PROJECT_SLUG` value resolves to a non-empty project slug; missing, blank, whitespace-only, null, and normalized false values do not enable Servd detection. If you've attached persistent shared storage at `storage/logs/`, switch this on to restore the automatic viewer default. A plugin that explicitly configures `enableLogViewer` keeps that explicit value.
 
-This setting does not import hosted logs from Servd or any external logging platform. It only tells Logging Library to try reading local files again. On Servd without shared persistent log storage, the viewer can still be empty or incomplete even though Servd is collecting the same Craft logs in its own dashboard.
+This setting does not import hosted logs from Craft Cloud, Servd, or any external logging platform. It only tells Logging Library to try reading local files again. It does not change Craft/Yii logging, dedicated Monolog targets, or log destinations.
 
 ## Interface
 
@@ -74,7 +74,7 @@ return [
 ];
 ```
 
-The `runtimeLogStore` block configures the [Runtime Logs](runtime-logs.md) view. Unlike the settings above, it has no Control Panel equivalent — it's config-file only. Its conservative defaults skip runtime capture for console requests and detected queue execution. The optional nested `redis.database` setting can inherit Craft's Redis database, select an assigned non-negative database, resolve an environment reference, or explicitly disable `SELECT`; the Runtime Logs page documents the strict resolution rules. Restart long-running queue workers after changing this block because existing targets retain their startup configuration.
+The `runtimeLogStore` block configures the [Runtime Logs](runtime-logs.md) view. Unlike the settings above, it has no Control Panel equivalent — it's config-file only and remains disabled until `runtimeLogStore.enabled` is set to `true`. It is governed independently from file-viewer detection and **Force Enable Log Viewers**. Its conservative defaults skip runtime capture for console requests and detected queue execution. The optional nested `redis.database` setting can inherit Craft's Redis database, select an assigned non-negative database, resolve an environment reference, or explicitly disable `SELECT`; the Runtime Logs page documents the strict resolution rules. Restart long-running queue workers after changing this block because existing targets retain their startup configuration.
 
 When a setting is present in this file, the matching Control Panel field is **disabled** and shows a notice that it's being overridden by `config/logging-library.php`. The full resolution order, highest priority first:
 
