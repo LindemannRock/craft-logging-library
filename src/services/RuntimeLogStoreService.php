@@ -12,7 +12,6 @@ namespace lindemannrock\logginglibrary\services;
 
 use Craft;
 use craft\base\Component;
-use craft\helpers\Json;
 use lindemannrock\logginglibrary\helpers\RuntimeCategoryOptionsHelper;
 use lindemannrock\logginglibrary\helpers\UserLabelHelper;
 use lindemannrock\logginglibrary\LoggingLibrary;
@@ -21,6 +20,9 @@ use lindemannrock\logginglibrary\services\runtime\RedisRuntimeLogStorage;
 use lindemannrock\logginglibrary\services\runtime\RuntimeLogRedisConnectionFactory;
 use lindemannrock\logginglibrary\services\runtime\RuntimeLogStorageInterface;
 use lindemannrock\logginglibrary\services\runtime\UnavailableRedisRuntimeLogStorage;
+use Monolog\Formatter\NormalizerFormatter;
+use Monolog\Utils;
+use samdark\log\PsrMessage;
 use yii\helpers\VarDumper;
 use yii\log\Logger;
 use yii\redis\Cache as RedisCache;
@@ -33,6 +35,7 @@ use yii\redis\Connection as RedisConnection;
  */
 class RuntimeLogStoreService extends Component
 {
+    private const CONTEXT_NORMALIZATION_FAILURE = '[Unable to normalize context value]';
     private const MAX_ENTRIES_LIMIT = 10000;
     /**
      * @since 5.14.0
@@ -57,7 +60,15 @@ class RuntimeLogStoreService extends Component
         try {
             $records = [];
             foreach ($messages as $message) {
-                $records[] = $this->normalizeMessage($message, $settings);
+                try {
+                    $records[] = $this->normalizeMessage($message, $settings);
+                } catch (\Throwable) {
+                    // One malformed record must not discard unrelated records in the buffered batch.
+                }
+            }
+
+            if ($records === []) {
+                return;
             }
 
             usort($records, fn(array $a, array $b) => strcmp((string)$b['timestamp'], (string)$a['timestamp']));
@@ -173,22 +184,34 @@ class RuntimeLogStoreService extends Component
         [$text, $level, $category, $timestamp] = $message;
 
         $canonicalLevel = $this->_canonicalLevel((int)$level);
-        $messageText = $this->_stringify($text);
+        $isPsrMessage = $text instanceof PsrMessage;
+        $messageText = $isPsrMessage ? $text->getMessage() : $this->_stringify($text);
         $messageText = LoggingService::sanitizeLogMessage($messageText);
         $messageText = $this->_truncate($messageText, (int)($settings['maxMessageBytes'] ?? 8000));
 
-        $context = [];
-        if (!empty($message[4]) && is_array($message[4])) {
-            $context['trace'] = array_slice($message[4], 0, 5);
+        $context = $isPsrMessage ? $text->getContext() : [];
+        $tupleContext = [];
+        if (
+            array_key_exists(4, $message)
+            && is_array($message[4])
+            && ($isPsrMessage || $message[4] !== [])
+        ) {
+            $tupleContext['trace'] = array_slice($message[4], 0, 5);
         }
 
         if (isset($message[5])) {
-            $context['memory'] = $message[5];
+            $tupleContext['memory'] = $message[5];
         }
 
+        if ($isPsrMessage) {
+            $tupleContext['category'] = (string)$category;
+            $tupleContext['timestamp'] = (float)$timestamp;
+        }
+
+        $context = array_merge($context, $tupleContext);
         $contextText = $context === []
             ? ''
-            : $this->_truncate(Json::encode($context), (int)($settings['maxContextBytes'] ?? 8000));
+            : $this->_encodeContext($context, (int)($settings['maxContextBytes'] ?? 8000));
 
         $user = '';
         if (($settings['privacy']['includeUserId'] ?? false) && Craft::$app->has('user', true)) {
@@ -421,6 +444,39 @@ class RuntimeLogStoreService extends Component
         }
 
         return VarDumper::export($value);
+    }
+
+    /**
+     * Normalize arbitrary context into bounded JSON without failing the record.
+     */
+    private function _encodeContext(array $context, int $maxBytes): string
+    {
+        $normalizer = new NormalizerFormatter();
+
+        try {
+            return $this->_truncate(
+                Utils::jsonEncode($normalizer->normalizeValue($context)),
+                $maxBytes,
+            );
+        } catch (\Throwable) {
+            $normalized = [];
+            foreach ($context as $key => $value) {
+                try {
+                    $normalized[$key] = $normalizer->normalizeValue($value);
+                } catch (\Throwable) {
+                    $normalized[$key] = self::CONTEXT_NORMALIZATION_FAILURE;
+                }
+            }
+
+            try {
+                return $this->_truncate(Utils::jsonEncode($normalized), $maxBytes);
+            } catch (\Throwable) {
+                return $this->_truncate(
+                    Utils::jsonEncode(['context' => self::CONTEXT_NORMALIZATION_FAILURE]),
+                    $maxBytes,
+                );
+            }
+        }
     }
 
     private function _truncate(string $value, int $maxBytes): string

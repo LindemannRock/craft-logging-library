@@ -43,7 +43,9 @@ Go to **Logging Library → Runtime Logs**. The view works like the [All Logs vi
 - **Filter** by level (only levels you've enabled for capture are offered) and by source — entries are grouped under plugin display names, with Craft/framework categories listed individually
 - **Search** across message, context, source, and user
 - **Sort** any column: Timestamp, Level, Source, Request User, or Message
-- **Expand a row** to read the full message and its context (a trace excerpt and memory usage, when Craft provides them)
+- **Expand a row** to read the full message and its context (structured PSR context plus Craft's category, timestamp, trace excerpt, and memory usage when available)
+
+Structured `samdark\log\PsrMessage` records keep their intended message and context fields instead of displaying an exported PHP object. Craft's tuple metadata remains authoritative when the same keys appear in PSR context. Runtime Logs safely normalizes objects, exceptions, resources, deep values, and invalid text before encoding the bounded context; if one context value cannot be normalized, that value receives a diagnostic marker while the record and neighboring entries remain available.
 
 The page **auto-refreshes** every few seconds (5 by default) and pauses while you have a row expanded, so entries don't shift under you mid-read. The sidebar shows the live state: the configured capture level, how many entries are held versus the configured maximum, and two storage details:
 

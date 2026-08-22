@@ -70,6 +70,14 @@ The affected batch is dropped fail-soft. Logging Library does not switch to Craf
 
 An explicit `'database' => null` sends no `SELECT` and is intended only for compatible cluster-style endpoints. Logical Redis databases provide namespace and administrative separation, not separate CPU, memory, network, eviction, or server contention.
 
+## Runtime Logs shows object reconstruction text for a structured message
+
+Older Logging Library versions exported a `samdark\log\PsrMessage` object as PHP reconstruction text, which could make the message begin with content resembling `unserialize(...)` and bury its structured context inside that text.
+
+**Fix:** Update to Logging Library 5.19.0 or later, then reproduce the event. New entries show `PsrMessage::getMessage()` as the message and `getContext()` in the separate context field. Existing cached Runtime entries are not rewritten; let them expire under the configured `ttl`, roll off the bounded store, or use **Clear Runtime Logs** if you have the `loggingLibrary:clearCache` permission and no longer need the current diagnostic window.
+
+**Why:** Runtime Logs stores bounded diagnostic snapshots. Updating normalization changes newly captured records only; it does not migrate, evaluate, or deserialize records already in Redis or Craft cache.
+
 ## Runtime Logs uses Craft cache
 
 This is expected only when Craft's configured cache is genuinely non-Redis. The generic backend keeps one bounded value in that cache and uses a zero-wait mutex. A busy mutex drops the current batch rather than delaying the request. Cache read failures do not replace the existing value, and failed writes leave the previous buffer intact.
