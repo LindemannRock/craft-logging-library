@@ -17,6 +17,7 @@ use craft\events\RegisterCacheOptionsEvent;
 use craft\events\RegisterUrlRulesEvent;
 use craft\events\RegisterUserPermissionsEvent;
 use craft\helpers\App;
+use craft\log\Dispatcher;
 use craft\log\MonologTarget;
 use craft\services\UserPermissions;
 use craft\utilities\ClearCaches;
@@ -509,22 +510,37 @@ class LoggingLibrary extends Plugin
      */
     private static function _configureLogging(string $handle, array $config): void
     {
-        // CRITICAL: Exclude our category from the global monologTargetConfig
-        // This prevents global targets from filtering our messages
+        // Exclude our category from future and already-instantiated default targets.
         $logComponent = Craft::$app->getLog();
+        $dispatcher = Craft::getLogger()->dispatcher;
 
         // Get current monolog config or initialize it
         $monologConfig = $logComponent->monologTargetConfig ?? [];
         $monologConfig['except'] = $monologConfig['except'] ?? [];
 
         // Add our handle to the except list if not already there
-        if (!in_array($handle, $monologConfig['except'])) {
+        if (!in_array($handle, $monologConfig['except'], true)) {
             $monologConfig['except'][] = $handle;
             $logComponent->monologTargetConfig = $monologConfig;
         }
 
+        $defaultTargetNames = [
+            Dispatcher::TARGET_WEB,
+            Dispatcher::TARGET_CONSOLE,
+            Dispatcher::TARGET_QUEUE,
+        ];
+        foreach ($dispatcher->targets as $key => $target) {
+            if (!$target instanceof MonologTarget ||
+                !in_array($key, $defaultTargetNames, true) && !in_array($target->getName(), $defaultTargetNames, true)) {
+                continue;
+            }
+
+            if (!in_array($handle, $target->except, true)) {
+                $target->except[] = $handle;
+            }
+        }
+
         // Remove ALL existing targets for this handle from dispatcher
-        $dispatcher = Craft::getLogger()->dispatcher;
         $targetsToRemove = [];
         foreach ($dispatcher->targets as $key => $target) {
             if ($target instanceof MonologTarget &&

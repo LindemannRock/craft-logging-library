@@ -131,9 +131,10 @@ Undated source logs such as `freeform-email.log` should appear as their own sour
 
 **Why:** Older parser caches may have been built before undated source logs and bracketed ISO-8601 Monolog lines were recognized. Plugin updates that improve the parser invalidate old caches automatically on the next view, so this usually resolves itself after updating; the manual **Refresh Cache** button covers the remaining cases by forcing a re-read with the current parser.
 
-## Duplicate log entries
+## Plugin entries also appear in Craft's global log
 
-1. Check if `LoggingLibrary::configure()` is being called multiple times for the same plugin handle
-2. Verify you don't have both `LoggingTrait` logging and direct `Craft::info()` calls with the same category
+If a plugin entry appears once in its dedicated destination and once in Craft's global log, first update to Logging Library 5.19.0 or later. Then confirm the category passed to Craft matches the exact `pluginHandle` used by `LoggingLibrary::configure()` and reproduce the event with a new message.
 
-**Why:** Each `configure()` call removes existing Monolog targets for that handle before creating a new one, but if something prevents cleanup (e.g., concurrent requests during init), duplicates can briefly appear.
+Logging Library keeps one dedicated target per configured handle, even when configuration runs again. It also excludes that exact handle from Craft's current default targets and from the template used to build future defaults. Other categories continue to reach Craft's global destination, and existing target exclusions, handlers, levels, and formatting remain in place.
+
+If two copies still appear in the same dedicated destination, check whether the application emits the event twice—for example, once through `LoggingTrait` and once through a direct `Craft::info()` call. Updating target routing does not remove entries already written to log files or hosted feeds.
