@@ -38,7 +38,7 @@ if ($base === null) {
     exit(1);
 }
 
-$handle = 'compat-smoke';
+$handle = 'compat-smoke-' . bin2hex(random_bytes(6));
 $today = date('Y-m-d');
 $logPath = Craft::$app->getPath()->getLogPath();
 if (!is_dir($logPath) && !mkdir($logPath, 0775, true) && !is_dir($logPath)) {
@@ -64,6 +64,21 @@ if (LoggingService::sanitizeLogMessage("one\ntwo\r\nthree") !== 'one\\ntwo\\nthr
 }
 
 $fixture = $logPath . DIRECTORY_SEPARATOR . $handle . '-' . $today . '.log';
+$fixtureOwned = false;
+
+if (file_exists($fixture)) {
+    fwrite(STDERR, "Refusing to overwrite an existing log fixture: {$fixture}\n");
+    exit(1);
+}
+
+register_shutdown_function(static function () use ($fixture, &$fixtureOwned): void {
+    if ($fixtureOwned && is_file($fixture) && !@unlink($fixture)) {
+        fwrite(STDERR, "Could not remove owned log fixture: {$fixture}\n");
+        exit(1);
+    }
+});
+
+$fixtureOwned = true;
 $contents = implode("\n", [
     "{$today} 12:00:00 [][INFO][{$handle}] Compatibility smoke info",
     "{$today} 12:00:01 [][WARNING][{$handle}] Compatibility smoke warning",
@@ -107,7 +122,11 @@ if (!$found) {
     exit(1);
 }
 
-@unlink($fixture);
+if (!unlink($fixture)) {
+    fwrite(STDERR, "Could not remove owned log fixture: {$fixture}\n");
+    exit(1);
+}
+$fixtureOwned = false;
 
 echo "Logging Library smoke test passed.\n";
 PHP
