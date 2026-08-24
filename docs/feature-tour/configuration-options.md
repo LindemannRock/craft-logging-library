@@ -1,8 +1,8 @@
-# Configuration Options
+# Configuration options
 
 These options are passed to `LoggingLibrary::configure()` as an associative array during your plugin's `init()` method. They control per-plugin logging behavior in code. Standalone Logging Library plugin settings such as the plugin name, items per page, and CP section visibility are managed separately in the Logging Library settings UI/config.
 
-## Configuration Reference
+## Configuration reference
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
@@ -17,7 +17,7 @@ These options are passed to `LoggingLibrary::configure()` as an associative arra
 | `logMenuItems` | `array` | `null` | Custom sidebar menu items for multi-section log pages |
 | `logMenuLabel` | `string` | `'Logs'` | Aria-label for the sidebar log menu |
 
-## Basic Example
+## Basic example
 
 ```php
 LoggingLibrary::configure([
@@ -31,7 +31,7 @@ LoggingLibrary::configure([
 
 Omit `enableLogViewer` to use automatic edge-platform detection. Set it explicitly only when you want to force-enable or force-disable the viewer for a plugin.
 
-## Log Levels
+## Log levels
 
 The `logLevel` setting controls the minimum severity written to log files:
 
@@ -45,7 +45,7 @@ The `logLevel` setting controls the minimum severity written to log files:
 > [!WARNING]
 > Debug-level logging only works when Craft's `devMode` is `true`. In production, `Craft::debug()` calls are silently ignored regardless of your `logLevel` setting.
 
-## Sidebar Menu
+## Sidebar menu
 
 When you provide two or more items in `logMenuItems`, a left sidebar appears on the logs page — useful for plugins with multiple log types:
 
@@ -61,7 +61,7 @@ LoggingLibrary::configure([
 
 The sidebar only renders when there are 2+ items. Single-item menus are hidden automatically.
 
-## Edge Platform Override
+## Edge platform override
 
 The `enableLogViewer` option defaults to `true` unless an edge platform is detected. You can override this explicitly:
 
@@ -72,6 +72,6 @@ LoggingLibrary::configure([
 ]);
 ```
 
-The Logging Library settings screen also includes `forceEnableLogViewer`, which globally force-enables the standalone All Logs viewer and every plugin's file-based Logs section when edge detection would normally hide them.
+The Logging Library settings screen also includes `forceEnableLogViewer`, which restores automatic file-viewer availability when edge detection would normally hide it. An explicit per-plugin `enableLogViewer` value still wins.
 
-See [Edge Detection](edge-detection.md) for details on supported platforms.
+See [Edge detection](edge-detection.md) for details on supported platforms.

@@ -2,7 +2,7 @@
 
 The `LoggingService` class provides static methods for direct logging, log statistics, recent entries, and log cleanup. Use it when you need logging outside of a class with `LoggingTrait`, or when you need log metadata like statistics.
 
-## Direct Logging
+## Direct logging
 
 Log a message for a specific plugin without using the trait:
 
@@ -24,7 +24,7 @@ LoggingService::log('Custom message', 'info', 'your-plugin', [
 | `$pluginHandle` | `string` | (required) | Plugin handle for routing to the correct log file |
 | `$context` | `array` | `[]` | Additional context data, appended as JSON. If the data can't be encoded, the entry is still logged with `[context encoding failed]` as the context |
 
-## Log Statistics
+## Log statistics
 
 Get aggregate statistics for a plugin's log files:
 
@@ -43,7 +43,7 @@ Returns an array with:
 | `newestDate` | `string\|null` | Newest log file date (`YYYY-MM-DD`) |
 | `levels` | `array` | Breakdown by level: `['error' => 5, 'warning' => 12, 'info' => 230, 'debug' => 0, 'unknown' => 0]` — `unknown` counts lines whose level couldn't be parsed |
 
-## Recent Entries
+## Recent entries
 
 Get the most recent log entries — useful for dashboard widgets:
 
@@ -63,7 +63,7 @@ foreach ($recentErrors as $entry) {
 | `$limit` | `int` | `10` | Maximum entries to return |
 | `$level` | `string` | `'all'` | Filter by level, or `'all'` for all levels |
 
-### Return Format
+### Return format
 
 Each entry is an array:
 
@@ -74,11 +74,11 @@ Each entry is an array:
 | `level` | `string` | Log level |
 | `category` | `string` | Plugin handle |
 | `message` | `string` | Log message |
-| `context` | `string\|null` | JSON context data |
+| `context` | `string` | JSON context data, or an empty string when the entry has no context |
 | `lineNumber` | `int` | Line number in the log file |
 | `raw` | `string` | Original unparsed log line |
 
-## Log Cleanup
+## Log cleanup
 
 Remove log files older than a specified number of days:
 
@@ -94,9 +94,9 @@ $deleted = LoggingService::cleanupOldLogs('your-plugin', 30);
 | `$pluginHandle` | `string` | (required) | Plugin handle |
 | `$retentionDays` | `int` | `30` | Delete files older than this many days |
 
-## Utility Methods
+## Utility methods
 
-### Check if Logging is Configured
+### Check if logging is configured
 
 ```php
 if (LoggingService::isConfigured('your-plugin')) {
@@ -104,14 +104,14 @@ if (LoggingService::isConfigured('your-plugin')) {
 }
 ```
 
-### Get Effective Log Level
+### Get effective log level
 
 ```php
 $level = LoggingService::getLogLevel('your-plugin');
 // Returns: 'info', 'debug', 'warning', 'error', or null if not configured
 ```
 
-### Message Sanitization @since(5.9.0)
+### Message sanitization @since(5.9.0)
 
 Log entries are one line each. If an attacker-controlled value reaches a log message with a raw newline in it, they could forge an extra log line — the classic log-injection attack ([CWE-117](https://cwe.mitre.org/data/definitions/117.html)). `sanitizeLogMessage()` neutralizes that by turning every `\r\n`, `\r`, or `\n` into the two-character literal `\n`, so the intent is still readable but the file always sees a single entry per emit:
 

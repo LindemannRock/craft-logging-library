@@ -1,4 +1,4 @@
-# Installation & Setup
+# Installation & setup
 
 ## Composer
 
@@ -20,6 +20,10 @@ composer require lindemannrock/craft-logging-library && php craft plugin/install
 ddev composer require lindemannrock/craft-logging-library && ddev craft plugin/install logging-library
 ```
 
-## Quick Start
+## Post-install setup
+
+Logging Library itself needs no additional Control Panel setup. Continue to the quickstart to connect it to a plugin and confirm your first dedicated log entry.
+
+## Quick start
 
 See [Quickstart](quickstart.md) for the fastest path from install to first result.

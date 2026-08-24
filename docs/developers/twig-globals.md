@@ -1,6 +1,6 @@
-# Twig Globals
+# Twig globals
 
-Logging Library provides the following global variables in your Twig templates.
+Use `loggingLibraryHelper` when a template needs Logging Library's configured display name. It exposes naming helpers only; log entries and Runtime Logs are not available through Twig globals.
 
 ## `loggingLibraryHelper`
 
@@ -23,6 +23,3 @@ Logging Library provides the following global variables in your Twig templates.
 {{ loggingLibraryHelper.lowerDisplayName }}
 {{ loggingLibraryHelper.pluralLowerDisplayName }}
 ```
-
----
-

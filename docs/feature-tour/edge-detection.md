@@ -1,8 +1,8 @@
-# Edge Detection
+# Edge detection
 
 Logging Library automatically hides file-based log viewers when Craft reports ephemeral storage or Servd identifies the project. This keeps unavailable local files out of the Control Panel without changing log emission.
 
-## Why It Matters
+## Why it matters
 
 Edge and CDN platforms use distributed, ephemeral storage. Local log files written on one node aren't accessible from another, and the file system may be restricted or unavailable. On these platforms:
 
@@ -19,7 +19,7 @@ Edge and CDN platforms use distributed, ephemeral storage. Local log files writt
 
 The two signals are combined with OR: either one is enough. Servd is detected when `SERVD_PROJECT_SLUG` resolves to a non-empty project slug. Missing, blank, whitespace-only, null, or normalized false values do not enable Servd detection; a genuine Servd project slug does. `CRAFT_EPHEMERAL=false` does not cancel a valid Servd slug. Craft owns the boolean normalization for `CRAFT_EPHEMERAL`; boolean/string `true` values enable that signal, while false, blank, absent, whitespace-only, and invalid values do not.
 
-## How It Works
+## How it works
 
 When `enableLogViewer` is not explicitly set in a plugin's `configure()` call, the detected-host result becomes its default. A match makes `enableLogViewer` default to `false`; an explicit per-plugin `true` or `false` still wins.
 
@@ -39,7 +39,7 @@ That distinction matters when you enable **Force Enable Log Viewers**. The overr
 
 For CP log visibility on these platforms, [Runtime Logs](runtime-logs.md) is usually the better answer than force-enabling file viewers. Enable it explicitly in configuration; Logging Library never enables it automatically just because the host is ephemeral.
 
-## Manual Override
+## Manual override
 
 You can override auto-detection per plugin:
 
@@ -57,7 +57,7 @@ LoggingLibrary::configure([
 ]);
 ```
 
-You can also force-enable all file-based viewers globally from the [Logging Library settings screen](settings.md), or in `config/logging-library.php`:
+You can also restore automatic file-viewer availability globally from the [Logging Library settings screen](settings.md), or in `config/logging-library.php`. Plugins with an explicit `enableLogViewer` value keep that value:
 
 ```php
 return [
@@ -69,7 +69,7 @@ return [
 
 Use the global override only when the environment has persistent storage available for `storage/logs/`.
 
-## Custom Platform Detection
+## Custom platform detection
 
 For platforms not yet supported, add your own detection:
 
@@ -84,7 +84,7 @@ LoggingLibrary::configure([
 ]);
 ```
 
-## Checking Availability in Code
+## Checking availability in code
 
 Logging Library exposes static helpers so you can branch on the current environment without re-implementing the detection logic:
 

@@ -1,16 +1,17 @@
 # Quickstart
 
-Get Logging Library running in under 5 minutes. By the end of this guide you'll have dedicated log files and a built-in log viewer for your plugin.
+Connect Logging Library to a plugin and confirm your first dedicated log entry in the Control Panel.
 
 ## Before you start
 
-Install [Logging Library](installation.md) first.
+Install Logging Library and complete its [post-install setup](installation.md#post-install-setup) first.
 
 ## 1. Add the trait and configure logging
 
 In your plugin's main class, add `LoggingTrait` and call `LoggingLibrary::configure()`:
 
 ```php
+use craft\base\Plugin;
 use lindemannrock\logginglibrary\traits\LoggingTrait;
 use lindemannrock\logginglibrary\LoggingLibrary;
 
@@ -53,6 +54,6 @@ For a CP view that does not depend on files, enable [Runtime Logs](../feature-to
 
 ## What's next
 
-- [Configuration Options](../feature-tour/configuration-options.md) — all available `configure()` parameters
-- [Feature Tour](../feature-tour/overview.md) — explore everything Logging Library can do
-- [Integration Guide](../feature-tour/integration-guide.md) — full setup with routes, nav, and permissions
+- [Configuration options](../feature-tour/configuration-options.md) — all available `configure()` parameters
+- [Feature tour](../feature-tour/overview.md) — explore everything Logging Library can do
+- [Integration guide](../feature-tour/integration-guide.md) — full setup with routes, nav, and permissions

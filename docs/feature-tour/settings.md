@@ -35,7 +35,7 @@ The Interface tab only appears when a viewer is available (see the note above).
 
 **Items Per Page** applies to Logging Library's own views — the standalone **All Logs** viewer and [Runtime Logs](runtime-logs.md). Each plugin's own viewer uses the `itemsPerPage` it passes to `configure()` (default 50) — see [Configuration Options](configuration-options.md).
 
-**Time Format** and **Show Seconds** cascade from the base plugin. If they're set in `config/lindemannrock-base.php`, that value wins and the field is locked here. The remaining date settings (month format, date order, separator) are global — they live only in the base config, not on this page. See [Log Viewer → Adaptive Timestamps](log-viewer.md) for how timestamps render.
+**Time Format** and **Show Seconds** cascade from the base plugin when their Control Panel fields are set to **Use global default**. Selecting a value here overrides the base default. Only the matching key in `config/logging-library.php` locks a field on this page. The remaining date settings (month format, date order, separator) are global — they live only in the base config, not on this page. See [Log viewer → Adaptive Timestamps](log-viewer.md) for how timestamps render.
 
 ## Overriding settings from a config file
 

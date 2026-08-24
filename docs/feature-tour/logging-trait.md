@@ -2,7 +2,7 @@
 
 The `LoggingTrait` is a drop-in trait that adds structured logging methods to any class. It routes messages through Craft's PSR-3 logging system to your plugin's dedicated log file.
 
-## How It Works
+## How it works
 
 Add `use LoggingTrait` to any class — plugin main class, service, controller, or any component. The trait provides four protected methods that map to Craft's native logging:
 
@@ -13,7 +13,7 @@ Add `use LoggingTrait` to any class — plugin main class, service, controller, 
 | `logError()` | `Craft::error()` | Failures that prevent an operation |
 | `logDebug()` | `Craft::debug()` | Internal state, variable dumps (requires `devMode`) |
 
-## Method Signatures
+## Method signatures
 
 All four methods share the same signature:
 
@@ -24,7 +24,7 @@ protected function logError(string $message, array $params = []): void
 protected function logDebug(string $message, array $params = []): void
 ```
 
-## Usage in Plugin Classes
+## Usage in plugin classes
 
 In a plugin's main class, the trait auto-detects the plugin handle (via `getHandle()`) for routing:
 
@@ -42,7 +42,7 @@ class YourPlugin extends Plugin
 }
 ```
 
-## Usage in Services and Controllers
+## Usage in services and controllers
 
 For services, controllers, and other components, set the handle manually in `init()`:
 
@@ -69,16 +69,16 @@ class YourService extends Component
 }
 ```
 
-## Handle Detection
+## Handle detection
 
 The trait determines the plugin handle in this order:
 
 1. Manually set via `$this->setLoggingHandle('your-plugin')`
-2. Auto-detected from a `getHandle()` method returning a non-empty string (this is how Plugin classes are detected — Craft's `$plugin->handle` is an alias of `getHandle()`)
-3. Auto-detected from a real `handle` property, if the class defines one
+2. If the class has a `getHandle()` method, use its result when it is a non-empty string (this is how plugin classes are detected — Craft's `$plugin->handle` is an alias of `getHandle()`). An empty result proceeds to the class-name fallback.
+3. Only when the class has no `getHandle()` method, use a real `handle` property when one exists and contains a non-empty string
 4. Fallback: derived from the class name in kebab-case
 
-## Message Formatting
+## Message formatting
 
 When you pass a `$params` array, the trait appends it as JSON:
 

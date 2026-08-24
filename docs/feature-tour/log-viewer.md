@@ -1,18 +1,18 @@
-# Log Viewer
+# Log viewer
 
 The built-in log viewer provides a web interface for browsing, filtering, searching, and downloading log files — directly within each plugin's Control Panel section.
 
 ![Built-in log viewer inside a plugin's CP section, showing the level filter, search box, and a sortable table of log entries](../images/log-viewer-cp.webp)
 
-## How It Works
+## How it works
 
 When a plugin calls `LoggingLibrary::configure()`, the log viewer becomes available at `your-plugin/logs/system` unless the viewer is explicitly disabled or the environment is detected as edge/ephemeral. CP routes are registered automatically when the viewer is enabled — no manual route registration is needed. The viewer reads parsed log entries from the [cache](caching.md) and renders them in a paginated table.
 
 ## Features
 
 - **Date Selection** — pick a specific log file by date from the available files
-- **Level Filtering** — filter by Error, Warning, Info, Debug, or Unknown (lines whose level couldn't be parsed)
-- **Full-Text Search** — search across messages and context data
+- **Level Filtering** — filter by Error, Warning, Info, or Debug in a plugin viewer; the standalone viewer also offers Unknown for lines whose level couldn't be parsed
+- **Full-Text Search** — search across messages, context data, categories, and users
 - **Sorting** — sort by timestamp, level, user, category, or message
 - **Pagination** — configurable entries per page. Per-plugin viewers default to 50 (set via `configure()`); the standalone All Logs viewer uses the **Items Per Page** setting on the Interface settings page (default 100)
 - **Download** — download the raw log file (permission-gated)
@@ -20,15 +20,14 @@ When a plugin calls `LoggingLibrary::configure()`, the log viewer becomes availa
 - **Context Expansion** — click to view JSON context data inline
 - **Consolidated Sources** — the standalone All Logs view groups Craft system logs and plugin logs in the source filter
 - **Adaptive Timestamps** — dated log files show time-only rows, while undated/current files such as `phperrors.log` show full date and time
-- **Smart Columns** — columns with no variance (e.g., all entries from the same user) are automatically hidden
 
 Full dates shown for undated/current files use the shared date settings from `config/lindemannrock-base.php`; Logging Library's own settings only expose time format and seconds controls.
 
-## Enabling the Viewer
+## Enabling the viewer
 
 Two things are required for the log viewer to work:
 
-### 1. Enable in Configuration
+### 1. Enable in configuration
 
 ```php
 LoggingLibrary::configure([
@@ -39,7 +38,7 @@ LoggingLibrary::configure([
 
 Omit `enableLogViewer` to use the default behavior: enabled on normal file-backed environments and disabled on detected edge/ephemeral platforms. Set `enableLogViewer` explicitly when you want to force-enable or force-disable the viewer for that plugin.
 
-### 2. Set Permissions (Optional)
+### 2. Set permissions (optional)
 
 ```php
 LoggingLibrary::configure([
@@ -51,18 +50,18 @@ LoggingLibrary::configure([
 
 When `viewSystemLogsPermissions` is empty, any logged-in user can view logs. When `downloadSystemLogsPermissions` is empty, the download button is hidden.
 
-## Viewer Filters
+## Viewer filters
 
 | Filter | Options | Description |
 |--------|---------|-------------|
-| Level | All Levels, Error, Warning, Info, Debug, Unknown | Filter entries by log level (Unknown catches lines whose level couldn't be parsed) |
+| Level | All Levels, Error, Warning, Info, Debug; plus Unknown in All Logs | Filter entries by log level. The standalone viewer's Unknown option catches lines whose level couldn't be parsed. |
 | Source | All Sources, System, Plugins | Filter the standalone All Logs view by log source |
 | Category | Categories found in selected Craft channel files | Filter web, queue, and console files by parsed log category, such as `application`, plugin handles, or class names |
-| Search | Free text | Case-insensitive search across message and context |
+| Search | Free text | Case-insensitive search across message, context, category, and user |
 | Sort | timestamp, level, user, category, message | Column to sort by |
 | Direction | asc, desc | Sort direction (default: desc — newest first) |
 
-## Log File Format
+## Log file format
 
 Plugin log files follow this format:
 

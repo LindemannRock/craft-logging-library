@@ -1,5 +1,7 @@
 # Troubleshooting
 
+Use these checks when a log destination, viewer, or Runtime Logs result does not match what you expect.
+
 ## Log file is empty or not created
 
 1. Verify Logging Library is installed and enabled: **Settings → Plugins → Logging Library**
@@ -74,7 +76,7 @@ An explicit `'database' => null` sends no `SELECT` and is intended only for comp
 
 Older Logging Library versions exported a `samdark\log\PsrMessage` object as PHP reconstruction text, which could make the message begin with content resembling `unserialize(...)` and bury its structured context inside that text.
 
-**Fix:** Update to Logging Library 5.19.0 or later, then reproduce the event. New entries show `PsrMessage::getMessage()` as the message and `getContext()` in the separate context field. Existing cached Runtime entries are not rewritten; let them expire under the configured `ttl`, roll off the bounded store, or use **Clear Runtime Logs** if you have the `loggingLibrary:clearCache` permission and no longer need the current diagnostic window.
+**Fix:** Update to Logging Library 5.18.1 or later, then reproduce the event. New entries show `PsrMessage::getMessage()` as the message and `getContext()` in the separate context field. Existing cached Runtime entries are not rewritten; let them expire under the configured `ttl`, roll off the bounded store, or use **Clear Runtime Logs** if you have the `loggingLibrary:clearCache` permission and no longer need the current diagnostic window.
 
 **Why:** Runtime Logs stores bounded diagnostic snapshots. Updating normalization changes newly captured records only; it does not migrate, evaluate, or deserialize records already in Redis or Craft cache.
 
@@ -133,7 +135,7 @@ Undated source logs such as `freeform-email.log` should appear as their own sour
 
 ## Plugin entries also appear in Craft's global log
 
-If a plugin entry appears once in its dedicated destination and once in Craft's global log, first update to Logging Library 5.19.0 or later. Then confirm the category passed to Craft matches the exact `pluginHandle` used by `LoggingLibrary::configure()` and reproduce the event with a new message.
+If a plugin entry appears once in its dedicated destination and once in Craft's global log, first update to Logging Library 5.18.1 or later. Then confirm the category passed to Craft matches the exact `pluginHandle` used by `LoggingLibrary::configure()` and reproduce the event with a new message.
 
 Logging Library keeps one dedicated target per configured handle, even when configuration runs again. It also excludes that exact handle from Craft's current default targets and from the template used to build future defaults. Other categories continue to reach Craft's global destination, and existing target exclusions, handlers, levels, and formatting remain in place.
 

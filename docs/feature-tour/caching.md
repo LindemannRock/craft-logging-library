@@ -4,7 +4,7 @@ Logging Library uses file-based caching to parse log files once and serve subseq
 
 This page covers the parsed-log-entry cache behind the file-based viewers. The log **file listing** is also cached in Craft's cache for 5 seconds, so a file created a moment ago can take up to 5 seconds to appear in the file selector. [Runtime Logs](runtime-logs.md) uses its authoritative bounded Redis list when Craft cache is Redis, or a generic Craft-cache value only when Craft cache is non-Redis, and never touches the parsed-file caches described here.
 
-## How It Works
+## How it works
 
 1. **First CP load** — the service streams the selected log file line by line and writes parsed entries into an indexed SQLite cache
 2. **Indexed queries** — the log viewer applies level/category/search filters, sorting, counts, and pagination in SQLite
@@ -13,7 +13,7 @@ This page covers the parsed-log-entry cache behind the file-based viewers. The l
 
 The indexed cache requires PHP's PDO SQLite driver. If PDO SQLite is unavailable, the viewer falls back to the legacy JSON/ArrayQuery cache so the interface still works, but large files will use more PHP memory.
 
-## Cache Invalidation
+## Cache invalidation
 
 The cache key is derived from `md5(parser version + filepath + filesize + mtime)`. This means:
 
@@ -21,7 +21,7 @@ The cache key is derived from `md5(parser version + filepath + filesize + mtime)
 - **Automatic invalidation on plugin updates** — when an update improves the log parser, its internal version string changes, so every file is re-parsed with the current parser on next view — no manual cache clearing needed
 - **Manual invalidation** — clear all caches via **Utilities → Clear Caches → Logging Library caches** in the Control Panel
 
-## Cache Statistics
+## Cache statistics
 
 The `LogCacheService` provides a `getCacheStats()` method that returns:
 
@@ -42,7 +42,7 @@ The CP log viewer is optimized for large files:
 - Entry counts use `getLogEntryCount()` @since(5.14.0), which counts in the indexed cache without materializing the parsed entries
 - The legacy `getLogs()` ArrayQuery API loads the full parsed log and should not be used for very large files
 
-## Cache Location
+## Cache location
 
 Cache files are stored at:
 

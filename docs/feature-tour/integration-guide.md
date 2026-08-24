@@ -1,8 +1,8 @@
-# Integration Guide
+# Integration guide
 
-Complete walkthrough for integrating Logging Library into a Craft CMS plugin — from initial setup through navigation, routes, and permissions.
+Connect Logging Library to a Craft CMS plugin, add its Control Panel navigation, and protect log access with permissions.
 
-## Step 1: Add Trait and Configure
+## Step 1: Add the trait and configure logging
 
 In your plugin's main class:
 
@@ -38,7 +38,7 @@ class YourPlugin extends Plugin
 > [!WARNING]
 > Do not log messages inside `init()` — it runs on every request and will flood your log files.
 
-## Step 2: Add Logs to CP Navigation
+## Step 2: Add Logs to CP navigation
 
 Use `LoggingLibrary::addLogsNav()` to add a "Logs" item to your plugin's sidebar:
 
@@ -61,13 +61,14 @@ public function getCpNavItem(): ?array
 
 The third parameter is an array of permissions — the user needs any one of them to see the Logs nav item.
 
-## Step 3: Register Permissions
+## Step 3: Register permissions
 
 Register view and download permissions for your plugin's logs:
 
 ```php
 use craft\events\RegisterUserPermissionsEvent;
 use craft\services\UserPermissions;
+use yii\base\Event;
 
 // Inside init()
 Event::on(
@@ -91,7 +92,7 @@ Event::on(
 );
 ```
 
-## Step 4: Log Messages
+## Step 4: Log messages
 
 In your services and controllers:
 
@@ -113,7 +114,7 @@ LoggingService::log('Custom message', 'info', 'your-plugin', ['key' => 'value'])
 
 ## Using PluginHelper::bootstrap()
 
-If your plugin uses the base plugin's `PluginHelper::bootstrap()`, you can pass log-related options directly:
+If your plugin uses the base plugin's `PluginHelper::bootstrap()`, you can pass the log permissions and menu options to it instead of calling `LoggingLibrary::configure()` directly:
 
 ```php
 PluginHelper::bootstrap($this, 'myHelper', ['myPlugin:viewLogs'], ['myPlugin:downloadLogs'], [
@@ -127,8 +128,8 @@ PluginHelper::bootstrap($this, 'myHelper', ['myPlugin:viewLogs'], ['myPlugin:dow
 ]);
 ```
 
-This is an alternative to calling `LoggingLibrary::addLogsNav()` manually — the base plugin handles the nav integration.
+This replaces the direct `configure()` call, but it does not add the Logs item to your plugin navigation. Keep the `LoggingLibrary::addLogsNav()` call from step 2.
 
-## Complete Example
+## Complete example
 
-See the full working example in the [Quickstart](../get-started/quickstart.md) or the README for a complete plugin class with all integration steps.
+See the [Quickstart](../get-started/quickstart.md) for a compact working plugin-class example.

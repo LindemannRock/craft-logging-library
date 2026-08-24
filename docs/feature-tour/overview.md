@@ -1,8 +1,8 @@
-# Feature Tour
+# Feature tour
 
-Logging Library is a shared infrastructure plugin that provides centralized logging for Craft CMS plugins. It gives every plugin that uses it dedicated daily log files, a built-in log viewer, and a standalone system log browser — all without duplicating code.
+Give every Craft CMS plugin a consistent place to write, inspect, and troubleshoot logs without rebuilding the same infrastructure. Logging Library provides dedicated daily log files, per-plugin viewers, and a standalone system log browser.
 
-## What It Does
+## What it does
 
 - **Dedicated Log Files** — each plugin gets its own daily log files (`plugin-handle-YYYY-MM-DD.log`) in `storage/logs/`
 - **Built-in Log Viewer** — web interface for viewing, filtering, searching, and downloading logs from within each plugin's CP section
@@ -19,7 +19,7 @@ Logging Library is a shared infrastructure plugin that provides centralized logg
 
 Craft's ephemeral-host signal and the normalized Servd signal compose with OR behavior. Missing, blank, whitespace-only, null, or normalized false `SERVD_PROJECT_SLUG` values do not detect Servd; a genuine project slug does. On Craft-ephemeral hosts such as Craft Cloud, and on detected Servd projects, detection suppresses file-based viewer presentation only. Craft/Yii logging and dedicated Monolog targets continue unchanged, and the CP viewer does not import the host's centralized log feed. Use `forceEnableLogViewer` when persistent local log storage makes file viewing safe. For file-independent CP visibility, opt into [Runtime Logs](runtime-logs.md) separately in configuration — it remains config-only and disabled by default.
 
-## How Plugins Use It
+## How plugins use it
 
 A plugin integrates Logging Library in three steps:
 
@@ -27,19 +27,19 @@ A plugin integrates Logging Library in three steps:
 2. **Log** — use `LoggingTrait` methods or `LoggingService::log()` to write structured log entries
 3. **View** — the log viewer is automatically available at your plugin's `/logs` URL
 
-See [Integration Guide](integration-guide.md) for the complete setup walkthrough.
+See the [Integration guide](integration-guide.md) for the complete setup walkthrough.
 
-## Key Pages
+## Key pages
 
-| Topic | What You'll Learn |
+| Topic | What you'll learn |
 |-------|-------------------|
-| [Configuration Options](configuration-options.md) | All parameters for `LoggingLibrary::configure()` |
+| [Configuration options](configuration-options.md) | All parameters for `LoggingLibrary::configure()` |
 | [LoggingTrait](logging-trait.md) | How to use the trait in plugins, services, and controllers |
 | [LoggingService API](logging-service.md) | Direct logging, statistics, recent entries, and cleanup |
-| [Log Viewer](log-viewer.md) | The built-in web interface for browsing logs |
+| [Log viewer](log-viewer.md) | The built-in web interface for browsing logs |
 | [Standalone Viewer](standalone-viewer.md) | The system-wide log browser |
 | [Runtime Logs](runtime-logs.md) | Recent activity from a bounded diagnostic store — no log files needed |
 | [Settings](settings.md) | The Control Panel settings area and config-file overrides |
 | [Caching](caching.md) | How the performance cache works |
-| [Edge Detection](edge-detection.md) | Hosting on edge/CDN platforms |
-| [Integration Guide](integration-guide.md) | Full plugin setup with routes, nav, and permissions |
+| [Edge detection](edge-detection.md) | Hosting on edge/CDN platforms |
+| [Integration guide](integration-guide.md) | Full plugin setup with routes, nav, and permissions |

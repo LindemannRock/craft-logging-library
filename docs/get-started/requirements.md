@@ -1,6 +1,6 @@
 # Requirements
 
-## System Requirements
+## System requirements
 
 | Requirement | Version |
 |-------------|---------|

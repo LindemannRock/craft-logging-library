@@ -1,10 +1,10 @@
-# Standalone System Log Viewer
+# Standalone system log viewer
 
-The standalone viewer provides a centralized interface for browsing all log files in `storage/logs/` — plugin logs, Craft logs, and PHP error logs — from a single page.
+Inspect plugin, Craft, and PHP error logs from one Control Panel page. The standalone viewer reads every supported log file in `storage/logs/` and groups it by source.
 
 ![Standalone All Logs viewer showing the source sidebar and a paginated, filterable table of log entries](../images/standalone-viewer-all-logs.webp)
 
-## Accessing the Viewer
+## Accessing the viewer
 
 When it's surfaced in the main navigation, the standalone viewer lives at **Control Panel → Logging Library → All Logs**.
 
@@ -19,7 +19,7 @@ If **Show Main Menu** is off, there is no main **Logging Library** navigation it
 
 When Craft reports an ephemeral host or Servd is detected and the override is off, **All Logs** is suppressed. An authorized request to the Logging Library root can redirect to the first accessible **Runtime Logs** or **Settings** route, but that direct-route fallback is not visible main navigation. Runtime Logs appear only when separately enabled in `config/logging-library.php`.
 
-## Source Filtering
+## Source filtering
 
 The viewer automatically groups log files by source and provides a dropdown filter:
 
@@ -32,7 +32,7 @@ The viewer automatically groups log files by source and provides a dropdown filt
 | *Plugin name* | `plugin-handle-YYYY-MM-DD.log` | Logs from plugins using Logging Library |
 | Other | Anything else | Unrecognized log file patterns |
 
-## Multi-Format Parsing
+## Multi-format parsing
 
 The viewer automatically detects the format of each log line and parses it accordingly:
 

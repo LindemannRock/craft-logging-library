@@ -4,9 +4,9 @@ Logging Library registers four permissions — two for its own log views (the st
 
 All four appear in the Control Panel under **Settings → Users → (group/user) → Permissions → Logging Library**. Admins always have full access regardless of permission settings.
 
-## Permission Structure
+## Permission structure
 
-### Standalone Viewer
+### Standalone viewer
 
 | Permission | Description |
 |------------|-------------|
@@ -15,7 +15,7 @@ All four appear in the Control Panel under **Settings → Users → (group/user)
 
 These control access to the centralized viewer at **Logging Library → All Logs** when the CP section is enabled. The same `viewAllLogs` permission also gates the [Runtime Logs](../feature-tour/runtime-logs.md) view when the runtime log store is enabled.
 
-### Caches & Settings
+### Caches & settings
 
 | Permission | Description |
 |------------|-------------|
@@ -24,7 +24,7 @@ These control access to the centralized viewer at **Logging Library → All Logs
 
 These two are top-level permissions — they are not nested under `viewAllLogs`. A user can manage settings without being able to read logs, and vice versa.
 
-### Per-Plugin Permissions
+### Per-plugin permissions
 
 Each plugin that integrates Logging Library registers its own permissions. These are not defined by the library — they are passed to `LoggingLibrary::configure()` as `viewSystemLogsPermissions` and `downloadSystemLogsPermissions`.
 
@@ -35,7 +35,7 @@ A typical plugin registers:
 | **`yourPlugin:viewLogs`** | Parent — view the plugin's log viewer |
 | └─ `yourPlugin:downloadLogs` | Download log files from the plugin's viewer |
 
-## Checking Permissions
+## Checking permissions
 
 In Twig:
 
@@ -56,7 +56,7 @@ if (Craft::$app->getUser()->checkPermission('loggingLibrary:viewAllLogs')) {
 $this->requirePermission('loggingLibrary:viewAllLogs');
 ```
 
-## Nested Permission Pattern
+## Nested permission pattern
 
 Craft's nested permissions are a UI convenience — the parent permission does not automatically grant child permissions.
 
@@ -65,7 +65,7 @@ Craft's nested permissions are a UI convenience — the parent permission does n
 
 To give a user read-only access, grant `loggingLibrary:viewAllLogs` only. For full access including downloads, also grant `loggingLibrary:downloadAllLogs`.
 
-## How Permissions Are Checked
+## How permissions are checked
 
 The library checks permissions in several places:
 

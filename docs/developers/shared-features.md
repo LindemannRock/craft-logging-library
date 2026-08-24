@@ -1,4 +1,4 @@
-# Shared Features
+# Shared features
 
 Logging Library is built on `lindemannrock/base`, the shared foundation used across LindemannRock plugins. Most of this is invisible in day-to-day use — it's what keeps naming, settings, and Control Panel behaviour consistent — but a couple of pieces are worth knowing about when you're working with the plugin in code or templates.
 
@@ -19,7 +19,7 @@ The [Settings](../feature-tour/settings.md) model composes several base traits s
 | Trait | What it adds |
 |-------|--------------|
 | `SettingsPersistenceTrait` | Saves/loads settings to the `logginglibrary_settings` table |
-| `SettingsConfigTrait` | Applies `config/logging-library.php` overrides and flags overridden fields |
+| `SettingsConfigTrait` | Detects `config/logging-library.php` overrides and flags overridden fields; `PluginHelper::applyConfigOverridesToSettings()` applies those values when Logging Library loads its settings |
 | `PluginNameSettingsTrait` | The configurable **Plugin Name** field |
 | `ItemsPerPageSettingsTrait` | The **Items Per Page** field (10–500) |
 | `DateFormatSettingsTrait` | The **Time Format** / **Show Seconds** fields that cascade from base |
