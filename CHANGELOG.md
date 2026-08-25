@@ -1,5 +1,15 @@
 # Changelog
 
+## [5.18.1](https://github.com/LindemannRock/craft-logging-library/compare/v5.18.0...v5.18.1) (2026-08-25)
+
+
+### Fixed
+
+* **deps:** require LindemannRock Plugin Base 5.38 ([b332924](https://github.com/LindemannRock/craft-logging-library/commit/b332924a611c8336ad028e32167e6dabc043774b))
+* **logs:** detect ephemeral hosts ([17f967c](https://github.com/LindemannRock/craft-logging-library/commit/17f967c15c62fa2ff5dd7fb3af19cdae48b3bf60))
+* **logs:** exclude dedicated categories from active defaults ([6914a06](https://github.com/LindemannRock/craft-logging-library/commit/6914a063af04b1cddbea1c58b1bee12ea9e8ac02))
+* **logs:** normalize structured runtime messages ([1916e15](https://github.com/LindemannRock/craft-logging-library/commit/1916e15f5a2918bac4015283fc211f5985fb0e97))
+
 ## [5.18.0](https://github.com/LindemannRock/craft-logging-library/compare/v5.17.0...v5.18.0) - 2026-08-05
 
 
