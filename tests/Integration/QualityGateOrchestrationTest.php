@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace lindemannrock\logginglibrary\tests\Integration;
 
+use Composer\Semver\Semver;
 use lindemannrock\logginglibrary\tests\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Process\Process;
@@ -52,6 +53,31 @@ final class QualityGateOrchestrationTest extends TestCase
             'Composer\\Config::disableProcessTimeout',
             'bash scripts/quality-gate',
         ], $composer['scripts']['quality-gate']);
+    }
+
+    public function testComposerRequiresPublishedDependencyAndToolFloors(): void
+    {
+        $composer = json_decode(
+            (string)file_get_contents($this->packageRoot() . '/composer.json'),
+            true,
+            flags: JSON_THROW_ON_ERROR,
+        );
+        self::assertIsArray($composer);
+
+        $baseConstraint = $composer['require']['lindemannrock/craft-plugin-base'] ?? null;
+        self::assertIsString($baseConstraint);
+        self::assertSame('^5.38.2', $baseConstraint);
+        self::assertFalse(Semver::satisfies('5.38.1', $baseConstraint));
+        self::assertTrue(Semver::satisfies('5.38.2', $baseConstraint));
+        self::assertTrue(Semver::satisfies('5.99.0', $baseConstraint));
+        self::assertFalse(Semver::satisfies('6.0.0', $baseConstraint));
+
+        $phpstanConstraint = $composer['require-dev']['phpstan/phpstan'] ?? null;
+        self::assertIsString($phpstanConstraint);
+        self::assertSame('^1.12.33', $phpstanConstraint);
+        self::assertFalse(Semver::satisfies('1.12.32', $phpstanConstraint));
+        self::assertTrue(Semver::satisfies('1.12.33', $phpstanConstraint));
+        self::assertFalse(Semver::satisfies('2.0.0', $phpstanConstraint));
     }
 
     public function testSuccessfulProbeRunsEveryConstituentInOrder(): void

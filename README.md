@@ -33,7 +33,7 @@ For recent-activity visibility in the CP on those platforms, enable the bounded 
 
 - Craft CMS 5.10+
 - PHP 8.2+
-- [LindemannRock Plugin Base](https://github.com/LindemannRock/craft-plugin-base) 5.38+ (required by Composer)
+- [LindemannRock Plugin Base](https://github.com/LindemannRock/craft-plugin-base) 5.38.2+ (required by Composer)
 
 ## Installation
 
