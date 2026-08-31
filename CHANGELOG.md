@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.18.2](https://github.com/LindemannRock/craft-logging-library/compare/v5.18.1...v5.18.2) (2026-08-31)
+
+
+### Fixed
+
+* **deps:** require Base 5.38.2 and PHPStan ([270a5b4](https://github.com/LindemannRock/craft-logging-library/commit/270a5b41703ff9a1b599ed4c14df668b8f1bf9c2))
+
 ## [5.18.1](https://github.com/LindemannRock/craft-logging-library/compare/v5.18.0...v5.18.1) - 2026-08-25
 
 
