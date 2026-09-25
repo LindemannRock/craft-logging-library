@@ -101,7 +101,8 @@ class RuntimeCategoryOptionsHelper
                 $patterns[] = null;
                 continue;
             }
-            foreach (preg_split('/\\R/', hex2bin($match[1])) ?: [] as $pattern) {
+            // Source groups use LF; broader byte-based newline matching can split UTF-8.
+            foreach (explode("\n", hex2bin($match[1])) as $pattern) {
                 $pattern = trim($pattern);
                 if ($pattern !== '' && !in_array($pattern, $patterns, true)) {
                     $patterns[] = $pattern;

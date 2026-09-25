@@ -73,6 +73,14 @@ Reload the Runtime Logs settings page after updating, remove the unwanted source
 
 **Why:** A picker bug allowed removed chips to leave stale values in the submitted form, so saving restored the earlier selections. Picker values are now encoded for safe removal and decoded back into ordinary category patterns before saving. This does not clear existing runtime logs.
 
+## Custom Unicode capture filters disappear after saving
+
+If a custom pattern such as `Åudit:*` or `作者:*` disappeared after saving, check both **Include Sources and Categories** and **Exclude Sources and Categories** under **Settings → Runtime Logs → Advanced**. Other selections in the affected list may also have been lost.
+
+After updating Logging Library, re-enter the intended selections, save, and reload the page to confirm they remain. If a field is locked by configuration, manage its `runtimeLogStore.includeCategories` or `runtimeLogStore.excludeCategories` value in `config/logging-library.php` instead. Restart long-running workers after changing capture settings.
+
+**Why:** A decoding defect could split certain Unicode characters and prevent the whole list from being stored. The corrected picker preserves these characters alongside named sources and other custom patterns. Previously lost selections cannot be recovered automatically. An empty Include list allows all categories; an empty Exclude list adds no custom exclusions. Other capture rules still apply, and correcting a filter does not remove entries already captured. See [Runtime Logs](../feature-tour/runtime-logs.md#configuration-reference).
+
 ## Runtime Logs shows Redis unavailable
 
 When Craft cache is Yii Redis, Redis is the only authoritative Runtime Logs backend. The sidebar reports **Redis unavailable** if its database configuration is invalid, `SELECT` is rejected, the independent connection cannot be established, or a Redis operation fails.
