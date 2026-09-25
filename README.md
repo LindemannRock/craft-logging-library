@@ -16,7 +16,8 @@ A reusable logging library for Craft CMS plugins that provides consistent loggin
 - **Standalone System Log Viewer** — browse all Craft, plugin, and PHP logs from one interface
 - **Runtime Logs** — bounded Redis/Craft-cache view of recent log activity for edge/ephemeral hosting where log files don't persist
 - **Control Panel Section** — access the standalone viewer from **Logging Library → All Logs** when the CP section is enabled
-- **Control Panel Settings** — display name, menu visibility, entries-per-page, and timestamp format, all overridable from `config/logging-library.php`
+- **Control Panel Settings** — runtime capture, file-viewer availability, display name, menu visibility, page size, and timestamps, with per-option config overrides
+- **Setup Summary** — review runtime capture, file availability, and configured storage through the shared setup screen; capture remains optional
 - **LoggingTrait** — drop-in trait with `logInfo()`, `logWarning()`, `logError()`, `logDebug()`
 - **LoggingService API** — direct logging, log statistics, recent entries, and cleanup
 - **High Performance Caching** — indexed file-based cache for large log viewer pages, with ArrayQuery compatibility for API callers
@@ -27,7 +28,7 @@ A reusable logging library for Craft CMS plugins that provides consistent loggin
 
 On ephemeral hosts such as Craft Cloud, and on Servd, automatic suppression affects file-based viewers only. Craft/Yii logging and Logging Library's dedicated Monolog targets continue unchanged. Logging Library does not import a hosting provider's centralized log feed into Craft; the file-based CP viewer reads local `storage/logs/` files only.
 
-For recent-activity visibility in the CP on those platforms, enable the bounded **Runtime Logs** view separately in `config/logging-library.php`. Runtime Logs remain opt-in and do not replace the host's logging dashboard.
+For recent-activity visibility in the CP on those platforms, enable the bounded **Runtime Logs** view under **Settings → Runtime Logs** or through `config/logging-library.php`. Runtime Logs remain opt-in and do not replace the host's logging dashboard.
 
 ## Requirements
 

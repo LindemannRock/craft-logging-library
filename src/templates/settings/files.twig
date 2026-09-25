@@ -1,0 +1,30 @@
+{% extends 'logging-library/_layouts/settings' %}
+{% import '_includes/forms' as forms %}
+
+{% set title = 'File Logs'|t('logging-library') %}
+{% set fullPageForm = true %}
+{% set selectedSettingsItem = 'files' %}
+
+{% block content %}
+	{{ actionInput('logging-library/settings/save') }}
+	{{ redirectInput('logging-library/settings/files') }}
+	{{ hiddenInput('section', 'files') }}
+	<h2 class='first'>{{ title }}</h2>
+
+	{% include 'logging-library/_components/file-availability' with {settings: settings} only %}
+	{{
+		forms.lightswitchField({
+		label: 'Force Enable File Log Viewers'|t('logging-library'),
+		instructions: 'Force-enable file-based log viewers even when an edge or ephemeral environment is detected. This affects Logging Library and every plugin&apos;s dedicated Logs section.'|t('logging-library'),
+		id: 'forceEnableLogViewer',
+		name: 'settings[forceEnableLogViewer]',
+		on: settings.forceEnableLogViewer,
+		errors: settings.getErrors('forceEnableLogViewer'),
+		disabled: settings.isOverriddenByConfig('forceEnableLogViewer'),
+		warning: settings.isOverriddenByConfig('forceEnableLogViewer')
+		? 'This is being overridden by the <code>forceEnableLogViewer</code> setting in <code>config/logging-library.php</code>.'|t('logging-library')|raw
+		: null,
+		})
+	}}
+	{% include 'lindemannrock-base/_components/plugin-credit' %}
+{% endblock %}

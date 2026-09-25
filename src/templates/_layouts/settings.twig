@@ -1,4 +1,4 @@
-{% extends "_layouts/cp" %}
+{% extends '_layouts/cp' %}
 
 {% set title = title ?? 'Settings'|t('logging-library') %}
 {% set selectedSettingsItem = selectedSettingsItem ?? 'general' %}
@@ -6,34 +6,50 @@
 {% set errorSummary = '' %}
 
 {% if settings is defined and settings.hasErrors() %}
-    {% set errorSummary = include('lindemannrock-base/_partials/error-summary', {
-        errors: settings.getErrors(),
-    })|trim %}
+	{%
+		set errorSummary = include('lindemannrock-base/_partials/error-summary', {
+		    errors: settings.getErrors(),
+		})|trim
+	%}
 {% endif %}
 
 {% block sidebar %}
-    <nav id="settings-nav">
-        <ul>
-            <li>
-                <a href="{{ url('logging-library/settings/general') }}" {% if selectedSettingsItem == 'general' %}class="sel"{% endif %} data-nav-item="general">
-                    {{ 'General'|t('logging-library') }}
-                </a>
-            </li>
-            <li id="logging-library-interface-nav-item" class="{{ settings is defined and not settings.standaloneViewerAvailable ? 'hidden' : '' }}">
-                <a href="{{ url('logging-library/settings/interface') }}" {% if selectedSettingsItem == 'interface' %}class="sel"{% endif %} data-nav-item="interface">
-                    {{ 'Interface'|t('logging-library') }}
-                </a>
-            </li>
-        </ul>
-    </nav>
+	<nav id='settings-nav'>
+		<ul>
+			<li>
+				<a
+					href='{{ url('logging-library/settings/general') }}'
+					{% if selectedSettingsItem == 'general' %}
+						class='sel'
+					{% endif %}
+					data-nav-item='general'
+				>
+					{{ 'General'|t('logging-library') }}
+				</a>
+			</li>
+			<li>
+				<a href='{{ url('logging-library/settings/runtime') }}' class='{{ selectedSettingsItem == 'runtime' ? 'sel' : '' }}'>{{ 'Runtime Logs'|t('logging-library') }}</a>
+			</li>
+			<li>
+				<a href='{{ url('logging-library/settings/files') }}' class='{{ selectedSettingsItem == 'files' ? 'sel' : '' }}'>{{ 'File Logs'|t('logging-library') }}</a>
+			</li>
+			<li id='logging-library-interface-nav-item'>
+				<a
+					href='{{ url('logging-library/settings/interface') }}'
+					{% if selectedSettingsItem == 'interface' %}
+						class='sel'
+					{% endif %}
+					data-nav-item='interface'
+				>
+					{{ 'Interface'|t('logging-library') }}
+				</a>
+			</li>
+		</ul>
+	</nav>
 {% endblock %}
 
 {% css %}
-    #settings-nav a {
-        transition: none;
-    }
+#settings-nav a { transition: none; }
 
-    #settings-nav a.sel {
-        cursor: default;
-    }
+#settings-nav a.sel { cursor: default; }
 {% endcss %}

@@ -14,6 +14,8 @@ return [
     'Open Settings' => 'Einstellungen öffnen',
 
     // Navigation
+    'Setup' => 'Einrichtung',
+    'File Logs' => 'Dateiprotokolle',
     'All Logs' => 'Alle Protokolle',
     'Runtime Logs' => 'Laufzeitprotokolle',
     'Logs' => 'Protokolle',
@@ -49,6 +51,7 @@ return [
     'User does not have permission to view logs' => 'Der Benutzer hat keine Berechtigung, Protokolle anzuzeigen',
 
     // Settings: General
+    'Show Logging Library in the main navigation. This does not enable or disable log capture.' => 'Logging Library in der Hauptnavigation anzeigen. Dies aktiviert oder deaktiviert die Protokollerfassung nicht.',
     'General Settings' => 'Allgemeine Einstellungen',
     'Force Enable Log Viewers' => 'Protokoll-Viewer erzwingen',
     'Force-enable file-based log viewers even when an edge or ephemeral environment is detected. This affects Logging Library and every plugin&apos;s dedicated Logs section.' => 'Dateibasierte Protokoll-Viewer erzwingen, auch wenn eine Edge- oder ephemere Umgebung erkannt wird. Dies betrifft Logging Library und den dedizierten Protokollbereich jedes Plugins.',
@@ -59,8 +62,55 @@ return [
     'Show Main Menu' => 'Hauptmenü anzeigen',
     'Show Logging Library in the main Control Panel navigation as a consolidated All Logs view when file-based log viewers are available.' => 'Logging Library in der Hauptnavigation des Control Panels als konsolidierte Alle Protokolle-Ansicht anzeigen, wenn dateibasierte Protokoll-Viewer verfügbar sind.',
 
+    // Settings: File Logs
+    'Force Enable File Log Viewers' => 'Dateibasierte Protokoll-Viewer erzwingen',
+    'An edge or ephemeral environment is detected. File viewers are hidden unless forced on; Runtime Logs remain available when enabled. Only force file viewers on if persistent log files are available.' => 'Eine Edge- oder kurzlebige Umgebung wurde erkannt. Datei-Viewer sind ausgeblendet, sofern sie nicht erzwungen werden; aktivierte Laufzeitprotokolle bleiben verfügbar. Erzwingen Sie Datei-Viewer nur, wenn persistente Protokolldateien verfügbar sind.',
+    'File viewers are available. Runtime Logs are optional and independent of file logging.' => 'Datei-Viewer sind verfügbar. Laufzeitprotokolle sind optional und unabhängig von der Dateiprotokollierung.',
+
+    // Settings: Runtime Logs
+    'Min: {min}, Max: {max}' => 'Min.: {min}, Max.: {max}',
+    'Uses the application cache configuration. The Redis database can be overridden in {file}. To verify capture, trigger a log message and check Runtime Logs.' => 'Verwendet die Konfiguration des Anwendungs-Caches. Die Redis-Datenbank kann in {file} überschrieben werden. Lösen Sie zur Prüfung der Erfassung eine Protokollmeldung aus und prüfen Sie die Laufzeitprotokolle.',
+    'Enable Runtime Logs' => 'Laufzeitprotokolle aktivieren',
+    'Skip Console Requests' => 'Konsolenanfragen überspringen',
+    'Skip Queue Requests' => 'Warteschlangenanfragen überspringen',
+    'Retention (seconds)' => 'Aufbewahrung (Sekunden)',
+    'Maximum Entries' => 'Maximale Einträge',
+    'Refresh Interval (seconds)' => 'Aktualisierungsintervall (Sekunden)',
+    'Maximum Message Bytes' => 'Maximale Nachrichtenbytes',
+    'Maximum Context Bytes' => 'Maximale Kontextbytes',
+    'Captured Levels' => 'Erfasste Protokollstufen',
+    'Include Categories' => 'Kategorien einschließen',
+    'Exclude Categories' => 'Kategorien ausschließen',
+    'Include Request User ID' => 'Benutzer-ID der Anfrage einschließen',
+    'Advanced' => 'Erweitert',
+    'Configured Storage' => 'Konfigurierter Speicher',
+    'Storage follows the Craft cache configuration. Redis database selection is configuration-only. This is not a connection test; confirm capture in Runtime Logs.' => 'Der Speicher folgt der Craft Cache-Konfiguration. Die Redis-Datenbank wird ausschließlich über die Konfiguration ausgewählt. Dies ist kein Verbindungstest; prüfen Sie die Erfassung unter Laufzeitprotokolle.',
+    'On multiple servers, use shared cache storage. Local file cache does not combine logs from other instances.' => 'Verwenden Sie bei mehreren Servern gemeinsamen Cache-Speicher. Ein lokaler Datei-Cache führt keine Protokolle anderer Instanzen zusammen.',
+    'Capture changes apply to new requests. Restart long-running workers to load changed settings. Disabling capture does not clear stored logs.' => 'Änderungen an der Erfassung gelten für neue Anfragen. Starten Sie langlebige Worker neu, um geänderte Einstellungen zu laden. Das Deaktivieren der Erfassung löscht keine gespeicherten Protokolle.',
+    'How often Runtime Logs refreshes automatically. Set to 0 to disable. Current: {duration}' => 'Wie oft die Laufzeitprotokolle automatisch aktualisiert werden. Zum Deaktivieren auf 0 setzen. Aktuell: {duration}',
+    'Choose which log categories to capture, not words in the message. Enter one category per line, such as {exact}, or use {prefix} to match categories starting with {start}. Leave empty to capture all categories.' => 'Wählen Sie die zu erfassenden Protokollkategorien, nicht Wörter in der Meldung. Geben Sie eine Kategorie pro Zeile ein, etwa {exact}, oder verwenden Sie {prefix} für Kategorien, die mit {start} beginnen. Lassen Sie das Feld leer, um alle Kategorien zu erfassen.',
+    'Skip these log categories even if included above. Enter one per line, such as {exact} or {prefix}. Leave empty to add no category exclusions.' => 'Überspringen Sie diese Protokollkategorien, auch wenn sie oben eingeschlossen sind. Geben Sie eine pro Zeile ein, etwa {exact} oder {prefix}. Lassen Sie das Feld leer, um keine Kategorieausschlüsse hinzuzufügen.',
+    'When on, Runtime Logs skips command-line requests. Turn off only when diagnosing console commands; file and hosted logs are unaffected.' => 'Wenn aktiviert, überspringen Laufzeitprotokolle Befehlszeilenanfragen. Deaktivieren Sie diese Option nur zur Diagnose von Konsolenbefehlen; Datei- und Hosting-Protokolle bleiben unverändert.',
+    'When on, Runtime Logs skips detected queue execution. To capture console queue workers, turn off both skip switches and restart the workers. Workers can generate large volumes of logs.' => 'Wenn aktiviert, überspringen Laufzeitprotokolle erkannte Warteschlangenausführungen. Um Konsolen-Worker der Warteschlange zu erfassen, deaktivieren Sie beide Überspringen-Schalter und starten Sie die Worker neu. Worker können große Protokollmengen erzeugen.',
+    'Adds the authenticated request user ID. Messages and context may still contain personal data regardless of this setting.' => 'Fügt die ID des authentifizierten Anfragebenutzers hinzu. Nachrichten und Kontext können unabhängig von dieser Einstellung personenbezogene Daten enthalten.',
+
+    'Maximum age of runtime entries, in seconds. Current: {duration}' => 'Höchstalter der Laufzeitprotokolleinträge in Sekunden. Aktuell: {duration}',
+    'Min: {min} ({minDuration}), Max: {max} ({maxDuration})' => 'Min.: {min} ({minDuration}), Max.: {max} ({maxDuration})',
+    '{count} second' => '{count} Sekunde',
+    '{count} seconds' => '{count} Sekunden',
+    '{count} minute' => '{count} Minute',
+    '{count} minutes' => '{count} Minuten',
+    '{count} hour' => '{count} Stunde',
+    '{count} hours' => '{count} Stunden',
+    '{count} day' => '{count} Tag',
+    '{count} days' => '{count} Tage',
+
     // Settings: Interface
     'Interface Settings' => 'Oberflächen-Einstellungen',
+
+    // Setup
+    'Choose the log views that suit this environment. Runtime capture is optional and remains off until enabled.' => 'Wählen Sie die für diese Umgebung geeigneten Protokollansichten. Die Laufzeiterfassung ist optional und bleibt bis zur Aktivierung ausgeschaltet.',
+    'Consider Runtime Logs for recent diagnostics on ephemeral hosting. Confirm shared storage before relying on logs from multiple instances.' => 'Erwägen Sie Laufzeitprotokolle für aktuelle Diagnosen auf kurzlebigem Hosting. Prüfen Sie den gemeinsamen Speicher, bevor Sie sich auf Protokolle mehrerer Instanzen verlassen.',
 
     // Log levels
     'All Levels' => 'Alle Stufen',
@@ -141,6 +191,7 @@ return [
     'Recent runtime logs use a bounded diagnostic store and are not complete log history.' => 'Aktuelle Laufzeitprotokolle verwenden einen begrenzten Diagnosespeicher und stellen keinen vollständigen Protokollverlauf dar.',
 
     // Config overrides
+    'This is being overridden by the <code>{setting}</code> setting in <code>config/logging-library.php</code>.' => 'Dies wird durch die Einstellung <code>{setting}</code> in <code>config/logging-library.php</code> überschrieben.',
     'This is being overridden by the <code>forceEnableLogViewer</code> setting in <code>config/logging-library.php</code>.' => 'Dies wird durch die Einstellung <code>forceEnableLogViewer</code> in <code>config/logging-library.php</code> überschrieben.',
     'This is being overridden by the <code>showCpSection</code> setting in <code>config/logging-library.php</code>.' => 'Dies wird durch die Einstellung <code>showCpSection</code> in <code>config/logging-library.php</code> überschrieben.',
 ];

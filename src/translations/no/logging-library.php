@@ -14,6 +14,8 @@ return [
     'Open Settings' => 'Åpne innstillinger',
 
     // Navigation
+    'Setup' => 'Oppsett',
+    'File Logs' => 'Fillogger',
     'All Logs' => 'Alle logger',
     'Runtime Logs' => 'Runtime-logger',
     'Logs' => 'Logger',
@@ -49,6 +51,7 @@ return [
     'User does not have permission to view logs' => 'Brukeren har ikke tillatelse til å vise logger',
 
     // Settings: General
+    'Show Logging Library in the main navigation. This does not enable or disable log capture.' => 'Vis Logging Library i hovednavigasjonen. Dette aktiverer eller deaktiverer ikke logginnsamling.',
     'General Settings' => 'Generelle innstillinger',
     'Force Enable Log Viewers' => 'Tving aktivering av loggvisere',
     'Force-enable file-based log viewers even when an edge or ephemeral environment is detected. This affects Logging Library and every plugin&apos;s dedicated Logs section.' => 'Tving aktivering av filbaserte loggvisere selv når et edge- eller flyktig miljø oppdages. Dette påvirker Logging Library og hvert plugins dedikerte Logger-seksjon.',
@@ -59,8 +62,55 @@ return [
     'Show Main Menu' => 'Vis hovedmeny',
     'Show Logging Library in the main Control Panel navigation as a consolidated All Logs view when file-based log viewers are available.' => 'Vis Logging Library i kontrollpanelets hovednavigasjon som en samlet Alle logger-visning når filbaserte loggvisere er tilgjengelige.',
 
+    // Settings: File Logs
+    'Force Enable File Log Viewers' => 'Tving aktivering av filloggvisere',
+    'An edge or ephemeral environment is detected. File viewers are hidden unless forced on; Runtime Logs remain available when enabled. Only force file viewers on if persistent log files are available.' => 'Et edge- eller midlertidig miljø er oppdaget. Filvisere er skjult med mindre de tvinges på; runtime-logger er fortsatt tilgjengelige når de er aktivert. Tving bare filvisere på hvis vedvarende loggfiler er tilgjengelige.',
+    'File viewers are available. Runtime Logs are optional and independent of file logging.' => 'Filvisere er tilgjengelige. Runtime-logger er valgfrie og uavhengige av fillogging.',
+
+    // Settings: Runtime Logs
+    'Min: {min}, Max: {max}' => 'Min: {min}, Maks: {max}',
+    'Uses the application cache configuration. The Redis database can be overridden in {file}. To verify capture, trigger a log message and check Runtime Logs.' => 'Bruker applikasjonscachens konfigurasjon. Redis-databasen kan overstyres i {file}. Generer en loggmelding og kontroller runtime-logger for å bekrefte innsamlingen.',
+    'Enable Runtime Logs' => 'Aktiver runtime-logger',
+    'Skip Console Requests' => 'Hopp over konsollforespørsler',
+    'Skip Queue Requests' => 'Hopp over køforespørsler',
+    'Retention (seconds)' => 'Oppbevaring (sekunder)',
+    'Maximum Entries' => 'Maksimalt antall oppføringer',
+    'Refresh Interval (seconds)' => 'Oppdateringsintervall (sekunder)',
+    'Maximum Message Bytes' => 'Maksimalt antall byte per melding',
+    'Maximum Context Bytes' => 'Maksimalt antall byte for kontekst',
+    'Captured Levels' => 'Innsamlede nivåer',
+    'Include Categories' => 'Inkluder kategorier',
+    'Exclude Categories' => 'Ekskluder kategorier',
+    'Include Request User ID' => 'Inkluder forespørselens bruker-ID',
+    'Advanced' => 'Avansert',
+    'Configured Storage' => 'Konfigurert lagring',
+    'Storage follows the Craft cache configuration. Redis database selection is configuration-only. This is not a connection test; confirm capture in Runtime Logs.' => 'Lagringen følger Crafts cachekonfigurasjon. Redis-databasen velges bare via konfigurasjon. Dette er ikke en tilkoblingstest; bekreft innsamling i runtime-logger.',
+    'On multiple servers, use shared cache storage. Local file cache does not combine logs from other instances.' => 'Bruk delt cachelagring på flere servere. Lokal filcache kombinerer ikke logger fra andre instanser.',
+    'Capture changes apply to new requests. Restart long-running workers to load changed settings. Disabling capture does not clear stored logs.' => 'Innsamlingsendringer gjelder nye forespørsler. Start langvarige arbeidsprosesser på nytt for å laste endrede innstillinger. Deaktivering av innsamling fjerner ikke lagrede logger.',
+    'How often Runtime Logs refreshes automatically. Set to 0 to disable. Current: {duration}' => 'Hvor ofte runtime-logger oppdateres automatisk. Angi 0 for å deaktivere. Gjeldende: {duration}',
+    'Choose which log categories to capture, not words in the message. Enter one category per line, such as {exact}, or use {prefix} to match categories starting with {start}. Leave empty to capture all categories.' => 'Velg hvilke loggkategorier som skal samles inn, ikke ord i meldingen. Angi én kategori per linje, for eksempel {exact}, eller bruk {prefix} for kategorier som begynner med {start}. La feltet stå tomt for å samle inn alle kategorier.',
+    'Skip these log categories even if included above. Enter one per line, such as {exact} or {prefix}. Leave empty to add no category exclusions.' => 'Hopp over disse loggkategoriene selv om de er inkludert ovenfor. Angi én per linje, for eksempel {exact} eller {prefix}. La feltet stå tomt for ikke å legge til kategoriekskluderinger.',
+    'When on, Runtime Logs skips command-line requests. Turn off only when diagnosing console commands; file and hosted logs are unaffected.' => 'Når dette er aktivert, hopper runtime-logger over kommandolinjeforespørsler. Deaktiver bare ved diagnostikk av konsollkommandoer; fillogger og vertsleverandørens logger påvirkes ikke.',
+    'When on, Runtime Logs skips detected queue execution. To capture console queue workers, turn off both skip switches and restart the workers. Workers can generate large volumes of logs.' => 'Når dette er aktivert, hopper runtime-logger over oppdaget køkjøring. For å samle inn logger fra konsollens køprosesser må du deaktivere begge hopp over-innstillingene og starte prosessene på nytt. Arbeidsprosesser kan generere store loggmengder.',
+    'Adds the authenticated request user ID. Messages and context may still contain personal data regardless of this setting.' => 'Legger til ID for forespørselens autentiserte bruker. Meldinger og kontekst kan inneholde personopplysninger uavhengig av denne innstillingen.',
+
+    'Maximum age of runtime entries, in seconds. Current: {duration}' => 'Maksimal alder for runtime-loggoppføringer i sekunder. Gjeldende: {duration}',
+    'Min: {min} ({minDuration}), Max: {max} ({maxDuration})' => 'Min: {min} ({minDuration}), Maks: {max} ({maxDuration})',
+    '{count} second' => '{count} sekund',
+    '{count} seconds' => '{count} sekunder',
+    '{count} minute' => '{count} minutt',
+    '{count} minutes' => '{count} minutter',
+    '{count} hour' => '{count} time',
+    '{count} hours' => '{count} timer',
+    '{count} day' => '{count} dag',
+    '{count} days' => '{count} dager',
+
     // Settings: Interface
     'Interface Settings' => 'Grensesnittinnstillinger',
+
+    // Setup
+    'Choose the log views that suit this environment. Runtime capture is optional and remains off until enabled.' => 'Velg loggvisningene som passer til dette miljøet. Runtime-innsamling er valgfri og forblir avslått til den aktiveres.',
+    'Consider Runtime Logs for recent diagnostics on ephemeral hosting. Confirm shared storage before relying on logs from multiple instances.' => 'Vurder runtime-logger for nyere diagnostikk på midlertidig hosting. Bekreft delt lagring før du stoler på logger fra flere instanser.',
 
     // Log levels
     'All Levels' => 'Alle nivåer',
@@ -141,6 +191,7 @@ return [
     'Recent runtime logs use a bounded diagnostic store and are not complete log history.' => 'Nylige runtime-logger bruker et begrenset diagnostikklager og er ikke en fullstendig logghistorikk.',
 
     // Config overrides
+    'This is being overridden by the <code>{setting}</code> setting in <code>config/logging-library.php</code>.' => 'Dette overstyres av innstillingen <code>{setting}</code> i <code>config/logging-library.php</code>.',
     'This is being overridden by the <code>forceEnableLogViewer</code> setting in <code>config/logging-library.php</code>.' => 'Dette overstyres av innstillingen <code>forceEnableLogViewer</code> i <code>config/logging-library.php</code>.',
     'This is being overridden by the <code>showCpSection</code> setting in <code>config/logging-library.php</code>.' => 'Dette overstyres av innstillingen <code>showCpSection</code> i <code>config/logging-library.php</code>.',
 ];

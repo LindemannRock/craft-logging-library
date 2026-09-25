@@ -1,31 +1,61 @@
 # Settings
 
-Logging Library has its own settings area in the Control Panel for the things that aren't tied to a single plugin's integration — the display name, whether the consolidated viewer appears in the main menu, how many entries the standalone viewer shows per page, and how timestamps are formatted. Per-plugin logging behaviour (log level, retention, per-plugin permissions) is still configured in code with [`LoggingLibrary::configure()`](configuration-options.md); this page covers the library's *own* settings.
+Choose which log views your site needs, then control runtime capture and presentation from **Logging Library → Settings**. Runtime capture is optional: installing or upgrading never turns it on automatically. Per-plugin file logging still uses [`LoggingLibrary::configure()`](configuration-options.md); these settings belong to Logging Library itself.
 
 ![Logging Library General settings page showing the Plugin Name field and the Show Main Menu toggle](../images/settings-general.webp)
 
 ## Where to find it
 
-When the Logging Library main item is visible, go to **Logging Library → Settings**. You can always reach the plugin settings through Craft's **Settings → Plugins → Logging Library** area when authorized. Settings open on the **General** tab, with **Interface** as a second tab when the standalone file viewer is surfaced. Access requires the `loggingLibrary:manageSettings` permission (admins always have it) — see [Permissions](../developers/permissions.md).
+Go to **Logging Library → Settings**, or reach it through **Settings → Plugins → Logging Library**. The four tabs are **General**, **Runtime Logs**, **File Logs**, and **Interface**. All remain accessible regardless of edge detection or whether a viewer is enabled. Settings and Setup require `loggingLibrary:manageSettings`; viewing logs is a separate permission — see [Permissions](../developers/permissions.md).
 
 > [!NOTE]
-> The main **Logging Library** navigation item is absent when **Show Main Menu** is off. It is also absent when both file viewers and Runtime Logs are unavailable. If Runtime Logs are enabled while file viewers are suppressed, the main item can remain with **Runtime Logs** instead of **All Logs**. An authorized direct request to the Logging Library root may redirect to Settings; that route behaviour does not create a visible main navigation item. The **Interface** tab is hidden whenever the standalone file viewer is not surfaced.
+> With **Show Main Menu** on, navigation contains only sections the current user can access. A settings manager can reach Settings and Setup even with both viewers off. A viewer-only user gets no empty menu. Turning the main menu off does not disable capture.
+
+## Setup
+
+Open **Logging Library → Setup** for a summary of capture, file-viewer availability, and configured storage. It uses the shared LindemannRock setup layout. Disabled runtime capture is a valid choice, not an incomplete installation.
+
+On an ephemeral host, Setup suggests considering Runtime Logs. It does not enable capture, change your cache, select a Redis database, or test connectivity. Confirm entries arrive in [Runtime Logs](runtime-logs.md) before relying on it; multiple instances need shared cache storage.
 
 ## General
 
 | Setting | What it does | Default |
 |---------|--------------|---------|
 | **Plugin Name** | The display name shown for Logging Library in the Control Panel. | `Logging Library` |
-| **Show Main Menu** | Allow Logging Library in the main Control Panel navigation when at least one viewer family is available. Turn it off to remove the main item while keeping each plugin's own **Logs** section. | On |
-| **Force Enable Log Viewers** | Only shown when Craft reports an ephemeral host or Servd is detected. Restores automatic file-viewer availability for the standalone **All Logs** view and plugin integrations; an explicit per-plugin `enableLogViewer` value still wins. | Off |
+| **Show Main Menu** | Show accessible Logging Library sections in the main navigation. Does not change capture or other plugins' **Logs** sections. | On |
 
-**Force Enable Log Viewers** is the escape hatch for the [edge-detection](edge-detection.md) behaviour. Craft's `App::isEphemeral()` signal and Servd detection compose with OR behavior. Servd is detected when Craft's normalized `SERVD_PROJECT_SLUG` value resolves to a non-empty project slug; missing, blank, whitespace-only, null, and normalized false values do not enable Servd detection. If you've attached persistent shared storage at `storage/logs/`, switch this on to restore the automatic viewer default. A plugin that explicitly configures `enableLogViewer` keeps that explicit value.
+## Runtime Logs
+
+Enable capture without creating a configuration file. Console/queue safeguards and request user IDs sit directly below **Enable Runtime Logs**, followed by capture levels, retention, entry count, and refresh interval. **Advanced** contains category filters and payload limits. See [Runtime Logs](runtime-logs.md#configuration-reference) for defaults and bounds.
+
+Turning **Enable Runtime Logs** off hides the dependent fields without clearing their saved values. **Configured Storage** stays visible. Turn capture back on to review or change those preferences.
+
+Each field shows its effective value. A matching nested `runtimeLogStore` option in configuration disables **only that field** and identifies the overriding key. Remove that option to manage it in the CP; the previously saved preference becomes effective again.
+
+Category filters match the category attached to a log entry, not words in its message. Enter one category per line: `my-plugin` matches that exact category, while `yii\db\*` matches categories starting with `yii\db\`. An empty include list allows all categories; exclusions take priority, and an empty exclude list adds no exclusions of your own. Choose at least one capture level. Set refresh to `0` to disable automatic refresh.
+
+**Retention (seconds)** defaults to `86400` (1 day). In the CP, enter between `1` second and `2592000` seconds (30 days); the readable preview updates as you type, and the tip shows both limits. This does not guarantee that entries survive for the whole duration: the entry limit, cache eviction, or clearing the store can remove them sooner. Explicit `runtimeLogStore.ttl` configuration overrides retain their existing behavior and are not shortened to the CP limit.
+
+The **Configured Storage** info box sits above **Enable Runtime Logs** and stays visible when capture is off. It describes the backend derived from the application cache configuration and points to the configuration file for Redis database overrides. To verify capture, enable Runtime Logs, trigger a message at a captured level and category, then check that the new entry appears in the Runtime Logs viewer. There is no separate connection-test page. The capture-change notice below the toggle appears with the capture controls. Setup retains the fuller deployment and multi-server guidance.
+
+> [!IMPORTANT]
+> Changes apply to new requests. Restart long-running workers to load changed settings. Disabling capture does not clear stored entries; use **Clear Runtime Logs** while the viewer is enabled if you intend to remove them. Retention and entry limits take effect through subsequent store operations, not a settings-save cleanup job.
+
+The other numeric runtime fields also show their accepted bounds in a **Tip**: Maximum Entries accepts `1–10000` (default `1000`), and Maximum Message Bytes and Maximum Context Bytes each accept `1–65536` bytes.
+
+**Refresh Interval (seconds)** defaults to `5`. In the CP, enter `0` to disable automatic refresh or `1–3600` seconds (up to 1 hour). The live **Current** preview shows a readable duration as you type, or **Disabled** for `0`; the tip explains both limits. Like retention, explicit `runtimeLogStore.refreshInterval` configuration overrides retain their existing behavior. No saved values are rewritten automatically.
+
+## File Logs
+
+**Force Enable File Log Viewers** keeps the existing `forceEnableLogViewer` key and saved value. It defaults to off. The tab explains whether file viewers are available or suppressed.
+
+**Force Enable File Log Viewers** is the escape hatch for [edge detection](edge-detection.md). Craft's `App::isEphemeral()` signal and Servd detection compose with OR behavior. Only enable it when persistent log files are available at `storage/logs/`. A plugin that explicitly configures `enableLogViewer` keeps that explicit value.
 
 This setting does not import hosted logs from Craft Cloud, Servd, or any external logging platform. It only tells Logging Library to try reading local files again. It does not change Craft/Yii logging, dedicated Monolog targets, or log destinations.
 
 ## Interface
 
-The Interface tab only appears when a viewer is available (see the note above).
+Interface settings remain available even when file viewers are hidden.
 
 | Setting | What it does | Default |
 |---------|--------------|---------|
@@ -39,7 +69,7 @@ The Interface tab only appears when a viewer is available (see the note above).
 
 ## Overriding settings from a config file
 
-Every setting on these pages can be locked in code with a `config/logging-library.php` file. Copy the sample from the plugin's `src/config.php` and edit your copy:
+Settings can be locked with `config/logging-library.php`. The sample in `src/config.php` lists the options, but copy only those you want to pin: every explicit option locks its matching field, even when it repeats a default. For example, this fuller configuration locks the named preferences while leaving other runtime fields editable:
 
 ```php
 <?php
@@ -56,7 +86,7 @@ return [
         // Force-enable file-based viewers even on edge/ephemeral hosting
         'forceEnableLogViewer' => false,
 
-        // Cache-backed recent runtime log store (config-only, no CP fields)
+        // Per-option overrides for the Runtime Logs settings
         // — see the Runtime Logs page for the full option reference
         'runtimeLogStore' => [
             'enabled' => false,
@@ -74,7 +104,7 @@ return [
 ];
 ```
 
-The `runtimeLogStore` block configures the [Runtime Logs](runtime-logs.md) view. Unlike the settings above, it has no Control Panel equivalent — it's config-file only and remains disabled until `runtimeLogStore.enabled` is set to `true`. It is governed independently from file-viewer detection and **Force Enable Log Viewers**. Its conservative defaults skip runtime capture for console requests and detected queue execution. The optional nested `redis.database` setting can inherit Craft's Redis database, select an assigned non-negative database, resolve an environment reference, or explicitly disable `SELECT`; the Runtime Logs page documents the strict resolution rules. Restart long-running queue workers after changing this block because existing targets retain their startup configuration.
+The `runtimeLogStore` block overrides individual [Runtime Logs](runtime-logs.md) preferences. Omitted options use saved preferences or defaults; the database's flat runtime column names are not public config keys. Capture remains independent of file-viewer detection. Only `redis.database` is configuration-only: omit it to inherit Craft's Redis database, choose an assigned non-negative database, resolve an environment reference, or explicitly disable `SELECT` with `null`. See the Runtime Logs page for strict resolution rules. Restart long-running workers after changing capture settings.
 
 When a setting is present in this file, the matching Control Panel field is **disabled** and shows a notice that it's being overridden by `config/logging-library.php`. The full resolution order, highest priority first:
 
@@ -88,3 +118,5 @@ Use the config file when you want a value pinned per environment (for example, f
 ## Where settings are stored
 
 These settings persist in the plugin's own database table (`logginglibrary_settings`), not in Craft's project config. The table is created on install and kept current by the plugin's migrations, so existing sites pick up new settings automatically on update.
+
+The 5.19.0 migration adds runtime preference columns with the existing conservative defaults. It preserves prior settings and does not copy environment-specific configuration into the database. Existing nested configuration keeps precedence unchanged. There is no log migration, cache move, Redis database change, or automatic capture activation. Apply the migration before using the new pages. Removing an override reveals the saved preference or default, not a copy of the removed value.

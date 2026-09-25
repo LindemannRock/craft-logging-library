@@ -12,6 +12,7 @@ namespace lindemannrock\logginglibrary\tests\Integration;
 
 use lindemannrock\logginglibrary\controllers\SettingsController;
 use lindemannrock\logginglibrary\LoggingLibrary;
+use lindemannrock\logginglibrary\models\Settings;
 use lindemannrock\logginglibrary\tests\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 
@@ -30,8 +31,9 @@ final class SettingsControllerSectionScopeTest extends TestCase
             'general' => [
                 'pluginName',
                 'showCpSection',
-                'forceEnableLogViewer',
             ],
+            'files' => ['forceEnableLogViewer'],
+            'runtime' => array_keys(Settings::RUNTIME_FIELDS),
             'interface' => [
                 'itemsPerPage',
                 'timeFormat',

@@ -14,6 +14,8 @@ return [
     'Open Settings' => 'Open Settings',
 
     // Navigation
+    'Setup' => 'Setup',
+    'File Logs' => 'File Logs',
     'All Logs' => 'All Logs',
     'Runtime Logs' => 'Runtime Logs',
     'Logs' => 'Logs',
@@ -49,6 +51,7 @@ return [
     'User does not have permission to view logs' => 'User does not have permission to view logs',
 
     // Settings: General
+    'Show Logging Library in the main navigation. This does not enable or disable log capture.' => 'Show Logging Library in the main navigation. This does not enable or disable log capture.',
     'General Settings' => 'General Settings',
     'Force Enable Log Viewers' => 'Force Enable Log Viewers',
     'Force-enable file-based log viewers even when an edge or ephemeral environment is detected. This affects Logging Library and every plugin&apos;s dedicated Logs section.' => 'Force-enable file-based log viewers even when an edge or ephemeral environment is detected. This affects Logging Library and every plugin&apos;s dedicated Logs section.',
@@ -59,8 +62,55 @@ return [
     'Show Main Menu' => 'Show Main Menu',
     'Show Logging Library in the main Control Panel navigation as a consolidated All Logs view when file-based log viewers are available.' => 'Show Logging Library in the main Control Panel navigation as a consolidated All Logs view when file-based log viewers are available.',
 
+    // Settings: File Logs
+    'Force Enable File Log Viewers' => 'Force Enable File Log Viewers',
+    'An edge or ephemeral environment is detected. File viewers are hidden unless forced on; Runtime Logs remain available when enabled. Only force file viewers on if persistent log files are available.' => 'An edge or ephemeral environment is detected. File viewers are hidden unless forced on; Runtime Logs remain available when enabled. Only force file viewers on if persistent log files are available.',
+    'File viewers are available. Runtime Logs are optional and independent of file logging.' => 'File viewers are available. Runtime Logs are optional and independent of file logging.',
+
+    // Settings: Runtime Logs
+    'Min: {min}, Max: {max}' => 'Min: {min}, Max: {max}',
+    'Uses the application cache configuration. The Redis database can be overridden in {file}. To verify capture, trigger a log message and check Runtime Logs.' => 'Uses the application cache configuration. The Redis database can be overridden in {file}. To verify capture, trigger a log message and check Runtime Logs.',
+    'Enable Runtime Logs' => 'Enable Runtime Logs',
+    'Skip Console Requests' => 'Skip Console Requests',
+    'Skip Queue Requests' => 'Skip Queue Requests',
+    'Retention (seconds)' => 'Retention (seconds)',
+    'Maximum Entries' => 'Maximum Entries',
+    'Refresh Interval (seconds)' => 'Refresh Interval (seconds)',
+    'Maximum Message Bytes' => 'Maximum Message Bytes',
+    'Maximum Context Bytes' => 'Maximum Context Bytes',
+    'Captured Levels' => 'Captured Levels',
+    'Include Categories' => 'Include Categories',
+    'Exclude Categories' => 'Exclude Categories',
+    'Include Request User ID' => 'Include Request User ID',
+    'Advanced' => 'Advanced',
+    'Configured Storage' => 'Configured Storage',
+    'Storage follows the Craft cache configuration. Redis database selection is configuration-only. This is not a connection test; confirm capture in Runtime Logs.' => 'Storage follows the Craft cache configuration. Redis database selection is configuration-only. This is not a connection test; confirm capture in Runtime Logs.',
+    'On multiple servers, use shared cache storage. Local file cache does not combine logs from other instances.' => 'On multiple servers, use shared cache storage. Local file cache does not combine logs from other instances.',
+    'Capture changes apply to new requests. Restart long-running workers to load changed settings. Disabling capture does not clear stored logs.' => 'Capture changes apply to new requests. Restart long-running workers to load changed settings. Disabling capture does not clear stored logs.',
+    'How often Runtime Logs refreshes automatically. Set to 0 to disable. Current: {duration}' => 'How often Runtime Logs refreshes automatically. Set to 0 to disable. Current: {duration}',
+    'Choose which log categories to capture, not words in the message. Enter one category per line, such as {exact}, or use {prefix} to match categories starting with {start}. Leave empty to capture all categories.' => 'Choose which log categories to capture, not words in the message. Enter one category per line, such as {exact}, or use {prefix} to match categories starting with {start}. Leave empty to capture all categories.',
+    'Skip these log categories even if included above. Enter one per line, such as {exact} or {prefix}. Leave empty to add no category exclusions.' => 'Skip these log categories even if included above. Enter one per line, such as {exact} or {prefix}. Leave empty to add no category exclusions.',
+    'When on, Runtime Logs skips command-line requests. Turn off only when diagnosing console commands; file and hosted logs are unaffected.' => 'When on, Runtime Logs skips command-line requests. Turn off only when diagnosing console commands; file and hosted logs are unaffected.',
+    'When on, Runtime Logs skips detected queue execution. To capture console queue workers, turn off both skip switches and restart the workers. Workers can generate large volumes of logs.' => 'When on, Runtime Logs skips detected queue execution. To capture console queue workers, turn off both skip switches and restart the workers. Workers can generate large volumes of logs.',
+    'Adds the authenticated request user ID. Messages and context may still contain personal data regardless of this setting.' => 'Adds the authenticated request user ID. Messages and context may still contain personal data regardless of this setting.',
+
+    'Maximum age of runtime entries, in seconds. Current: {duration}' => 'Maximum age of runtime entries, in seconds. Current: {duration}',
+    'Min: {min} ({minDuration}), Max: {max} ({maxDuration})' => 'Min: {min} ({minDuration}), Max: {max} ({maxDuration})',
+    '{count} second' => '{count} second',
+    '{count} seconds' => '{count} seconds',
+    '{count} minute' => '{count} minute',
+    '{count} minutes' => '{count} minutes',
+    '{count} hour' => '{count} hour',
+    '{count} hours' => '{count} hours',
+    '{count} day' => '{count} day',
+    '{count} days' => '{count} days',
+
     // Settings: Interface
     'Interface Settings' => 'Interface Settings',
+
+    // Setup
+    'Choose the log views that suit this environment. Runtime capture is optional and remains off until enabled.' => 'Choose the log views that suit this environment. Runtime capture is optional and remains off until enabled.',
+    'Consider Runtime Logs for recent diagnostics on ephemeral hosting. Confirm shared storage before relying on logs from multiple instances.' => 'Consider Runtime Logs for recent diagnostics on ephemeral hosting. Confirm shared storage before relying on logs from multiple instances.',
 
     // Log levels
     'All Levels' => 'All Levels',
@@ -141,6 +191,7 @@ return [
     'Recent runtime logs use a bounded diagnostic store and are not complete log history.' => 'Recent runtime logs use a bounded diagnostic store and are not complete log history.',
 
     // Config overrides
+    'This is being overridden by the <code>{setting}</code> setting in <code>config/logging-library.php</code>.' => 'This is being overridden by the <code>{setting}</code> setting in <code>config/logging-library.php</code>.',
     'This is being overridden by the <code>forceEnableLogViewer</code> setting in <code>config/logging-library.php</code>.' => 'This is being overridden by the <code>forceEnableLogViewer</code> setting in <code>config/logging-library.php</code>.',
     'This is being overridden by the <code>showCpSection</code> setting in <code>config/logging-library.php</code>.' => 'This is being overridden by the <code>showCpSection</code> setting in <code>config/logging-library.php</code>.',
 ];

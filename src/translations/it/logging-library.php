@@ -14,6 +14,8 @@ return [
     'Open Settings' => 'Apri le impostazioni',
 
     // Navigation
+    'Setup' => 'Configurazione',
+    'File Logs' => 'Log su file',
     'All Logs' => 'Tutti i log',
     'Runtime Logs' => 'Log runtime',
     'Logs' => 'Log',
@@ -49,6 +51,7 @@ return [
     'User does not have permission to view logs' => 'L\'utente non dispone dell\'autorizzazione per visualizzare i log',
 
     // Settings: General
+    'Show Logging Library in the main navigation. This does not enable or disable log capture.' => 'Mostra Logging Library nella navigazione principale. Questo non attiva né disattiva l\'acquisizione dei log.',
     'General Settings' => 'Impostazioni generali',
     'Force Enable Log Viewers' => 'Forza abilitazione visualizzatori di log',
     'Force-enable file-based log viewers even when an edge or ephemeral environment is detected. This affects Logging Library and every plugin&apos;s dedicated Logs section.' => 'Forza l\'abilitazione dei visualizzatori di log basati su file anche quando viene rilevato un ambiente edge o effimero. Questo influisce su Logging Library e sulla sezione Log dedicata di ogni plugin.',
@@ -59,8 +62,55 @@ return [
     'Show Main Menu' => 'Mostra menu principale',
     'Show Logging Library in the main Control Panel navigation as a consolidated All Logs view when file-based log viewers are available.' => 'Mostra Logging Library nella navigazione principale del pannello di controllo come vista consolidata Tutti i log quando i visualizzatori di log basati su file sono disponibili.',
 
+    // Settings: File Logs
+    'Force Enable File Log Viewers' => 'Forza attivazione visualizzatori di log su file',
+    'An edge or ephemeral environment is detected. File viewers are hidden unless forced on; Runtime Logs remain available when enabled. Only force file viewers on if persistent log files are available.' => 'È stato rilevato un ambiente edge o temporaneo. I visualizzatori di file sono nascosti salvo attivazione forzata; i log runtime restano disponibili quando attivati. Forzare i visualizzatori solo se sono disponibili file di log persistenti.',
+    'File viewers are available. Runtime Logs are optional and independent of file logging.' => 'I visualizzatori di file sono disponibili. I log runtime sono facoltativi e indipendenti dalla registrazione su file.',
+
+    // Settings: Runtime Logs
+    'Min: {min}, Max: {max}' => 'Min: {min}, Max: {max}',
+    'Uses the application cache configuration. The Redis database can be overridden in {file}. To verify capture, trigger a log message and check Runtime Logs.' => 'Utilizza la configurazione della cache dell’applicazione. Il database Redis può essere sovrascritto in {file}. Per verificare l’acquisizione, generare un messaggio di log e controllare i log runtime.',
+    'Enable Runtime Logs' => 'Attiva log runtime',
+    'Skip Console Requests' => 'Ignora richieste console',
+    'Skip Queue Requests' => 'Ignora richieste della coda',
+    'Retention (seconds)' => 'Conservazione (secondi)',
+    'Maximum Entries' => 'Numero massimo di voci',
+    'Refresh Interval (seconds)' => 'Intervallo di aggiornamento (secondi)',
+    'Maximum Message Bytes' => 'Byte massimi del messaggio',
+    'Maximum Context Bytes' => 'Byte massimi del contesto',
+    'Captured Levels' => 'Livelli acquisiti',
+    'Include Categories' => 'Includi categorie',
+    'Exclude Categories' => 'Escludi categorie',
+    'Include Request User ID' => 'Includi ID utente della richiesta',
+    'Advanced' => 'Avanzate',
+    'Configured Storage' => 'Archiviazione configurata',
+    'Storage follows the Craft cache configuration. Redis database selection is configuration-only. This is not a connection test; confirm capture in Runtime Logs.' => 'L\'archiviazione segue la configurazione della cache Craft. Il database Redis si seleziona solo tramite configurazione. Questo non è un test di connessione; verificare l\'acquisizione nei log runtime.',
+    'On multiple servers, use shared cache storage. Local file cache does not combine logs from other instances.' => 'Su più server, usare una cache condivisa. La cache di file locale non combina i log di altre istanze.',
+    'Capture changes apply to new requests. Restart long-running workers to load changed settings. Disabling capture does not clear stored logs.' => 'Le modifiche all\'acquisizione si applicano alle nuove richieste. Riavviare i processi di lunga durata per caricare le impostazioni modificate. Disattivare l\'acquisizione non elimina i log archiviati.',
+    'How often Runtime Logs refreshes automatically. Set to 0 to disable. Current: {duration}' => 'Frequenza di aggiornamento automatico dei log runtime. Impostare 0 per disattivarlo. Attuale: {duration}',
+    'Choose which log categories to capture, not words in the message. Enter one category per line, such as {exact}, or use {prefix} to match categories starting with {start}. Leave empty to capture all categories.' => 'Scegliere le categorie di log da acquisire, non parole del messaggio. Inserire una categoria per riga, come {exact}, oppure usare {prefix} per le categorie che iniziano con {start}. Lasciare vuoto per acquisire tutte le categorie.',
+    'Skip these log categories even if included above. Enter one per line, such as {exact} or {prefix}. Leave empty to add no category exclusions.' => 'Ignorare queste categorie di log anche se incluse sopra. Inserirne una per riga, come {exact} o {prefix}. Lasciare vuoto per non aggiungere esclusioni di categorie.',
+    'When on, Runtime Logs skips command-line requests. Turn off only when diagnosing console commands; file and hosted logs are unaffected.' => 'Quando l’opzione è attiva, i log di runtime ignorano le richieste da riga di comando. Disattivarla solo per diagnosticare i comandi della console; i log su file e dell’hosting restano invariati.',
+    'When on, Runtime Logs skips detected queue execution. To capture console queue workers, turn off both skip switches and restart the workers. Workers can generate large volumes of logs.' => 'Quando l’opzione è attiva, i log di runtime ignorano l’esecuzione della coda rilevata. Per acquisire i processi della coda della console, disattivare entrambe le opzioni di esclusione e riavviare i processi. I processi possono generare grandi volumi di log.',
+    'Adds the authenticated request user ID. Messages and context may still contain personal data regardless of this setting.' => 'Aggiunge l\'ID dell\'utente autenticato della richiesta. Messaggi e contesto possono contenere dati personali indipendentemente da questa impostazione.',
+
+    'Maximum age of runtime entries, in seconds. Current: {duration}' => 'Età massima delle voci dei log di runtime, in secondi. Attuale: {duration}',
+    'Min: {min} ({minDuration}), Max: {max} ({maxDuration})' => 'Min: {min} ({minDuration}), Max: {max} ({maxDuration})',
+    '{count} second' => '{count} secondo',
+    '{count} seconds' => '{count} secondi',
+    '{count} minute' => '{count} minuto',
+    '{count} minutes' => '{count} minuti',
+    '{count} hour' => '{count} ora',
+    '{count} hours' => '{count} ore',
+    '{count} day' => '{count} giorno',
+    '{count} days' => '{count} giorni',
+
     // Settings: Interface
     'Interface Settings' => 'Impostazioni interfaccia',
+
+    // Setup
+    'Choose the log views that suit this environment. Runtime capture is optional and remains off until enabled.' => 'Scegliere le viste dei log adatte a questo ambiente. L\'acquisizione runtime è facoltativa e resta disattivata fino all\'attivazione.',
+    'Consider Runtime Logs for recent diagnostics on ephemeral hosting. Confirm shared storage before relying on logs from multiple instances.' => 'Valutare i log runtime per la diagnostica recente su hosting temporaneo. Verificare l\'archiviazione condivisa prima di affidarsi ai log di più istanze.',
 
     // Log levels
     'All Levels' => 'Tutti i livelli',
@@ -141,6 +191,7 @@ return [
     'Recent runtime logs use a bounded diagnostic store and are not complete log history.' => 'I log di runtime recenti usano un archivio diagnostico limitato e non costituiscono una cronologia completa dei log.',
 
     // Config overrides
+    'This is being overridden by the <code>{setting}</code> setting in <code>config/logging-library.php</code>.' => 'Questa impostazione viene sovrascritta dall\'impostazione <code>{setting}</code> in <code>config/logging-library.php</code>.',
     'This is being overridden by the <code>forceEnableLogViewer</code> setting in <code>config/logging-library.php</code>.' => 'Questa impostazione viene sovrascritta dall\'impostazione <code>forceEnableLogViewer</code> in <code>config/logging-library.php</code>.',
     'This is being overridden by the <code>showCpSection</code> setting in <code>config/logging-library.php</code>.' => 'Questa impostazione viene sovrascritta dall\'impostazione <code>showCpSection</code> in <code>config/logging-library.php</code>.',
 ];

@@ -28,7 +28,9 @@ class Settings extends Model
     use DateFormatSettingsTrait;
     use ItemsPerPageSettingsTrait;
     use PluginNameSettingsTrait;
-    use SettingsConfigTrait;
+    use SettingsConfigTrait {
+        isOverriddenByConfig as private configOverridesAttribute;
+    }
     use SettingsDisplayNameTrait;
     use SettingsPersistenceTrait;
 
@@ -46,6 +48,145 @@ class Settings extends Model
      * @var bool Whether to force-enable file-based log viewers on edge/ephemeral environments
      */
     public bool $forceEnableLogViewer = false;
+
+    /**
+     * @var bool Persisted Runtime Logs option; nested runtimeLogStore config takes precedence.
+     * @since 5.19.0
+     */
+    public bool $runtimeEnabled = false;
+
+    /**
+     * @var bool Persisted Runtime Logs option; nested runtimeLogStore config takes precedence.
+     * @since 5.19.0
+     */
+    public bool $runtimeSkipConsoleRequests = true;
+
+    /**
+     * @var bool Persisted Runtime Logs option; nested runtimeLogStore config takes precedence.
+     * @since 5.19.0
+     */
+    public bool $runtimeSkipQueueRequests = true;
+
+    /**
+     * @var int Persisted Runtime Logs option; nested runtimeLogStore config takes precedence.
+     * @since 5.19.0
+     */
+    public int $runtimeTtl = 86400;
+
+    /**
+     * @var int Persisted Runtime Logs option; nested runtimeLogStore config takes precedence.
+     * @since 5.19.0
+     */
+    public int $runtimeMaxEntries = 1000;
+
+    /**
+     * @var int Persisted Runtime Logs option; nested runtimeLogStore config takes precedence.
+     * @since 5.19.0
+     */
+    public int $runtimeRefreshInterval = 5;
+
+    /**
+     * @var int Persisted Runtime Logs option; nested runtimeLogStore config takes precedence.
+     * @since 5.19.0
+     */
+    public int $runtimeMaxMessageBytes = 8000;
+
+    /**
+     * @var int Persisted Runtime Logs option; nested runtimeLogStore config takes precedence.
+     * @since 5.19.0
+     */
+    public int $runtimeMaxContextBytes = 8000;
+
+    /**
+     * @var array Persisted Runtime Logs option; nested runtimeLogStore config takes precedence.
+     * @since 5.19.0
+     */
+    public array $runtimeLevels = ['error', 'warning', 'info'];
+
+    /**
+     * @var array Persisted Runtime Logs option; nested runtimeLogStore config takes precedence.
+     * @since 5.19.0
+     */
+    public array $runtimeCategories = [];
+
+    /**
+     * @var array Persisted Runtime Logs option; nested runtimeLogStore config takes precedence.
+     * @since 5.19.0
+     */
+    public array $runtimeExcept = [];
+
+    /**
+     * @var bool Persisted Runtime Logs option; nested runtimeLogStore config takes precedence.
+     * @since 5.19.0
+     */
+    public bool $runtimeIncludeUserId = false;
+
+    /**
+     * Persisted attributes mapped to the existing public configuration contract.
+     *
+     * @since 5.19.0
+     */
+    public const RUNTIME_FIELDS = [
+        'runtimeEnabled' => 'enabled',
+        'runtimeSkipConsoleRequests' => 'skipConsoleRequests',
+        'runtimeSkipQueueRequests' => 'skipQueueRequests',
+        'runtimeTtl' => 'ttl',
+        'runtimeMaxEntries' => 'maxEntries',
+        'runtimeRefreshInterval' => 'refreshInterval',
+        'runtimeMaxMessageBytes' => 'maxMessageBytes',
+        'runtimeMaxContextBytes' => 'maxContextBytes',
+        'runtimeLevels' => 'levels',
+        'runtimeCategories' => 'categories',
+        'runtimeExcept' => 'except',
+        'runtimeIncludeUserId' => 'privacy.includeUserId',
+    ];
+
+    /**
+     * @inheritdoc
+     */
+    public function isOverriddenByConfig(string $attribute): bool
+    {
+        $path = self::RUNTIME_FIELDS[$attribute] ?? null;
+        return $this->configOverridesAttribute($path === null ? $attribute : 'runtimeLogStore.' . $path);
+    }
+
+    /**
+     * Database preferences before per-option configuration overrides.
+     *
+     * @since 5.19.0
+     */
+    public function getStoredRuntimeConfig(): array
+    {
+        $config = [];
+        foreach (self::RUNTIME_FIELDS as $attribute => $path) {
+            if ($path === 'privacy.includeUserId') {
+                $config['privacy']['includeUserId'] = $this->$attribute;
+            } else {
+                $config[$path] = $this->$attribute;
+            }
+        }
+        return $config;
+    }
+
+    /**
+     * Effective values for the CP, including per-option nested overrides.
+     *
+     * @since 5.19.0
+     */
+    public function getRuntimeConfig(): array
+    {
+        return LoggingLibrary::getRuntimeLogStoreConfig($this);
+    }
+
+    /**
+     * Configured storage metadata, not a connectivity or durability guarantee.
+     *
+     * @since 5.19.0
+     */
+    public function getRuntimeStorage(): array
+    {
+        return LoggingLibrary::getInstance()->runtimeLogStore->getStorageStatus($this->getRuntimeConfig());
+    }
 
     /**
      * Database table name for settings persistence
@@ -68,7 +209,7 @@ class Settings extends Model
      */
     protected static function integerFields(): array
     {
-        return ['itemsPerPage'];
+        return ['itemsPerPage', 'runtimeTtl', 'runtimeMaxEntries', 'runtimeRefreshInterval', 'runtimeMaxMessageBytes', 'runtimeMaxContextBytes'];
     }
 
     /**
@@ -76,7 +217,15 @@ class Settings extends Model
      */
     protected static function booleanFields(): array
     {
-        return ['showCpSection', 'forceEnableLogViewer', 'showSeconds'];
+        return ['showCpSection', 'forceEnableLogViewer', 'showSeconds', 'runtimeEnabled', 'runtimeSkipConsoleRequests', 'runtimeSkipQueueRequests', 'runtimeIncludeUserId'];
+    }
+
+    /**
+     * JSON list preferences retain their ordering and replace configured lists.
+     */
+    protected static function jsonFields(): array
+    {
+        return ['runtimeLevels', 'runtimeCategories', 'runtimeExcept'];
     }
 
     /**
@@ -108,7 +257,7 @@ class Settings extends Model
      */
     public function getStandaloneViewerAvailable(): bool
     {
-        return $this->showCpSection && $this->getLogViewerAvailable();
+        return $this->showCpSection && ($this->getLogViewerAvailable() || (bool)$this->getRuntimeConfig()['enabled']);
     }
 
     /**
@@ -133,6 +282,14 @@ class Settings extends Model
     public function rules(): array
     {
         return array_merge([
+            [['runtimeEnabled', 'runtimeSkipConsoleRequests', 'runtimeSkipQueueRequests', 'runtimeIncludeUserId'], 'boolean'],
+            [['runtimeTtl'], 'integer', 'min' => 1, 'max' => 2592000],
+            [['runtimeMaxEntries'], 'integer', 'min' => 1, 'max' => 10000],
+            [['runtimeRefreshInterval'], 'integer', 'min' => 0, 'max' => 3600],
+            [['runtimeMaxMessageBytes', 'runtimeMaxContextBytes'], 'integer', 'min' => 1, 'max' => \lindemannrock\logginglibrary\services\RuntimeLogStoreService::MAX_BYTES_LIMIT],
+            [['runtimeLevels'], 'required'],
+            [['runtimeLevels'], 'each', 'rule' => ['in', 'range' => ['error', 'warning', 'info', 'trace'], 'skipOnEmpty' => false]],
+            [['runtimeCategories', 'runtimeExcept'], 'each', 'rule' => ['string', 'max' => 255, 'skipOnEmpty' => false]],
             [['showCpSection'], 'boolean'],
             [['showCpSection'], 'default', 'value' => true],
             [['forceEnableLogViewer'], 'boolean'],
@@ -147,7 +304,19 @@ class Settings extends Model
     {
         return array_merge([
             'showCpSection' => Craft::t('logging-library', 'Show Main Menu'),
-            'forceEnableLogViewer' => Craft::t('logging-library', 'Force Enable Log Viewers'),
+            'forceEnableLogViewer' => Craft::t('logging-library', 'Force Enable File Log Viewers'),
+            'runtimeEnabled' => Craft::t('logging-library', 'Enable Runtime Logs'),
+            'runtimeSkipConsoleRequests' => Craft::t('logging-library', 'Skip Console Requests'),
+            'runtimeSkipQueueRequests' => Craft::t('logging-library', 'Skip Queue Requests'),
+            'runtimeTtl' => Craft::t('logging-library', 'Retention (seconds)'),
+            'runtimeMaxEntries' => Craft::t('logging-library', 'Maximum Entries'),
+            'runtimeRefreshInterval' => Craft::t('logging-library', 'Refresh Interval (seconds)'),
+            'runtimeMaxMessageBytes' => Craft::t('logging-library', 'Maximum Message Bytes'),
+            'runtimeMaxContextBytes' => Craft::t('logging-library', 'Maximum Context Bytes'),
+            'runtimeLevels' => Craft::t('logging-library', 'Captured Levels'),
+            'runtimeCategories' => Craft::t('logging-library', 'Include Categories'),
+            'runtimeExcept' => Craft::t('logging-library', 'Exclude Categories'),
+            'runtimeIncludeUserId' => Craft::t('logging-library', 'Include Request User ID'),
         ], $this->pluginNameSettingsLabel(), $this->itemsPerPageSettingsLabel(), $this->dateFormatSettingsLabels());
     }
 }

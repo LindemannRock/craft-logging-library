@@ -10,6 +10,8 @@ namespace lindemannrock\logginglibrary\controllers;
 
 use Craft;
 use craft\web\Controller;
+use lindemannrock\base\helpers\PluginHelper;
+use lindemannrock\base\helpers\PluginThemeStyleHelper;
 use lindemannrock\base\helpers\SettingsPostHelper;
 use lindemannrock\logginglibrary\LoggingLibrary;
 use lindemannrock\logginglibrary\models\Settings;
@@ -22,6 +24,25 @@ use yii\web\Response;
  */
 class SettingsController extends Controller
 {
+    /**
+     * Shared setup page with optional runtime capture and deployment information.
+     *
+     * @since 5.19.0
+     */
+    public function actionSetup(): Response
+    {
+        $this->requirePermission(LoggingLibrary::PERMISSION_MANAGE_SETTINGS);
+        $plugin = LoggingLibrary::getInstance();
+        $iconSvg = PluginHelper::getIconSvg($plugin);
+        return $this->renderTemplate('logging-library/setup', [
+            'settings' => $plugin->getSettings(),
+            'pluginVersion' => PluginHelper::getPluginVersion($plugin),
+            'pluginIconSvg' => $iconSvg,
+            'pluginHeroStyle' => PluginThemeStyleHelper::heroCssVarsFromSvg($iconSvg),
+            'logoPaths' => PluginHelper::lrLogoPaths(),
+        ]);
+    }
+
     /**
      * Settings index
      */
@@ -50,12 +71,34 @@ class SettingsController extends Controller
         $this->requirePermission(LoggingLibrary::PERMISSION_MANAGE_SETTINGS);
 
         $settings = LoggingLibrary::getInstance()->getSettings();
-        if ($settings instanceof Settings && !$settings->getStandaloneViewerAvailable()) {
-            return $this->redirect('logging-library/settings/general');
-        }
-
         return $this->renderTemplate('logging-library/settings/interface', [
             'settings' => $settings,
+        ]);
+    }
+
+    /**
+     * Runtime capture preferences, independent of file-viewer availability.
+     *
+     * @since 5.19.0
+     */
+    public function actionRuntime(): Response
+    {
+        $this->requirePermission(LoggingLibrary::PERMISSION_MANAGE_SETTINGS);
+        return $this->renderTemplate('logging-library/settings/runtime', [
+            'settings' => LoggingLibrary::getInstance()->getSettings(),
+        ]);
+    }
+
+    /**
+     * File-viewer availability and the existing deployment override.
+     *
+     * @since 5.19.0
+     */
+    public function actionFiles(): Response
+    {
+        $this->requirePermission(LoggingLibrary::PERMISSION_MANAGE_SETTINGS);
+        return $this->renderTemplate('logging-library/settings/files', [
+            'settings' => LoggingLibrary::getInstance()->getSettings(),
         ]);
     }
 
@@ -70,20 +113,21 @@ class SettingsController extends Controller
         $settings = Settings::loadFromDatabase();
         $settingsData = $this->request->getBodyParam('settings', []);
         $section = $this->_validSettingsSection($this->request->getBodyParam('section', 'general'));
-        if ($section === 'interface' && !$settings->getStandaloneViewerAvailable()) {
-            return $this->redirect('logging-library/settings/general');
-        }
-
         $result = SettingsPostHelper::apply(
             model: $settings,
             postedValues: is_array($settingsData) ? $settingsData : [],
             allowedAttributes: $this->_validationAttributesForSection($section),
             shouldSkipAttribute: fn(string $attribute): bool => $settings->isOverriddenByConfig($attribute),
+            adapters: [
+                'runtimeLevels' => static fn(mixed $value): mixed => $value === '' ? [] : $value,
+                'runtimeCategories' => static fn(mixed $value): mixed => is_string($value) ? preg_split('/\\R/', trim($value), -1, PREG_SPLIT_NO_EMPTY) : $value,
+                'runtimeExcept' => static fn(mixed $value): mixed => is_string($value) ? preg_split('/\\R/', trim($value), -1, PREG_SPLIT_NO_EMPTY) : $value,
+            ],
         );
 
         $attributesToValidate = $result->attributesToValidate;
 
-        $isValid = $settings->validate($attributesToValidate);
+        $isValid = $settings->validate($attributesToValidate, false);
 
         if (!$isValid || $result->hasErrors || $settings->hasErrors()) {
             Craft::$app->getSession()->setError(Craft::t('logging-library', 'Could not save settings.'));
@@ -111,7 +155,9 @@ class SettingsController extends Controller
     private function _validationAttributesForSection(string $section): array
     {
         return match ($section) {
-            'general' => ['pluginName', 'showCpSection', 'forceEnableLogViewer'],
+            'general' => ['pluginName', 'showCpSection'],
+            'files' => ['forceEnableLogViewer'],
+            'runtime' => array_keys(Settings::RUNTIME_FIELDS),
             'interface' => ['itemsPerPage', 'timeFormat', 'showSeconds'],
             default => ['pluginName'],
         };
@@ -122,6 +168,6 @@ class SettingsController extends Controller
      */
     private function _validSettingsSection(string $section): string
     {
-        return in_array($section, ['general', 'interface'], true) ? $section : 'general';
+        return in_array($section, ['general', 'runtime', 'files', 'interface'], true) ? $section : 'general';
     }
 }

@@ -47,6 +47,17 @@ class RuntimeLogStoreService extends Component
     private string $_storageSignature = '';
 
     /**
+     * Describe the selected backend without reading records or writing a probe.
+     * Availability here reflects configuration and any prior operation, not a health check.
+     *
+     * @since 5.19.0
+     */
+    public function getStorageStatus(array $settings): array
+    {
+        return $this->_storage($settings)->status();
+    }
+
+    /**
      * Append Yii log messages to the bounded runtime store.
      */
     public function appendMessages(array $messages, array $settings): void

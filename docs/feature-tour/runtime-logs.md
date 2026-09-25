@@ -13,7 +13,9 @@ Where the [file-based viewers](standalone-viewer.md) read what's on disk, Runtim
 
 ## Turn it on
 
-Runtime Logs is **off by default** and configured entirely from `config/logging-library.php` — there's no Control Panel toggle. Create the file (copy the sample from the plugin's `src/config.php`) and enable the store:
+Runtime Logs is **off by default**. Open **Logging Library → Settings → Runtime Logs**, turn on **Enable Runtime Logs**, choose the levels and limits you need, and save. Setup summarizes the environment and storage without enabling capture for you.
+
+If a field is disabled, it is pinned in `config/logging-library.php`. Remove only the matching option to manage that field in the CP, or keep configuration as the authority. For example:
 
 ```php
 <?php
@@ -28,13 +30,13 @@ return [
 ];
 ```
 
-That's all it takes. On the next application start, Logging Library registers a log target that captures matching messages, and **Runtime Logs** appears in the Logging Library section of the Control Panel. Viewing requires the `loggingLibrary:viewAllLogs` permission — see [Permissions](../developers/permissions.md).
+On the next request, Logging Library registers a target that captures matching messages. Trigger a normal web request that logs at an enabled level, then open **Runtime Logs** to verify capture. **Show Main Menu** must be on for navigation to appear. Viewing requires `loggingLibrary:viewAllLogs`; changing preferences requires `loggingLibrary:manageSettings` — see [Permissions](../developers/permissions.md).
 
 > [!IMPORTANT]
 > Restart long-running queue workers after changing `runtimeLogStore` configuration. A target keeps the configuration snapshot from the application startup that created it.
 
 > [!NOTE]
-> Enabling the runtime store also makes the **Logging Library** CP section available on edge platforms where the file-based viewers are hidden — Runtime Logs works there precisely because it doesn't need log files.
+> Runtime Logs works independently of file viewers on edge platforms. Settings managers can reach Setup and Settings even with both viewers off, provided **Show Main Menu** is on.
 
 ## Browse runtime logs
 
@@ -60,7 +62,9 @@ Entries per page follows the standalone viewer's **Items Per Page** setting — 
 
 ## Configuration reference
 
-All options live under the `runtimeLogStore` key in `config/logging-library.php`:
+Capture options are editable in **Settings → Runtime Logs**. Console/queue safeguards and request user IDs sit directly below **Enable Runtime Logs**. Category lists and payload limits are under **Advanced**. Only `redis.database` stays configuration-only.
+
+Use nested `runtimeLogStore` options to override individual preferences. Each explicit option locks only its corresponding field; omitted options use saved preferences or defaults. This full example pins every capture preference, so copy only the options you want managed in code:
 
 ```php
 'runtimeLogStore' => [
@@ -91,9 +95,9 @@ All options live under the `runtimeLogStore` key in `config/logging-library.php`
 | `enabled` | Turns the runtime store (and the **Runtime Logs** CP view) on. | `false` |
 | `skipConsoleRequests` | Excludes runtime capture for console requests. This affects only Runtime Logs. | `true` |
 | `skipQueueRequests` | Excludes runtime capture when Craft queue execution is detected. Queue exclusion applies to the current buffered export batch as a whole. | `true` |
-| `ttl` | How long entries live, in seconds. Older entries are dropped from the view and the cache entry expires. | `86400` (24 hours) |
+| `ttl` | Maximum age of entries, in seconds; the store also expires after inactivity. CP preferences accept 1–2592000 seconds (30 days). Explicit config overrides retain their existing range and are not clamped to the CP limit. Entry limits or cache eviction can remove entries sooner. | `86400` (1 day) |
 | `maxEntries` | Rolling window size — the newest N entries are kept (capped at 10,000). | `1000` |
-| `refreshInterval` | Seconds between CP auto-refreshes. Set `0` to disable auto-refresh. | `5` |
+| `refreshInterval` | Seconds between CP auto-refreshes. Set `0` to disable auto-refresh. CP values are limited to `0–3600` (1 hour) with a live duration preview; explicit configuration overrides retain their existing range. | `5` |
 | `maxMessageBytes` | Longer messages are truncated with `...` (capped at 65,536 bytes). | `8000` |
 | `maxContextBytes` | Same truncation for the context payload. | `8000` |
 | `levels` | Which levels to capture: any of `error`, `warning`, `info`, `trace` (`debug` is accepted as an alias for `trace`). The CP's Debug filter only appears when Craft's `devMode` is on. | `['error', 'warning', 'info']` |
@@ -102,7 +106,11 @@ All options live under the `runtimeLogStore` key in `config/logging-library.php`
 | `redis.database` | Optional Runtime Logs Redis database. Omit it to inherit Craft's Redis database, use a non-negative integer, use an environment reference such as `'$LOGGING_LIBRARY_RUNTIME_REDIS_DB'`, or set it explicitly to `null` to avoid `SELECT`. | Omitted |
 | `privacy.includeUserId` | Record which logged-in user triggered each entry. Off by default so no user IDs are written to cache; when off, the Request User column shows **System**. | `false` |
 
-Bounded capture options such as entry and payload limits are clamped. Redis database values use the stricter fail-closed rules below.
+The CP rejects out-of-range values: retention is 1–2,592,000 seconds (30 days); entries 1–10,000; refresh 0–3,600 seconds (1 hour); message/context limits 1–65,536 bytes. Choose at least one supported level. Category fields take one pattern per line (up to 255 characters each), with a trailing `*` for prefix matching. Configuration-file values retain their existing normalization and bounded-limit clamping. Redis database values use the stricter fail-closed rules below.
+
+Saving settings does not clear entries or move them between backends. Disabling capture hides the viewer and stops capture in new requests without deleting the buffer. **Configured Storage** in Settings and Setup describes the selected backend without probing connectivity; confirm real capture in the viewer.
+
+**Include Request User ID** is off by default. Turning it off omits that metadata from new entries; messages and context can still contain personal or sensitive data. It is not a redaction setting, and existing entries are not rewritten.
 
 ## Storage backends
 

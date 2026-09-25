@@ -14,6 +14,8 @@ return [
     'Open Settings' => 'Instellingen openen',
 
     // Navigation
+    'Setup' => 'Setup',
+    'File Logs' => 'Bestandslogboeken',
     'All Logs' => 'Alle logboeken',
     'Runtime Logs' => 'Runtime-logboeken',
     'Logs' => 'Logboeken',
@@ -49,6 +51,7 @@ return [
     'User does not have permission to view logs' => 'De gebruiker heeft geen toestemming om logboeken te bekijken',
 
     // Settings: General
+    'Show Logging Library in the main navigation. This does not enable or disable log capture.' => 'Logging Library in de hoofdnavigatie weergeven. Dit schakelt het vastleggen van logboeken niet in of uit.',
     'General Settings' => 'Algemene instellingen',
     'Force Enable Log Viewers' => 'Logviewers geforceerd inschakelen',
     'Force-enable file-based log viewers even when an edge or ephemeral environment is detected. This affects Logging Library and every plugin&apos;s dedicated Logs section.' => 'Bestandsgebaseerde logviewers geforceerd inschakelen, ook wanneer een edge- of vluchtige omgeving wordt gedetecteerd. Dit is van toepassing op Logging Library en het toegewezen loggedeelte van elke plugin.',
@@ -59,8 +62,55 @@ return [
     'Show Main Menu' => 'Hoofdmenu weergeven',
     'Show Logging Library in the main Control Panel navigation as a consolidated All Logs view when file-based log viewers are available.' => 'Logging Library weergeven in de hoofdnavigatie van het Control Panel als een geconsolideerde Alle logboeken-weergave wanneer bestandsgebaseerde logviewers beschikbaar zijn.',
 
+    // Settings: File Logs
+    'Force Enable File Log Viewers' => 'Bestandslogviewers geforceerd inschakelen',
+    'An edge or ephemeral environment is detected. File viewers are hidden unless forced on; Runtime Logs remain available when enabled. Only force file viewers on if persistent log files are available.' => 'Er is een edge- of tijdelijke omgeving gedetecteerd. Bestandsviewers zijn verborgen tenzij geforceerd ingeschakeld; runtime-logboeken blijven beschikbaar wanneer ingeschakeld. Forceer bestandsviewers alleen als permanente logbestanden beschikbaar zijn.',
+    'File viewers are available. Runtime Logs are optional and independent of file logging.' => 'Bestandsviewers zijn beschikbaar. Runtime-logboeken zijn optioneel en onafhankelijk van bestandsregistratie.',
+
+    // Settings: Runtime Logs
+    'Min: {min}, Max: {max}' => 'Min: {min}, Max: {max}',
+    'Uses the application cache configuration. The Redis database can be overridden in {file}. To verify capture, trigger a log message and check Runtime Logs.' => 'Gebruikt de configuratie van de applicatiecache. De Redis-database kan worden overschreven in {file}. Genereer een logbericht en controleer de Runtime-logboeken om de vastlegging te verifiëren.',
+    'Enable Runtime Logs' => 'Runtime-logboeken inschakelen',
+    'Skip Console Requests' => 'Consoleverzoeken overslaan',
+    'Skip Queue Requests' => 'Wachtrijverzoeken overslaan',
+    'Retention (seconds)' => 'Bewaartermijn (seconden)',
+    'Maximum Entries' => 'Maximumaantal vermeldingen',
+    'Refresh Interval (seconds)' => 'Verversingsinterval (seconden)',
+    'Maximum Message Bytes' => 'Maximale berichtbytes',
+    'Maximum Context Bytes' => 'Maximale contextbytes',
+    'Captured Levels' => 'Vastgelegde niveaus',
+    'Include Categories' => 'Categorieën opnemen',
+    'Exclude Categories' => 'Categorieën uitsluiten',
+    'Include Request User ID' => 'Gebruikers-ID van verzoek opnemen',
+    'Advanced' => 'Geavanceerd',
+    'Configured Storage' => 'Geconfigureerde opslag',
+    'Storage follows the Craft cache configuration. Redis database selection is configuration-only. This is not a connection test; confirm capture in Runtime Logs.' => 'De opslag volgt de Craft-cacheconfiguratie. De Redis-database wordt alleen via configuratie gekozen. Dit is geen verbindingstest; controleer de vastlegging in Runtime-logboeken.',
+    'On multiple servers, use shared cache storage. Local file cache does not combine logs from other instances.' => 'Gebruik gedeelde cacheopslag bij meerdere servers. Lokale bestandscache combineert geen logboeken van andere instanties.',
+    'Capture changes apply to new requests. Restart long-running workers to load changed settings. Disabling capture does not clear stored logs.' => 'Wijzigingen in de vastlegging gelden voor nieuwe verzoeken. Herstart langdurige werkprocessen om gewijzigde instellingen te laden. Uitschakelen van de vastlegging wist geen opgeslagen logboeken.',
+    'How often Runtime Logs refreshes automatically. Set to 0 to disable. Current: {duration}' => 'Hoe vaak de runtime-logboeken automatisch worden vernieuwd. Stel in op 0 om dit uit te schakelen. Huidig: {duration}',
+    'Choose which log categories to capture, not words in the message. Enter one category per line, such as {exact}, or use {prefix} to match categories starting with {start}. Leave empty to capture all categories.' => 'Kies welke logboekcategorieën u wilt vastleggen, niet woorden in het bericht. Voer één categorie per regel in, zoals {exact}, of gebruik {prefix} voor categorieën die beginnen met {start}. Laat leeg om alle categorieën vast te leggen.',
+    'Skip these log categories even if included above. Enter one per line, such as {exact} or {prefix}. Leave empty to add no category exclusions.' => 'Sla deze logboekcategorieën over, ook als ze hierboven zijn opgenomen. Voer er één per regel in, zoals {exact} of {prefix}. Laat leeg om geen categorie-uitsluitingen toe te voegen.',
+    'When on, Runtime Logs skips command-line requests. Turn off only when diagnosing console commands; file and hosted logs are unaffected.' => 'Wanneer ingeschakeld, slaan runtimelogboeken opdrachtregelaanvragen over. Schakel dit alleen uit om consoleopdrachten te onderzoeken; bestandslogboeken en gehoste logboeken blijven ongewijzigd.',
+    'When on, Runtime Logs skips detected queue execution. To capture console queue workers, turn off both skip switches and restart the workers. Workers can generate large volumes of logs.' => 'Wanneer ingeschakeld, slaan runtimelogboeken gedetecteerde wachtrijuitvoering over. Schakel beide overslaanschakelaars uit en herstart de werkprocessen om consolewerkprocessen voor de wachtrij vast te leggen. Werkprocessen kunnen grote hoeveelheden logboeken genereren.',
+    'Adds the authenticated request user ID. Messages and context may still contain personal data regardless of this setting.' => 'Voegt de ID van de aangemelde verzoekgebruiker toe. Berichten en context kunnen ongeacht deze instelling persoonsgegevens bevatten.',
+
+    'Maximum age of runtime entries, in seconds. Current: {duration}' => 'Maximale leeftijd van runtimelogboekvermeldingen, in seconden. Huidig: {duration}',
+    'Min: {min} ({minDuration}), Max: {max} ({maxDuration})' => 'Min: {min} ({minDuration}), Max: {max} ({maxDuration})',
+    '{count} second' => '{count} seconde',
+    '{count} seconds' => '{count} seconden',
+    '{count} minute' => '{count} minuut',
+    '{count} minutes' => '{count} minuten',
+    '{count} hour' => '{count} uur',
+    '{count} hours' => '{count} uur',
+    '{count} day' => '{count} dag',
+    '{count} days' => '{count} dagen',
+
     // Settings: Interface
     'Interface Settings' => 'Interface-instellingen',
+
+    // Setup
+    'Choose the log views that suit this environment. Runtime capture is optional and remains off until enabled.' => 'Kies de logboekweergaven die bij deze omgeving passen. Runtime-vastlegging is optioneel en blijft uitgeschakeld totdat u deze inschakelt.',
+    'Consider Runtime Logs for recent diagnostics on ephemeral hosting. Confirm shared storage before relying on logs from multiple instances.' => 'Overweeg Runtime-logboeken voor recente diagnoses op tijdelijke hosting. Controleer gedeelde opslag voordat u vertrouwt op logboeken van meerdere instanties.',
 
     // Log levels
     'All Levels' => 'Alle niveaus',
@@ -141,6 +191,7 @@ return [
     'Recent runtime logs use a bounded diagnostic store and are not complete log history.' => 'Recente runtime-logboeken gebruiken een begrensde diagnostische opslag en vormen geen volledige logboekgeschiedenis.',
 
     // Config overrides
+    'This is being overridden by the <code>{setting}</code> setting in <code>config/logging-library.php</code>.' => 'Dit wordt overschreven door de instelling <code>{setting}</code> in <code>config/logging-library.php</code>.',
     'This is being overridden by the <code>forceEnableLogViewer</code> setting in <code>config/logging-library.php</code>.' => 'Dit wordt overschreven door de instelling <code>forceEnableLogViewer</code> in <code>config/logging-library.php</code>.',
     'This is being overridden by the <code>showCpSection</code> setting in <code>config/logging-library.php</code>.' => 'Dit wordt overschreven door de instelling <code>showCpSection</code> in <code>config/logging-library.php</code>.',
 ];

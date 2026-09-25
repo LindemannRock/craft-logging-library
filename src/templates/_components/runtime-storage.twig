@@ -1,0 +1,31 @@
+{% set storage = settings.runtimeStorage %}
+{% set storageLabel = 'Craft cache'|t('logging-library') %}
+{% if storage.backend == 'redis' %}
+	{%
+		set storageLabel = not storage.available ? 'Redis unavailable'|t('logging-library')
+		: (storage.database is null ? 'Redis (SELECT disabled)'|t('logging-library')
+		: 'Redis database {database}'|t('logging-library', {database: storage.database}))
+	%}
+{% endif %}
+{% if compact ?? false %}
+	{% set storageMessage %}
+	<strong>{{ 'Configured Storage'|t('logging-library') }}: {{ storageLabel }}</strong>
+	<br>
+	{{ 'Uses the application cache configuration. The Redis database can be overridden in {file}. To verify capture, trigger a log message and check Runtime Logs.'|t('logging-library', {file: tag('code', {text: 'config/logging-library.php'})})|raw }}
+	{% endset %}
+	{%
+		include 'lindemannrock-base/_components/info-box' with {
+			message: storageMessage,
+			type: storage.backend == 'redis' and not storage.available ? 'warning' : 'info',
+			margin: 'bottom',
+			boxId: 'runtime-storage-status',
+		} only
+	%}
+{% else %}
+	<h3>{{ 'Configured Storage'|t('logging-library') }}</h3>
+	<p>{{ storageLabel }}</p>
+	<p class='light'>
+		{{ 'Storage follows the Craft cache configuration. Redis database selection is configuration-only. This is not a connection test; confirm capture in Runtime Logs.'|t('logging-library') }}
+	</p>
+	<p class='light'>{{ 'On multiple servers, use shared cache storage. Local file cache does not combine logs from other instances.'|t('logging-library') }}</p>
+{% endif %}

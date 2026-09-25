@@ -14,6 +14,8 @@ return [
     'Open Settings' => '設定を開く',
 
     // Navigation
+    'Setup' => 'セットアップ',
+    'File Logs' => 'ファイルログ',
     'All Logs' => 'すべてのログ',
     'Runtime Logs' => 'ランタイムログ',
     'Logs' => 'ログ',
@@ -49,6 +51,7 @@ return [
     'User does not have permission to view logs' => 'ユーザーにログを表示する権限がありません',
 
     // Settings: General
+    'Show Logging Library in the main navigation. This does not enable or disable log capture.' => 'メインナビゲーションに Logging Library を表示します。ログのキャプチャの有効・無効は変更しません。',
     'General Settings' => '一般設定',
     'Force Enable Log Viewers' => 'ログビューアーを強制有効化',
     'Force-enable file-based log viewers even when an edge or ephemeral environment is detected. This affects Logging Library and every plugin&apos;s dedicated Logs section.' => 'エッジ環境またはエフェメラル環境が検出された場合でも、ファイルベースのログビューアーを強制的に有効にします。これは Logging Library およびすべてのプラグインの専用 Logs セクションに影響します。',
@@ -59,8 +62,55 @@ return [
     'Show Main Menu' => 'メインメニューを表示',
     'Show Logging Library in the main Control Panel navigation as a consolidated All Logs view when file-based log viewers are available.' => 'ファイルベースのログビューアーが利用可能な場合に、コントロールパネルのメインナビゲーションに Logging Library を統合された すべてのログ ビューとして表示します。',
 
+    // Settings: File Logs
+    'Force Enable File Log Viewers' => 'ファイルログビューアーを強制的に有効にする',
+    'An edge or ephemeral environment is detected. File viewers are hidden unless forced on; Runtime Logs remain available when enabled. Only force file viewers on if persistent log files are available.' => 'エッジ環境または一時的な環境が検出されました。ファイルビューアーは強制的に有効にしない限り非表示になります。有効なランタイムログは引き続き利用できます。永続的なログファイルが利用できる場合のみ、ファイルビューアーを強制的に有効にしてください。',
+    'File viewers are available. Runtime Logs are optional and independent of file logging.' => 'ファイルビューアーが利用できます。ランタイムログは任意であり、ファイルへのログ記録とは独立しています。',
+
+    // Settings: Runtime Logs
+    'Min: {min}, Max: {max}' => '最小: {min}、最大: {max}',
+    'Uses the application cache configuration. The Redis database can be overridden in {file}. To verify capture, trigger a log message and check Runtime Logs.' => 'アプリケーションキャッシュの設定を使用します。Redis データベースは {file} で上書きできます。キャプチャを確認するには、ログメッセージを発生させてランタイムログを確認してください。',
+    'Enable Runtime Logs' => 'ランタイムログを有効にする',
+    'Skip Console Requests' => 'コンソールリクエストをスキップする',
+    'Skip Queue Requests' => 'キューリクエストをスキップする',
+    'Retention (seconds)' => '保持期間（秒）',
+    'Maximum Entries' => '最大エントリー数',
+    'Refresh Interval (seconds)' => '更新間隔（秒）',
+    'Maximum Message Bytes' => 'メッセージの最大バイト数',
+    'Maximum Context Bytes' => 'コンテキストの最大バイト数',
+    'Captured Levels' => 'キャプチャするレベル',
+    'Include Categories' => '含めるカテゴリ',
+    'Exclude Categories' => '除外するカテゴリ',
+    'Include Request User ID' => 'リクエストユーザー ID を含める',
+    'Advanced' => '詳細設定',
+    'Configured Storage' => '設定されたストレージ',
+    'Storage follows the Craft cache configuration. Redis database selection is configuration-only. This is not a connection test; confirm capture in Runtime Logs.' => 'ストレージは Craft のキャッシュ設定に従います。Redis データベースは設定ファイルでのみ選択できます。これは接続テストではありません。ランタイムログでキャプチャを確認してください。',
+    'On multiple servers, use shared cache storage. Local file cache does not combine logs from other instances.' => '複数のサーバーでは共有キャッシュストレージを使用してください。ローカルファイルキャッシュは他のインスタンスのログを統合しません。',
+    'Capture changes apply to new requests. Restart long-running workers to load changed settings. Disabling capture does not clear stored logs.' => 'キャプチャの変更は新しいリクエストに適用されます。変更した設定を読み込むには、長時間実行されるワーカーを再起動してください。キャプチャを無効にしても保存済みのログは削除されません。',
+    'How often Runtime Logs refreshes automatically. Set to 0 to disable. Current: {duration}' => 'ランタイムログが自動更新される頻度です。無効にするには 0 に設定してください。現在: {duration}',
+    'Choose which log categories to capture, not words in the message. Enter one category per line, such as {exact}, or use {prefix} to match categories starting with {start}. Leave empty to capture all categories.' => 'メッセージ内の単語ではなく、キャプチャするログカテゴリを選択してください。{exact} のように 1 行に 1 つのカテゴリを入力するか、{prefix} を使用して {start} で始まるカテゴリに一致させます。すべてのカテゴリをキャプチャするには空欄にしてください。',
+    'Skip these log categories even if included above. Enter one per line, such as {exact} or {prefix}. Leave empty to add no category exclusions.' => '上記で含めた場合でも、これらのログカテゴリを除外します。{exact} や {prefix} のように 1 行に 1 つ入力してください。カテゴリの除外を追加しない場合は空欄にしてください。',
+    'When on, Runtime Logs skips command-line requests. Turn off only when diagnosing console commands; file and hosted logs are unaffected.' => '有効にすると、ランタイムログはコマンドラインのリクエストを除外します。コンソールコマンドの診断時のみ無効にしてください。ファイルログとホスティングのログには影響しません。',
+    'When on, Runtime Logs skips detected queue execution. To capture console queue workers, turn off both skip switches and restart the workers. Workers can generate large volumes of logs.' => '有効にすると、ランタイムログは検出されたキュー実行を除外します。コンソールのキューワーカーをキャプチャするには、両方の除外スイッチを無効にしてワーカーを再起動してください。ワーカーは大量のログを生成する場合があります。',
+    'Adds the authenticated request user ID. Messages and context may still contain personal data regardless of this setting.' => 'リクエストの認証済みユーザー ID を追加します。この設定に関係なく、メッセージとコンテキストには個人データが含まれる場合があります。',
+
+    'Maximum age of runtime entries, in seconds. Current: {duration}' => 'ランタイムログのエントリーの最大保持期間（秒単位）です。現在: {duration}',
+    'Min: {min} ({minDuration}), Max: {max} ({maxDuration})' => '最小: {min}（{minDuration}）、最大: {max}（{maxDuration}）',
+    '{count} second' => '{count} 秒',
+    '{count} seconds' => '{count} 秒',
+    '{count} minute' => '{count} 分',
+    '{count} minutes' => '{count} 分',
+    '{count} hour' => '{count} 時間',
+    '{count} hours' => '{count} 時間',
+    '{count} day' => '{count} 日',
+    '{count} days' => '{count} 日',
+
     // Settings: Interface
     'Interface Settings' => 'インターフェース設定',
+
+    // Setup
+    'Choose the log views that suit this environment. Runtime capture is optional and remains off until enabled.' => 'この環境に適したログ表示を選択してください。ランタイムキャプチャは任意であり、有効にするまで無効のままです。',
+    'Consider Runtime Logs for recent diagnostics on ephemeral hosting. Confirm shared storage before relying on logs from multiple instances.' => '一時的なホスティングでの最近の診断にはランタイムログをご検討ください。複数のインスタンスのログを利用する前に、共有ストレージを確認してください。',
 
     // Log levels
     'All Levels' => 'すべてのレベル',
@@ -141,6 +191,7 @@ return [
     'Recent runtime logs use a bounded diagnostic store and are not complete log history.' => '最近のランタイムログには上限のある診断ストアが使用され、完全なログ履歴ではありません。',
 
     // Config overrides
+    'This is being overridden by the <code>{setting}</code> setting in <code>config/logging-library.php</code>.' => 'この設定は <code>config/logging-library.php</code> の <code>{setting}</code> 設定によって上書きされています。',
     'This is being overridden by the <code>forceEnableLogViewer</code> setting in <code>config/logging-library.php</code>.' => 'この設定は <code>config/logging-library.php</code> の <code>forceEnableLogViewer</code> 設定によって上書きされています。',
     'This is being overridden by the <code>showCpSection</code> setting in <code>config/logging-library.php</code>.' => 'この設定は <code>config/logging-library.php</code> の <code>showCpSection</code> 設定によって上書きされています。',
 ];

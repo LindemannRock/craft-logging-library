@@ -25,7 +25,10 @@ return [
         // Force-enable file-based log viewers even when an edge/ephemeral environment is detected
         'forceEnableLogViewer' => false,
 
-        // Store bounded recent runtime log records for edge/ephemeral environments
+        // Store bounded recent runtime log records for edge/ephemeral environments.
+        // Each option present here overrides and locks only its matching CP field.
+        // Remove options you want to manage under Settings > Runtime Logs.
+        // Redis database selection remains configuration-only.
         'runtimeLogStore' => [
             'enabled' => false,
             'skipConsoleRequests' => true,

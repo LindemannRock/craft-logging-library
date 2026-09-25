@@ -122,10 +122,12 @@ final class EnvironmentDetectionTest extends TestCase
                     self::assertSame($expectedRuntimeNavigation, $sections['runtime-logs']['when']);
 
                     if (!$expectedFileViewer && !$expectedRuntimeNavigation) {
-                        $this->withPluginSettings(
-                            $settings,
-                            fn() => self::assertNull(LoggingLibrary::getInstance()->getCpNavItem()),
-                        );
+                        $user = new \craft\web\User(['enableSession' => false, 'identityClass' => \craft\elements\User::class]);
+                        self::assertSame([], \lindemannrock\base\helpers\CpNavHelper::buildSubnav($user, $settings, $sections));
+                        $user->setIdentity(new \craft\elements\User(['admin' => true]));
+                        self::assertSame(['settings', 'setup'], array_keys(\lindemannrock\base\helpers\CpNavHelper::buildSubnav($user, $settings, $sections)));
+                        self::assertSame([LoggingLibrary::PERMISSION_MANAGE_SETTINGS], $sections['setup']['permissionsAll']);
+                        self::assertSame([LoggingLibrary::PERMISSION_MANAGE_SETTINGS], $sections['settings']['permissionsAll']);
                     }
                 });
             },
@@ -164,35 +166,37 @@ final class EnvironmentDetectionTest extends TestCase
     #[DataProvider('requestModeProvider')]
     public function testAutomaticSuppressionPreservesDedicatedTargetsInConsoleAndControlPanel(string $requestMode): void
     {
-        $this->withEnvironmentValues(true, 'true', true, false, function() use ($requestMode): void {
-            $this->withLoggingState(function() use ($requestMode): void {
-                $originalRequest = Craft::$app->getRequest();
-                $handle = 'lglib-test-ephemeral-' . $requestMode;
+        $this->withPluginSettings(new Settings(['forceEnableLogViewer' => false]), function() use ($requestMode): void {
+            $this->withEnvironmentValues(true, 'true', true, false, function() use ($requestMode): void {
+                $this->withLoggingState(function() use ($requestMode): void {
+                    $originalRequest = Craft::$app->getRequest();
+                    $handle = 'lglib-test-ephemeral-' . $requestMode;
 
-                try {
-                    Craft::$app->set('request', $requestMode === 'console' ? new ConsoleRequest() : new WebRequest());
-                    $beforeMonologConfig = Craft::$app->getLog()->monologTargetConfig ?? [];
-                    $beforeTargetCount = count(Craft::getLogger()->dispatcher->targets);
+                    try {
+                        Craft::$app->set('request', $requestMode === 'console' ? new ConsoleRequest() : new WebRequest());
+                        $beforeMonologConfig = Craft::$app->getLog()->monologTargetConfig ?? [];
+                        $beforeTargetCount = count(Craft::getLogger()->dispatcher->targets);
 
-                    LoggingLibrary::configure(['pluginHandle' => $handle]);
+                        LoggingLibrary::configure(['pluginHandle' => $handle]);
 
-                    self::assertFalse(LoggingLibrary::getConfig($handle)['enableLogViewer']);
-                    self::assertCount($beforeTargetCount + 1, Craft::getLogger()->dispatcher->targets);
+                        self::assertFalse(LoggingLibrary::getConfig($handle)['enableLogViewer']);
+                        self::assertCount($beforeTargetCount + 1, Craft::getLogger()->dispatcher->targets);
 
-                    $target = $this->dedicatedTarget($handle);
-                    self::assertInstanceOf(MonologTarget::class, $target);
-                    self::assertSame($handle, $target->getName());
-                    self::assertSame([$handle], $target->categories);
+                        $target = $this->dedicatedTarget($handle);
+                        self::assertInstanceOf(MonologTarget::class, $target);
+                        self::assertSame($handle, $target->getName());
+                        self::assertSame([$handle], $target->categories);
 
-                    $expectedMonologConfig = $beforeMonologConfig;
-                    $expectedMonologConfig['except'] = $expectedMonologConfig['except'] ?? [];
-                    if (!in_array($handle, $expectedMonologConfig['except'], true)) {
-                        $expectedMonologConfig['except'][] = $handle;
+                        $expectedMonologConfig = $beforeMonologConfig;
+                        $expectedMonologConfig['except'] = $expectedMonologConfig['except'] ?? [];
+                        if (!in_array($handle, $expectedMonologConfig['except'], true)) {
+                            $expectedMonologConfig['except'][] = $handle;
+                        }
+                        self::assertSame($expectedMonologConfig, Craft::$app->getLog()->monologTargetConfig);
+                    } finally {
+                        Craft::$app->set('request', $originalRequest);
                     }
-                    self::assertSame($expectedMonologConfig, Craft::$app->getLog()->monologTargetConfig);
-                } finally {
-                    Craft::$app->set('request', $originalRequest);
-                }
+                });
             });
         });
     }

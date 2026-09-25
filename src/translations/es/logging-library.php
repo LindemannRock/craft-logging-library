@@ -14,6 +14,8 @@ return [
     'Open Settings' => 'Abrir la configuración',
 
     // Navigation
+    'Setup' => 'Configuración',
+    'File Logs' => 'Registros en archivos',
     'All Logs' => 'Todos los registros',
     'Runtime Logs' => 'Registros de tiempo de ejecución',
     'Logs' => 'Registros',
@@ -49,6 +51,7 @@ return [
     'User does not have permission to view logs' => 'El usuario no tiene permiso para ver los registros',
 
     // Settings: General
+    'Show Logging Library in the main navigation. This does not enable or disable log capture.' => 'Mostrar Logging Library en la navegación principal. Esto no activa ni desactiva la captura de registros.',
     'General Settings' => 'Configuración general',
     'Force Enable Log Viewers' => 'Forzar activación de visores de registros',
     'Force-enable file-based log viewers even when an edge or ephemeral environment is detected. This affects Logging Library and every plugin&apos;s dedicated Logs section.' => 'Forzar la activación de visores de registros basados en archivos incluso cuando se detecta un entorno edge o efímero. Esto afecta a Logging Library y a la sección de Registros dedicada de cada plugin.',
@@ -59,8 +62,55 @@ return [
     'Show Main Menu' => 'Mostrar menú principal',
     'Show Logging Library in the main Control Panel navigation as a consolidated All Logs view when file-based log viewers are available.' => 'Mostrar Logging Library en la navegación principal del panel de control como una vista consolidada Todos los registros cuando los visores de registros basados en archivos estén disponibles.',
 
+    // Settings: File Logs
+    'Force Enable File Log Viewers' => 'Forzar visores de registros en archivos',
+    'An edge or ephemeral environment is detected. File viewers are hidden unless forced on; Runtime Logs remain available when enabled. Only force file viewers on if persistent log files are available.' => 'Se detecta un entorno edge o efímero. Los visores de archivos se ocultan salvo que se fuerce su activación; los registros de tiempo de ejecución siguen disponibles cuando están activados. Fuerce los visores solo si dispone de archivos de registro persistentes.',
+    'File viewers are available. Runtime Logs are optional and independent of file logging.' => 'Los visores de archivos están disponibles. Los registros de tiempo de ejecución son opcionales e independientes del registro en archivos.',
+
+    // Settings: Runtime Logs
+    'Min: {min}, Max: {max}' => 'Mín.: {min}, Máx.: {max}',
+    'Uses the application cache configuration. The Redis database can be overridden in {file}. To verify capture, trigger a log message and check Runtime Logs.' => 'Utiliza la configuración de la caché de aplicación. La base de datos Redis se puede sobrescribir en {file}. Para verificar la captura, genere un mensaje de registro y consulte los registros de tiempo de ejecución.',
+    'Enable Runtime Logs' => 'Activar registros de tiempo de ejecución',
+    'Skip Console Requests' => 'Omitir solicitudes de consola',
+    'Skip Queue Requests' => 'Omitir solicitudes de cola',
+    'Retention (seconds)' => 'Retención (segundos)',
+    'Maximum Entries' => 'Máximo de entradas',
+    'Refresh Interval (seconds)' => 'Intervalo de actualización (segundos)',
+    'Maximum Message Bytes' => 'Máximo de bytes del mensaje',
+    'Maximum Context Bytes' => 'Máximo de bytes del contexto',
+    'Captured Levels' => 'Niveles capturados',
+    'Include Categories' => 'Incluir categorías',
+    'Exclude Categories' => 'Excluir categorías',
+    'Include Request User ID' => 'Incluir ID de usuario de la solicitud',
+    'Advanced' => 'Avanzado',
+    'Configured Storage' => 'Almacenamiento configurado',
+    'Storage follows the Craft cache configuration. Redis database selection is configuration-only. This is not a connection test; confirm capture in Runtime Logs.' => 'El almacenamiento sigue la configuración de caché de Craft. La base de datos Redis se selecciona solo mediante configuración. Esto no es una prueba de conexión; confirme la captura en los registros de tiempo de ejecución.',
+    'On multiple servers, use shared cache storage. Local file cache does not combine logs from other instances.' => 'En varios servidores, utilice almacenamiento de caché compartido. La caché de archivos local no combina registros de otras instancias.',
+    'Capture changes apply to new requests. Restart long-running workers to load changed settings. Disabling capture does not clear stored logs.' => 'Los cambios de captura se aplican a nuevas solicitudes. Reinicie los procesos de larga duración para cargar la configuración modificada. Desactivar la captura no borra los registros almacenados.',
+    'How often Runtime Logs refreshes automatically. Set to 0 to disable. Current: {duration}' => 'Frecuencia de actualización automática de los registros de tiempo de ejecución. Establezca 0 para desactivarla. Actual: {duration}',
+    'Choose which log categories to capture, not words in the message. Enter one category per line, such as {exact}, or use {prefix} to match categories starting with {start}. Leave empty to capture all categories.' => 'Elija qué categorías de registros capturar, no palabras del mensaje. Introduzca una categoría por línea, como {exact}, o utilice {prefix} para las categorías que comiencen por {start}. Deje vacío para capturar todas las categorías.',
+    'Skip these log categories even if included above. Enter one per line, such as {exact} or {prefix}. Leave empty to add no category exclusions.' => 'Omita estas categorías de registros aunque estén incluidas arriba. Introduzca una por línea, como {exact} o {prefix}. Deje vacío para no añadir exclusiones de categorías.',
+    'When on, Runtime Logs skips command-line requests. Turn off only when diagnosing console commands; file and hosted logs are unaffected.' => 'Cuando esta opción está activada, los registros de ejecución omiten las solicitudes de línea de comandos. Desactívela solo para diagnosticar comandos de consola; los registros en archivos y del alojamiento no se ven afectados.',
+    'When on, Runtime Logs skips detected queue execution. To capture console queue workers, turn off both skip switches and restart the workers. Workers can generate large volumes of logs.' => 'Cuando esta opción está activada, los registros de ejecución omiten la ejecución de cola detectada. Para capturar los procesos de cola de la consola, desactive ambas opciones de omisión y reinicie los procesos. Los procesos pueden generar grandes volúmenes de registros.',
+    'Adds the authenticated request user ID. Messages and context may still contain personal data regardless of this setting.' => 'Añade el ID del usuario autenticado de la solicitud. Los mensajes y el contexto pueden contener datos personales independientemente de esta configuración.',
+
+    'Maximum age of runtime entries, in seconds. Current: {duration}' => 'Antigüedad máxima de las entradas de registros de ejecución, en segundos. Actual: {duration}',
+    'Min: {min} ({minDuration}), Max: {max} ({maxDuration})' => 'Mín.: {min} ({minDuration}), Máx.: {max} ({maxDuration})',
+    '{count} second' => '{count} segundo',
+    '{count} seconds' => '{count} segundos',
+    '{count} minute' => '{count} minuto',
+    '{count} minutes' => '{count} minutos',
+    '{count} hour' => '{count} hora',
+    '{count} hours' => '{count} horas',
+    '{count} day' => '{count} día',
+    '{count} days' => '{count} días',
+
     // Settings: Interface
     'Interface Settings' => 'Configuración de interfaz',
+
+    // Setup
+    'Choose the log views that suit this environment. Runtime capture is optional and remains off until enabled.' => 'Elija las vistas de registros adecuadas para este entorno. La captura de tiempo de ejecución es opcional y permanece desactivada hasta que se active.',
+    'Consider Runtime Logs for recent diagnostics on ephemeral hosting. Confirm shared storage before relying on logs from multiple instances.' => 'Considere los registros de tiempo de ejecución para diagnósticos recientes en alojamiento efímero. Confirme el almacenamiento compartido antes de confiar en registros de varias instancias.',
 
     // Log levels
     'All Levels' => 'Todos los niveles',
@@ -141,6 +191,7 @@ return [
     'Recent runtime logs use a bounded diagnostic store and are not complete log history.' => 'Los registros recientes de tiempo de ejecución usan un almacén de diagnóstico limitado y no constituyen un historial completo de registros.',
 
     // Config overrides
+    'This is being overridden by the <code>{setting}</code> setting in <code>config/logging-library.php</code>.' => 'Este valor está siendo anulado por la configuración <code>{setting}</code> en <code>config/logging-library.php</code>.',
     'This is being overridden by the <code>forceEnableLogViewer</code> setting in <code>config/logging-library.php</code>.' => 'Este valor está siendo anulado por la configuración <code>forceEnableLogViewer</code> en <code>config/logging-library.php</code>.',
     'This is being overridden by the <code>showCpSection</code> setting in <code>config/logging-library.php</code>.' => 'Este valor está siendo anulado por la configuración <code>showCpSection</code> en <code>config/logging-library.php</code>.',
 ];

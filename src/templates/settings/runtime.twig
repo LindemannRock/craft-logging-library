@@ -1,0 +1,137 @@
+{% extends 'logging-library/_layouts/settings' %}
+{% import '_includes/forms' as forms %}
+
+{% set title = 'Runtime Logs'|t('logging-library') %}
+{% set fullPageForm = true %}
+{% set selectedSettingsItem = 'runtime' %}
+{% set runtime = settings.runtimeConfig %}
+
+{% macro runtimeField(settings, runtime, attribute, path, type, options = {}) %}
+{% import '_includes/forms' as forms %}
+{% set locked = settings.isOverriddenByConfig(attribute) %}
+{% set value = attribute == 'runtimeIncludeUserId' ? runtime.privacy.includeUserId : runtime[path] %}
+{% set value = not locked and settings.hasErrors() ? attribute(settings, attribute) : value %}
+{%
+	set field = {
+	    label: settings.getAttributeLabel(attribute),
+	    id: attribute,
+	    name: 'settings[' ~ attribute ~ ']',
+	    errors: settings.getErrors(attribute),
+	    disabled: locked,
+	    warning: locked ? 'This is being overridden by the <code>{setting}</code> setting in <code>config/logging-library.php</code>.'|t('logging-library', {setting: 'runtimeLogStore.' ~ path})|raw : null,
+	}|merge(options)
+%}
+{% if type == 'number' and field.min is defined and field.max is defined and field.tip is not defined %}
+	{% set field = field|merge({tip: 'Min: {min}, Max: {max}'|t('logging-library', {min: field.min, max: field.max})}) %}
+{% endif %}
+{% if type == 'boolean' %}
+	{{ forms.lightswitchField(field|merge({on: value})) }}
+{% elseif type == 'levels' %}
+	{{
+		forms.checkboxGroupField(field|merge({
+		values: value,
+		options: [
+		{label: 'Error'|t('logging-library'), value: 'error', disabled: locked},
+		{label: 'Warning'|t('logging-library'), value: 'warning', disabled: locked},
+		{label: 'Info'|t('logging-library'), value: 'info', disabled: locked},
+		{label: 'Debug'|t('logging-library'), value: 'trace', disabled: locked},
+		],
+		}))
+	}}
+{% elseif type == 'list' %}
+	{{ forms.textareaField(field|merge({value: value|join('\n'), rows: 4})) }}
+{% else %}
+	{{ forms.textField(field|merge({value: value, type: 'number', step: 1})) }}
+{% endif %}
+{% endmacro %}
+
+{% block content %}
+	{{ actionInput('logging-library/settings/save') }}
+	{{ redirectInput('logging-library/settings/runtime') }}
+	{{ hiddenInput('section', 'runtime') }}
+	<h2 class='first'>{{ title }}</h2>
+	<p>{{ 'Recent runtime logs use a bounded diagnostic store and are not complete log history.'|t('logging-library') }}</p>
+	{% include 'logging-library/_components/runtime-storage' with {settings: settings, compact: true} only %}
+
+	{{ _self.runtimeField(settings, runtime, 'runtimeEnabled', 'enabled', 'boolean', {toggle: 'runtime-settings'}) }}
+	{% set enabled = not settings.isOverriddenByConfig('runtimeEnabled') and settings.hasErrors() ? settings.runtimeEnabled : runtime.enabled %}
+	<div id='runtime-settings' class='{{ not enabled ? 'hidden' }}'>
+		{%
+			include 'lindemannrock-base/_components/info-box' with {
+			    message: 'Capture changes apply to new requests. Restart long-running workers to load changed settings. Disabling capture does not clear stored logs.'|t('logging-library'),
+			    type: 'info',
+			    margin: 'bottom',
+			} only
+		%}
+		{{
+			_self.runtimeField(settings, runtime, 'runtimeSkipConsoleRequests', 'skipConsoleRequests', 'boolean', {
+			instructions: 'When on, Runtime Logs skips command-line requests. Turn off only when diagnosing console commands; file and hosted logs are unaffected.'|t('logging-library'),
+			})
+		}}
+		{{
+			_self.runtimeField(settings, runtime, 'runtimeSkipQueueRequests', 'skipQueueRequests', 'boolean', {
+			instructions: 'When on, Runtime Logs skips detected queue execution. To capture console queue workers, turn off both skip switches and restart the workers. Workers can generate large volumes of logs.'|t('logging-library'),
+			})
+		}}
+		{{
+			_self.runtimeField(settings, runtime, 'runtimeIncludeUserId', 'privacy.includeUserId', 'boolean', {
+			instructions: 'Adds the authenticated request user ID. Messages and context may still contain personal data regardless of this setting.'|t('logging-library'),
+			})
+		}}
+		{{ _self.runtimeField(settings, runtime, 'runtimeLevels', 'levels', 'levels') }}
+		{{
+			_self.runtimeField(settings, runtime, 'runtimeTtl', 'ttl', 'number', {
+			min: 1, max: 2592000,
+			instructions: 'Maximum age of runtime entries, in seconds. Current: {duration}'|t('logging-library', {duration: tag('strong', {id: 'runtimeTtl-human'})})|raw,
+			tip: 'Min: {min} ({minDuration}), Max: {max} ({maxDuration})'|t('logging-library', {
+			min: 1,
+			minDuration: '{count} second'|t('logging-library', {count: 1}),
+			max: 2592000,
+			maxDuration: '{count} days'|t('logging-library', {count: 30}),
+			}),
+			})
+		}}
+		{{ _self.runtimeField(settings, runtime, 'runtimeMaxEntries', 'maxEntries', 'number', {min: 1, max: 10000}) }}
+		{{
+			_self.runtimeField(settings, runtime, 'runtimeRefreshInterval', 'refreshInterval', 'number', {
+			min: 0, max: 3600,
+			instructions: 'How often Runtime Logs refreshes automatically. Set to 0 to disable. Current: {duration}'|t('logging-library', {duration: tag('strong', {id: 'runtimeRefreshInterval-human'})})|raw,
+			tip: 'Min: {min} ({minDuration}), Max: {max} ({maxDuration})'|t('logging-library', {
+			min: 0,
+			minDuration: 'Disabled'|t('lindemannrock-base'),
+			max: 3600,
+			maxDuration: '{count} hour'|t('logging-library', {count: 1}),
+			}),
+			})
+		}}
+
+		<hr>
+		<h2>{{ 'Advanced'|t('logging-library') }}</h2>
+		{{
+			_self.runtimeField(settings, runtime, 'runtimeCategories', 'categories', 'list', {
+			instructions: 'Choose which log categories to capture, not words in the message. Enter one category per line, such as {exact}, or use {prefix} to match categories starting with {start}. Leave empty to capture all categories.'|t('logging-library', {exact: '`my-plugin`', prefix: '`yii\\db\\*`', start: '`yii\\db\\`'}),
+			})
+		}}
+		{{
+			_self.runtimeField(settings, runtime, 'runtimeExcept', 'except', 'list', {
+			instructions: 'Skip these log categories even if included above. Enter one per line, such as {exact} or {prefix}. Leave empty to add no category exclusions.'|t('logging-library', {exact: '`my-plugin`', prefix: '`yii\\db\\*`'}),
+			})
+		}}
+		{{ _self.runtimeField(settings, runtime, 'runtimeMaxMessageBytes', 'maxMessageBytes', 'number', {min: 1, max: 65536}) }}
+		{{ _self.runtimeField(settings, runtime, 'runtimeMaxContextBytes', 'maxContextBytes', 'number', {min: 1, max: 65536}) }}
+	</div>
+	{% include 'lindemannrock-base/_components/plugin-credit' %}
+{% endblock %}
+
+{% js %}
+/* Use the same duration preview pattern as the suite's cache settings. */ (function() { const timeUnits = { second: {{ '{count} second'|t('logging-library', {count: '__COUNT__'})|json_encode|raw }},
+seconds: {{ '{count} seconds'|t('logging-library', {count: '__COUNT__'})|json_encode|raw }}, minute: {{ '{count} minute'|t('logging-library', {count: '__COUNT__'})|json_encode|raw }}, minutes:
+{{ '{count} minutes'|t('logging-library', {count: '__COUNT__'})|json_encode|raw }}, hour: {{ '{count} hour'|t('logging-library', {count: '__COUNT__'})|json_encode|raw }}, hours:
+{{ '{count} hours'|t('logging-library', {count: '__COUNT__'})|json_encode|raw }}, day: {{ '{count} day'|t('logging-library', {count: '__COUNT__'})|json_encode|raw }}, days:
+{{ '{count} days'|t('logging-library', {count: '__COUNT__'})|json_encode|raw }}
+}; const disabledLabel = {{ 'Disabled'|t('lindemannrock-base')|json_encode|raw }}; ['runtimeTtl', 'runtimeRefreshInterval'].forEach(function(id) { const input = document.getElementById(id); const
+preview = document.getElementById(id + '-human'); if (!input || !preview) { return; } const updatePreview = function() { const seconds = parseInt(input.value, 10) || 0; if (id ===
+'runtimeRefreshInterval' && seconds === 0) { preview.textContent = disabledLabel; return; } let value = seconds; let unit = 'second'; if (seconds >= 86400) { value = Math.round(seconds / 86400 * 10) /
+10; unit = 'day'; } else if (seconds >= 3600) { value = Math.round(seconds / 3600 * 10) / 10; unit = 'hour'; } else if (seconds >= 60) { value = Math.round(seconds / 60 * 10) / 10; unit = 'minute'; }
+preview.textContent = timeUnits[unit + (value !== 1 ? 's' : '')].replace('__COUNT__', value); }; input.addEventListener('input', updatePreview); updatePreview(); }); })();
+{% endjs %}

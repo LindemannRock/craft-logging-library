@@ -7,7 +7,7 @@ Logging Library is built on `lindemannrock/base`, the shared foundation used acr
 In its `init()`, Logging Library calls `PluginHelper::bootstrap()`. This single call wires up the pieces the base plugin provides:
 
 - **Twig globals** — registers the `loggingLibraryHelper` variable for templates (see [Twig Globals](twig-globals.md))
-- **Install experience** — the welcome screen shown on first install, with a call-to-action that opens **All Logs** (or **Settings** when no viewer is available)
+- **Install experience** — the welcome screen shown on first install, with a call-to-action that opens **Setup** to review capture, file availability, and configured storage
 - **Plugin-name resolution** — applies the display name from `config/logging-library.php` if one is set
 
 Unlike a consumer plugin, Logging Library passes empty log-permission arrays to `bootstrap()` — it *provides* the logging infrastructure rather than consuming it, so it registers its own viewer routes and permissions directly.
@@ -19,7 +19,7 @@ The [Settings](../feature-tour/settings.md) model composes several base traits s
 | Trait | What it adds |
 |-------|--------------|
 | `SettingsPersistenceTrait` | Saves/loads settings to the `logginglibrary_settings` table |
-| `SettingsConfigTrait` | Detects `config/logging-library.php` overrides and flags overridden fields; `PluginHelper::applyConfigOverridesToSettings()` applies those values when Logging Library loads its settings |
+| `SettingsConfigTrait` | Detects config overrides and flags overridden fields. Base applies ordinary settings overrides; runtime preferences map to the existing nested `runtimeLogStore` options and are merged when effective runtime configuration is read, without importing those overrides into stored preferences |
 | `PluginNameSettingsTrait` | The configurable **Plugin Name** field |
 | `ItemsPerPageSettingsTrait` | The **Items Per Page** field (10–500) |
 | `DateFormatSettingsTrait` | The **Time Format** / **Show Seconds** fields that cascade from base |

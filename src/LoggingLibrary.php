@@ -54,7 +54,7 @@ class LoggingLibrary extends Plugin
     /**
      * @var string Plugin schema version for migrations
      */
-    public string $schemaVersion = '1.0.5';
+    public string $schemaVersion = '1.0.6';
 
     /**
      * @var bool Whether the plugin registers a control panel section
@@ -83,18 +83,14 @@ class LoggingLibrary extends Plugin
     {
         parent::init();
 
-        $logViewersAvailable = self::areLogViewersAvailable();
-
         // Bootstrap the base plugin helper
         PluginHelper::bootstrap($this, 'loggingLibraryHelper', [], [], [
             'installExperience' => [
                 'headline' => Craft::t('logging-library', 'Logging Library'),
                 'body' => Craft::t('logging-library', 'Inspect system logs, review plugin logging output, and centralize diagnostics from one control panel workspace.'),
-                'ctaLabel' => $logViewersAvailable
-                    ? Craft::t('logging-library', 'Open All Logs')
-                    : Craft::t('logging-library', 'Open Settings'),
-                'ctaUrl' => $logViewersAvailable ? 'logging-library/logs/system' : 'logging-library/settings/general',
-                'redirectUri' => $logViewersAvailable ? 'logging-library/logs/system' : 'logging-library/settings/general',
+                'ctaLabel' => Craft::t('logging-library', 'Setup'),
+                'ctaUrl' => 'logging-library/setup',
+                'redirectUri' => 'logging-library/setup',
                 'confettiPreset' => 'surprise',
             ],
         ]);
@@ -117,6 +113,9 @@ class LoggingLibrary extends Plugin
                 $event->rules['logging-library/logs'] = 'logging-library/logs/index';
                 $event->rules['logging-library/settings'] = 'logging-library/settings/index';
                 $event->rules['logging-library/settings/general'] = 'logging-library/settings/general';
+                $event->rules['logging-library/setup'] = 'logging-library/settings/setup';
+                $event->rules['logging-library/settings/runtime'] = 'logging-library/settings/runtime';
+                $event->rules['logging-library/settings/files'] = 'logging-library/settings/files';
                 $event->rules['logging-library/settings/interface'] = 'logging-library/settings/interface';
                 $event->rules['logging-library/settings/save'] = 'logging-library/settings/save';
                 $event->rules['logging-library/logs/system'] = 'logging-library/logs/index';
@@ -158,7 +157,7 @@ class LoggingLibrary extends Plugin
     public function getCpNavItem(): ?array
     {
         $settings = $this->getSettings();
-        if (!($settings instanceof Settings) || !$settings->showCpSection || (!self::areLogViewersAvailable($settings) && !self::isRuntimeLogStoreEnabled())) {
+        if (!($settings instanceof Settings) || !$settings->showCpSection) {
             return null;
         }
 
@@ -207,6 +206,12 @@ class LoggingLibrary extends Plugin
                 'url' => 'logging-library/settings',
                 'permissionsAll' => [self::PERMISSION_MANAGE_SETTINGS],
             ],
+            [
+                'key' => 'setup',
+                'label' => Craft::t('logging-library', 'Setup'),
+                'url' => 'logging-library/setup',
+                'permissionsAll' => [self::PERMISSION_MANAGE_SETTINGS],
+            ],
         ];
     }
 
@@ -239,7 +244,7 @@ class LoggingLibrary extends Plugin
         $settings = parent::getSettings();
 
         if ($settings instanceof Settings) {
-            PluginHelper::applyConfigOverridesToSettings($settings, 'logging-library');
+            PluginHelper::applyConfigOverridesToSettings($settings, 'logging-library', array_keys(Settings::RUNTIME_FIELDS));
         }
 
         return $settings;
@@ -416,25 +421,11 @@ class LoggingLibrary extends Plugin
      *
      * @since 5.14.0
      */
-    public static function getRuntimeLogStoreConfig(): array
+    public static function getRuntimeLogStoreConfig(?Settings $settings = null): array
     {
-        $defaults = [
-            'enabled' => false,
-            'skipConsoleRequests' => true,
-            'skipQueueRequests' => true,
-            'ttl' => 86400,
-            'maxEntries' => 1000,
-            'refreshInterval' => 5,
-            'maxMessageBytes' => 8000,
-            'maxContextBytes' => 8000,
-            'levels' => ['error', 'warning', 'info'],
-            'categories' => [],
-            'except' => [],
-            'redis' => [],
-            'privacy' => [
-                'includeUserId' => false,
-            ],
-        ];
+        $settings ??= self::getInstance()?->getSettings();
+        $defaults = ($settings instanceof Settings ? $settings : new Settings())->getStoredRuntimeConfig();
+        $defaults['redis'] = [];
 
         try {
             $config = Craft::$app->getConfig()->getConfigFromFile('logging-library');

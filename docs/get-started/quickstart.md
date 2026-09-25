@@ -50,7 +50,7 @@ Navigate to **Logging Library → All Logs** in the Control Panel. If **Show Mai
 
 The file-based viewer is enabled by default on durable hosts. Craft's ephemeral-host signal and Servd detection compose with OR behavior. Servd is detected when Craft's normalized `SERVD_PROJECT_SLUG` value resolves to a non-empty project slug; missing, blank, whitespace-only, null, and normalized false values do not enable Servd detection. Either detected signal hides automatic file viewers unless you explicitly [force-enable them](../feature-tour/settings.md). This affects viewers only: Craft/Yii logging and dedicated Monolog targets keep running, and force-enabling only retries local file reading rather than connecting to a hosted log feed.
 
-For a CP view that does not depend on files, enable [Runtime Logs](../feature-tour/runtime-logs.md) separately in `config/logging-library.php`. It remains opt-in and can be the only Logging Library view shown on an ephemeral host.
+For a CP view that does not depend on files, enable [Runtime Logs](../feature-tour/runtime-logs.md) in **Logging Library → Settings → Runtime Logs**, or through `config/logging-library.php`. It remains opt-in and can be the only Logging Library view shown on an ephemeral host.
 
 ## What's next
 

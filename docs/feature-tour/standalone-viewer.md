@@ -11,13 +11,13 @@ When it's surfaced in the main navigation, the standalone viewer lives at **Cont
 The main-menu item appears only when **both** of these are true:
 
 - **Show Main Menu** is on in [Settings → General](settings.md), and
-- at least one log view is available: a file-based viewer (you're not on a detected edge/ephemeral environment, or **Force Enable Log Viewers** overrides it — see [Edge Detection](edge-detection.md)), or the [runtime log store](runtime-logs.md) is enabled.
+- the user has access to at least one available section: file logs, [Runtime Logs](runtime-logs.md), or Settings/Setup. File views need durable storage or the file-viewer override; runtime capture must be enabled separately.
 
 The **All Logs** subnav item itself still requires a file-based viewer; when only the runtime store is enabled (for example, on an edge environment), the menu shows **Runtime Logs** instead.
 
 If **Show Main Menu** is off, there is no main **Logging Library** navigation item. On a durable host, the page itself remains reachable at `/admin/logging-library/logs/system` for anyone with the `loggingLibrary:viewAllLogs` permission.
 
-When Craft reports an ephemeral host or Servd is detected and the override is off, **All Logs** is suppressed. An authorized request to the Logging Library root can redirect to the first accessible **Runtime Logs** or **Settings** route, but that direct-route fallback is not visible main navigation. Runtime Logs appear only when separately enabled in `config/logging-library.php`.
+When Craft reports an ephemeral host or Servd is detected and the override is off, **All Logs** is suppressed. An authorized request to the Logging Library root can redirect to the first accessible **Runtime Logs** or **Settings** route, but that direct-route fallback is not visible main navigation. Runtime Logs appear only when separately enabled in Settings or configuration. Settings managers can still see Settings and Setup when both viewers are off.
 
 ## Source filtering
 

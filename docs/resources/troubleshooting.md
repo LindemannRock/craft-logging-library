@@ -39,22 +39,22 @@ Use these checks when a log destination, viewer, or Runtime Logs result does not
 
 1. Confirm **Show Main Menu** is on
 2. Check whether file viewers are suppressed because Craft reports an ephemeral host or its normalized `SERVD_PROJECT_SLUG` value resolves to a non-empty project slug. Missing, blank, whitespace-only, null, and normalized false Servd values do not detect Servd
-3. Check whether `runtimeLogStore.enabled` is `true` in `config/logging-library.php`
+3. Check permissions: settings managers can access Settings and Setup; viewer-only users need an available viewer
 
-**Fix:** If persistent shared storage backs `storage/logs/`, use **Force Enable Log Viewers** to restore automatic file-viewer availability. Otherwise, opt into [Runtime Logs](../feature-tour/runtime-logs.md) through configuration. With file viewers suppressed and Runtime Logs disabled, Logging Library intentionally has no main navigation item; a direct root-route redirect to Settings does not make one appear.
+**Fix:** If persistent shared storage backs `storage/logs/`, use **Force Enable File Log Viewers** to restore automatic file-viewer availability. Otherwise, enable [Runtime Logs](../feature-tour/runtime-logs.md) under **Settings → Runtime Logs** or in configuration. With both viewers off, a settings manager still sees Settings and Setup, but a viewer-only user has no available section.
 
 ## Servd shows an empty Select File dropdown
 
 On Servd, Logging Library can only show files that exist in the current Craft `storage/logs/` path. Servd collects Craft logs centrally for its dashboard, but that hosted log feed is not imported into the Logging Library interface.
 
-**Fix:** For recent activity in the CP, enable [Runtime Logs](../feature-tour/runtime-logs.md) — it captures log messages into a bounded Redis list, or a bounded generic value when Craft cache is non-Redis, so it doesn't depend on files in `storage/logs/`. Use Servd's **Logs** page, or Servd's Papertrail/Datadog integrations, for the complete hosted log history. Only enable **Force Enable Log Viewers** if `storage/logs/` is backed by persistent shared storage. Without that, the dropdown may be empty, stale, or limited to whichever application instance handled the request.
+**Fix:** For recent activity in the CP, enable [Runtime Logs](../feature-tour/runtime-logs.md) — it captures log messages into a bounded Redis list, or a bounded generic value when Craft cache is non-Redis, so it doesn't depend on files in `storage/logs/`. Use Servd's **Logs** page, or Servd's Papertrail/Datadog integrations, for the complete hosted log history. Only enable **Force Enable File Log Viewers** if `storage/logs/` is backed by persistent shared storage. Without that, the dropdown may be empty, stale, or limited to whichever application instance handled the request.
 
 ## Runtime Logs is missing or empty
 
-1. Confirm `runtimeLogStore.enabled` is `true` in `config/logging-library.php` — there is no Control Panel toggle
+1. Confirm **Enable Runtime Logs** is on under **Settings → Runtime Logs**, or overridden to `true` by `runtimeLogStore.enabled` in configuration
 2. Check the user has `loggingLibrary:viewAllLogs` and that **Show Main Menu** is on in Logging Library settings
 3. If the view is empty, trigger something that logs at a captured level (`error`, `warning`, or `info` by default) and let the page auto-refresh
-4. Check your `levels`, `categories`, and `except` config — an entry has to match all three to be captured
+4. Check effective capture levels and include/exclude categories in Settings — an entry has to match all three to be captured
 
 **Why:** Runtime entries only exist in their selected diagnostic store. They expire with the configured `ttl`, roll off past `maxEntries`, and disappear when that store is cleared or evicts them. On load-balanced hosting without a shared cache backend (such as Redis), each instance keeps its own fallback store, so the CP may show only entries captured by the instance serving your request. The Runtime Logs sidebar reports the effective backend and Redis database. See [Runtime Logs](../feature-tour/runtime-logs.md).
 
@@ -88,7 +88,7 @@ With a local or otherwise non-shared cache, each application instance has a sepa
 
 ## Console or queue entries are missing from Runtime Logs
 
-1. Check `runtimeLogStore.skipConsoleRequests` and `runtimeLogStore.skipQueueRequests` in `config/logging-library.php`; both default to `true`
+1. Check **Skip Console Requests** and **Skip Queue Requests** under **Settings → Runtime Logs**, directly below **Enable Runtime Logs**, including any config overrides; both default to on
 2. Remember that Craft queue workers normally run as console requests, so changing only the queue option may still leave worker entries excluded
 3. Check the configured `levels`, especially before enabling debug-level capture for a busy command or worker
 
@@ -119,6 +119,12 @@ Restart long-running queue workers after changing these options. A running worke
 Numeric settings such as Items Per Page must be whole numbers within the allowed range. If a value is invalid, Logging Library keeps you on the same settings page and shows the field error inline.
 
 When a setting is overridden in `config/logging-library.php`, the Control Panel field is skipped during save. Change the config file value instead.
+
+## Runtime settings are locked or changes do not take effect
+
+Each explicit nested option in `config/logging-library.php` locks only its matching field. Copying the full sample pins all listed options. Remove the specific override to manage that value in the CP; the saved preference or default becomes effective again. Redis database selection remains configuration-only.
+
+Changes affect new requests. Restart long-running workers after saving capture settings. **Configured Storage** on Settings and Setup does not test connectivity: trigger a matching log message and check the Runtime Logs viewer. Turning capture off does not clear existing entries, and disabling user IDs does not redact personal data already present in messages or context.
 
 ## Cache not updating after new log entries
 
