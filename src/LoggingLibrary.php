@@ -49,12 +49,16 @@ class LoggingLibrary extends Plugin
     public const PERMISSION_DOWNLOAD_ALL_LOGS = 'loggingLibrary:downloadAllLogs';
     public const PERMISSION_CLEAR_CACHE = 'loggingLibrary:clearCache';
     public const PERMISSION_MANAGE_SETTINGS = 'loggingLibrary:manageSettings';
+    /** @since 5.19.0 */
+    public const PERMISSION_VIEW_RUNTIME_LOGS = 'loggingLibrary:viewRuntimeLogs';
+    /** @since 5.19.0 */
+    public const PERMISSION_CLEAR_RUNTIME_LOGS = 'loggingLibrary:clearRuntimeLogs';
     private const ALL_LOG_FILES_CACHE_TTL = 5;
 
     /**
      * @var string Plugin schema version for migrations
      */
-    public string $schemaVersion = '1.0.6';
+    public string $schemaVersion = '1.0.8';
 
     /**
      * @var bool Whether the plugin registers a control panel section
@@ -88,9 +92,9 @@ class LoggingLibrary extends Plugin
             'installExperience' => [
                 'headline' => Craft::t('logging-library', 'Logging Library'),
                 'body' => Craft::t('logging-library', 'Inspect system logs, review plugin logging output, and centralize diagnostics from one control panel workspace.'),
-                'ctaLabel' => Craft::t('logging-library', 'Setup'),
-                'ctaUrl' => 'logging-library/setup',
-                'redirectUri' => 'logging-library/setup',
+                'ctaLabel' => Craft::t('logging-library', 'Settings'),
+                'ctaUrl' => 'logging-library/settings',
+                'redirectUri' => 'logging-library/settings',
                 'confettiPreset' => 'surprise',
             ],
         ]);
@@ -113,7 +117,6 @@ class LoggingLibrary extends Plugin
                 $event->rules['logging-library/logs'] = 'logging-library/logs/index';
                 $event->rules['logging-library/settings'] = 'logging-library/settings/index';
                 $event->rules['logging-library/settings/general'] = 'logging-library/settings/general';
-                $event->rules['logging-library/setup'] = 'logging-library/settings/setup';
                 $event->rules['logging-library/settings/runtime'] = 'logging-library/settings/runtime';
                 $event->rules['logging-library/settings/files'] = 'logging-library/settings/files';
                 $event->rules['logging-library/settings/interface'] = 'logging-library/settings/interface';
@@ -132,7 +135,10 @@ class LoggingLibrary extends Plugin
             ClearCaches::class,
             ClearCaches::EVENT_REGISTER_CACHE_OPTIONS,
             function(RegisterCacheOptionsEvent $event) {
-                if (!Craft::$app->getUser()->checkPermission(self::PERMISSION_CLEAR_CACHE)) {
+                if (
+                    !Craft::$app->getUser()->checkPermission(self::PERMISSION_VIEW_ALL_LOGS)
+                    || !Craft::$app->getUser()->checkPermission(self::PERMISSION_CLEAR_CACHE)
+                ) {
                     return;
                 }
 
@@ -197,19 +203,13 @@ class LoggingLibrary extends Plugin
                 'key' => 'runtime-logs',
                 'label' => Craft::t('logging-library', 'Runtime Logs'),
                 'url' => 'logging-library/logs/runtime',
-                'permissionsAll' => [self::PERMISSION_VIEW_ALL_LOGS],
+                'permissionsAll' => [self::PERMISSION_VIEW_RUNTIME_LOGS],
                 'when' => self::isRuntimeLogStoreEnabled(),
             ],
             [
                 'key' => 'settings',
                 'label' => Craft::t('logging-library', 'Settings'),
                 'url' => 'logging-library/settings',
-                'permissionsAll' => [self::PERMISSION_MANAGE_SETTINGS],
-            ],
-            [
-                'key' => 'setup',
-                'label' => Craft::t('logging-library', 'Setup'),
-                'url' => 'logging-library/setup',
                 'permissionsAll' => [self::PERMISSION_MANAGE_SETTINGS],
             ],
         ];
@@ -446,8 +446,8 @@ class LoggingLibrary extends Plugin
         $runtimeConfig['refreshInterval'] = max(0, (int)($runtimeConfig['refreshInterval'] ?? $defaults['refreshInterval']));
         $runtimeConfig['maxMessageBytes'] = min(RuntimeLogStoreService::MAX_BYTES_LIMIT, max(1, (int)($runtimeConfig['maxMessageBytes'] ?? $defaults['maxMessageBytes'])));
         $runtimeConfig['maxContextBytes'] = min(RuntimeLogStoreService::MAX_BYTES_LIMIT, max(1, (int)($runtimeConfig['maxContextBytes'] ?? $defaults['maxContextBytes'])));
-        $runtimeConfig['categories'] = array_values(array_filter((array)($runtimeConfig['categories'] ?? []), 'is_string'));
-        $runtimeConfig['except'] = array_values(array_filter((array)($runtimeConfig['except'] ?? []), 'is_string'));
+        $runtimeConfig['includeCategories'] = array_values(array_filter((array)($runtimeConfig['includeCategories'] ?? []), 'is_string'));
+        $runtimeConfig['excludeCategories'] = array_values(array_filter((array)($runtimeConfig['excludeCategories'] ?? []), 'is_string'));
 
         return $runtimeConfig;
     }
@@ -471,8 +471,8 @@ class LoggingLibrary extends Plugin
 
         $target = new RuntimeLogTarget([
             'levels' => $config['levels'],
-            'categories' => $config['categories'],
-            'except' => array_merge(['yii\i18n\PhpMessageSource:*'], $config['except']),
+            'categories' => $config['includeCategories'],
+            'except' => array_merge(['yii\i18n\PhpMessageSource:*'], $config['excludeCategories']),
             'runtimeSettings' => $config,
         ]);
 
@@ -992,15 +992,23 @@ class LoggingLibrary extends Plugin
                     'heading' => $this->name,
                     'permissions' => [
                         self::PERMISSION_VIEW_ALL_LOGS => [
-                            'label' => Craft::t('logging-library', 'View all system logs'),
+                            'label' => Craft::t('logging-library', 'View all file logs'),
                             'nested' => [
                                 self::PERMISSION_DOWNLOAD_ALL_LOGS => [
-                                    'label' => Craft::t('logging-library', 'Download all system logs'),
+                                    'label' => Craft::t('logging-library', 'Download all file logs'),
+                                ],
+                                self::PERMISSION_CLEAR_CACHE => [
+                                    'label' => Craft::t('logging-library', 'Clear file log cache'),
                                 ],
                             ],
                         ],
-                        self::PERMISSION_CLEAR_CACHE => [
-                            'label' => Craft::t('logging-library', 'Clear cache'),
+                        self::PERMISSION_VIEW_RUNTIME_LOGS => [
+                            'label' => Craft::t('logging-library', 'View runtime logs'),
+                            'nested' => [
+                                self::PERMISSION_CLEAR_RUNTIME_LOGS => [
+                                    'label' => Craft::t('logging-library', 'Clear runtime logs'),
+                                ],
+                            ],
                         ],
                         self::PERMISSION_MANAGE_SETTINGS => [
                             'label' => Craft::t('logging-library', 'Manage settings'),

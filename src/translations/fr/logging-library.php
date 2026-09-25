@@ -14,7 +14,6 @@ return [
     'Open Settings' => 'Ouvrir les paramètres',
 
     // Navigation
-    'Setup' => 'Configuration',
     'File Logs' => 'Journaux sur fichiers',
     'All Logs' => 'Tous les journaux',
     'Runtime Logs' => 'Journaux d\'exécution',
@@ -27,9 +26,10 @@ return [
     'Interface' => 'Interface',
 
     // Permissions
-    'View all system logs' => 'Afficher tous les journaux système',
-    'Download all system logs' => 'Télécharger tous les journaux système',
-    'Clear cache' => 'Vider le cache',
+    'View all file logs' => 'Afficher tous les journaux sur fichiers',
+    'Download all file logs' => 'Télécharger tous les journaux sur fichiers',
+    'Clear file log cache' => 'Vider le cache des journaux sur fichiers',
+    'View runtime logs' => 'Afficher les journaux d\'exécution',
     'Manage settings' => 'Gérer les paramètres',
 
     // Common
@@ -64,7 +64,7 @@ return [
 
     // Settings: File Logs
     'Force Enable File Log Viewers' => 'Forcer les visionneuses de journaux sur fichiers',
-    'An edge or ephemeral environment is detected. File viewers are hidden unless forced on; Runtime Logs remain available when enabled. Only force file viewers on if persistent log files are available.' => 'Un environnement edge ou éphémère est détecté. Les visionneuses de fichiers sont masquées sauf si leur activation est forcée ; les journaux d\'exécution restent disponibles lorsqu\'ils sont activés. Ne forcez les visionneuses que si des fichiers journaux persistants sont disponibles.',
+    'An edge or ephemeral environment is detected. File viewers are hidden unless forced on; {runtimeLogs} remain available when enabled. Only force file viewers on if persistent log files are available.' => 'Un environnement edge ou éphémère est détecté. Les visionneuses de fichiers sont masquées sauf si leur activation est forcée ; les {runtimeLogs} restent disponibles lorsqu\'ils sont activés. Ne forcez les visionneuses que si des fichiers journaux persistants sont disponibles.',
     'File viewers are available. Runtime Logs are optional and independent of file logging.' => 'Les visionneuses de fichiers sont disponibles. Les journaux d\'exécution sont facultatifs et indépendants de la journalisation sur fichiers.',
 
     // Settings: Runtime Logs
@@ -79,17 +79,18 @@ return [
     'Maximum Message Bytes' => 'Octets maximaux par message',
     'Maximum Context Bytes' => 'Octets maximaux du contexte',
     'Captured Levels' => 'Niveaux capturés',
-    'Include Categories' => 'Inclure les catégories',
-    'Exclude Categories' => 'Exclure les catégories',
+    'Include Sources and Categories' => 'Inclure les sources et les catégories',
+    'Exclude Sources and Categories' => 'Exclure les sources et les catégories',
+    'Category: {pattern}' => 'Catégorie : {pattern}',
     'Include Request User ID' => 'Inclure l\'ID utilisateur de la requête',
     'Advanced' => 'Avancé',
     'Configured Storage' => 'Stockage configuré',
-    'Storage follows the Craft cache configuration. Redis database selection is configuration-only. This is not a connection test; confirm capture in Runtime Logs.' => 'Le stockage suit la configuration du cache Craft. La base de données Redis se choisit uniquement dans la configuration. Ceci n\'est pas un test de connexion ; vérifiez la capture dans les journaux d\'exécution.',
-    'On multiple servers, use shared cache storage. Local file cache does not combine logs from other instances.' => 'Dans les environnements multi-serveurs, utilisez un cache partagé. Le cache de fichiers local ne regroupe pas les journaux des autres instances.',
-    'Capture changes apply to new requests. Restart long-running workers to load changed settings. Disabling capture does not clear stored logs.' => 'Les modifications de capture s\'appliquent aux nouvelles requêtes. Redémarrez les processus de traitement de longue durée pour charger les paramètres modifiés. Désactiver la capture ne supprime pas les journaux stockés.',
+    'Capture new messages in Runtime Logs. Changes apply to new requests; restart long-running workers to apply them. Turning this off does not delete existing logs.' => 'Capturez les nouveaux messages dans les journaux d\'exécution. Les modifications s\'appliquent aux nouvelles requêtes ; redémarrez les processus de traitement de longue durée pour les appliquer. La désactivation ne supprime pas les journaux existants.',
+    'Limits the message text kept for each new Runtime Logs entry, in bytes rather than characters. Longer messages are shortened. File logs are unaffected.' => 'Limite le texte conservé pour chaque nouvelle entrée des journaux d\'exécution, en octets plutôt qu\'en caractères. Les messages plus longs sont raccourcis. Les journaux sur fichiers ne sont pas affectés.',
+    'Limits the extra data kept for each new Runtime Logs entry, such as error details and stack traces, in bytes after JSON encoding. Larger context is shortened. File logs are unaffected.' => 'Limite les données supplémentaires conservées pour chaque nouvelle entrée des journaux d\'exécution, telles que les détails des erreurs et les traces de pile, en octets après encodage JSON. Un contexte plus volumineux est raccourci. Les journaux sur fichiers ne sont pas affectés.',
     'How often Runtime Logs refreshes automatically. Set to 0 to disable. Current: {duration}' => 'Fréquence d\'actualisation automatique des journaux d\'exécution. Définissez 0 pour la désactiver. Valeur actuelle : {duration}',
-    'Choose which log categories to capture, not words in the message. Enter one category per line, such as {exact}, or use {prefix} to match categories starting with {start}. Leave empty to capture all categories.' => 'Choisissez les catégories de journaux à capturer, et non des mots du message. Saisissez une catégorie par ligne, comme {exact}, ou utilisez {prefix} pour les catégories commençant par {start}. Laissez vide pour capturer toutes les catégories.',
-    'Skip these log categories even if included above. Enter one per line, such as {exact} or {prefix}. Leave empty to add no category exclusions.' => 'Ignorez ces catégories de journaux même si elles sont incluses ci-dessus. Saisissez-en une par ligne, comme {exact} ou {prefix}. Laissez vide pour ne pas ajouter d’exclusions de catégories.',
+    'Choose sources by name or type a category pattern such as {pattern} and press Enter. Leave empty to capture all sources. Changes affect new messages only.' => 'Choisissez les sources par nom ou saisissez un motif de catégorie comme {pattern}, puis appuyez sur Entrée. Laissez vide pour capturer toutes les sources. Les modifications concernent uniquement les nouveaux messages.',
+    'Choose sources to skip or type a category pattern and press Enter. Exclusions take precedence. Existing entries are not removed.' => 'Choisissez les sources à ignorer ou saisissez un motif de catégorie, puis appuyez sur Entrée. Les exclusions sont prioritaires. Les entrées existantes ne sont pas supprimées.',
     'When on, Runtime Logs skips command-line requests. Turn off only when diagnosing console commands; file and hosted logs are unaffected.' => 'Lorsque cette option est activée, les journaux d’exécution ignorent les requêtes en ligne de commande. Désactivez-la uniquement pour diagnostiquer des commandes de console ; les journaux sur fichiers et ceux de l’hébergeur restent inchangés.',
     'When on, Runtime Logs skips detected queue execution. To capture console queue workers, turn off both skip switches and restart the workers. Workers can generate large volumes of logs.' => 'Lorsque cette option est activée, les journaux d’exécution ignorent l’exécution de file d’attente détectée. Pour capturer les processus de file d’attente en console, désactivez les deux options d’exclusion et redémarrez les processus. Ceux-ci peuvent générer de grands volumes de journaux.',
     'Adds the authenticated request user ID. Messages and context may still contain personal data regardless of this setting.' => 'Ajoute l\'ID utilisateur authentifié de la requête. Les messages et le contexte peuvent contenir des données personnelles indépendamment de ce paramètre.',
@@ -107,10 +108,6 @@ return [
 
     // Settings: Interface
     'Interface Settings' => 'Paramètres d\'interface',
-
-    // Setup
-    'Choose the log views that suit this environment. Runtime capture is optional and remains off until enabled.' => 'Choisissez les vues de journaux adaptées à cet environnement. La capture d\'exécution est facultative et reste désactivée jusqu\'à son activation.',
-    'Consider Runtime Logs for recent diagnostics on ephemeral hosting. Confirm shared storage before relying on logs from multiple instances.' => 'Envisagez les journaux d\'exécution pour les diagnostics récents sur un hébergement éphémère. Vérifiez le stockage partagé avant de vous fier aux journaux de plusieurs instances.',
 
     // Log levels
     'All Levels' => 'Tous les niveaux',
@@ -176,7 +173,7 @@ return [
     'Current File' => 'Fichier actuel',
     'Log entries' => 'Entrées de journal',
     'Refresh Cache' => 'Actualiser le cache',
-    'Clear Runtime Logs' => 'Effacer les journaux d\'exécution',
+    'Clear runtime logs' => 'Effacer les journaux d\'exécution',
     'Clear recent runtime logs? This cannot be undone.' => 'Effacer les journaux d\'exécution récents ? Cette action est irréversible.',
     'Loading' => 'Chargement',
     'Download File' => 'Télécharger le fichier',

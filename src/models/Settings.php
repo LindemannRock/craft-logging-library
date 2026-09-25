@@ -16,6 +16,7 @@ use lindemannrock\base\traits\PluginNameSettingsTrait;
 use lindemannrock\base\traits\SettingsConfigTrait;
 use lindemannrock\base\traits\SettingsDisplayNameTrait;
 use lindemannrock\base\traits\SettingsPersistenceTrait;
+use lindemannrock\logginglibrary\helpers\RuntimeCategoryOptionsHelper;
 use lindemannrock\logginglibrary\LoggingLibrary;
 
 /**
@@ -107,13 +108,13 @@ class Settings extends Model
      * @var array Persisted Runtime Logs option; nested runtimeLogStore config takes precedence.
      * @since 5.19.0
      */
-    public array $runtimeCategories = [];
+    public array $runtimeIncludeCategories = [];
 
     /**
      * @var array Persisted Runtime Logs option; nested runtimeLogStore config takes precedence.
      * @since 5.19.0
      */
-    public array $runtimeExcept = [];
+    public array $runtimeExcludeCategories = [];
 
     /**
      * @var bool Persisted Runtime Logs option; nested runtimeLogStore config takes precedence.
@@ -136,8 +137,8 @@ class Settings extends Model
         'runtimeMaxMessageBytes' => 'maxMessageBytes',
         'runtimeMaxContextBytes' => 'maxContextBytes',
         'runtimeLevels' => 'levels',
-        'runtimeCategories' => 'categories',
-        'runtimeExcept' => 'except',
+        'runtimeIncludeCategories' => 'includeCategories',
+        'runtimeExcludeCategories' => 'excludeCategories',
         'runtimeIncludeUserId' => 'privacy.includeUserId',
     ];
 
@@ -176,6 +177,16 @@ class Settings extends Model
     public function getRuntimeConfig(): array
     {
         return LoggingLibrary::getRuntimeLogStoreConfig($this);
+    }
+
+    /**
+     * Readable source choices and preserved custom category patterns for the CP.
+     *
+     * @since 5.19.0
+     */
+    public function getRuntimeCategoryPicker(array $patterns): array
+    {
+        return RuntimeCategoryOptionsHelper::capturePicker($patterns);
     }
 
     /**
@@ -225,7 +236,7 @@ class Settings extends Model
      */
     protected static function jsonFields(): array
     {
-        return ['runtimeLevels', 'runtimeCategories', 'runtimeExcept'];
+        return ['runtimeLevels', 'runtimeIncludeCategories', 'runtimeExcludeCategories'];
     }
 
     /**
@@ -289,7 +300,7 @@ class Settings extends Model
             [['runtimeMaxMessageBytes', 'runtimeMaxContextBytes'], 'integer', 'min' => 1, 'max' => \lindemannrock\logginglibrary\services\RuntimeLogStoreService::MAX_BYTES_LIMIT],
             [['runtimeLevels'], 'required'],
             [['runtimeLevels'], 'each', 'rule' => ['in', 'range' => ['error', 'warning', 'info', 'trace'], 'skipOnEmpty' => false]],
-            [['runtimeCategories', 'runtimeExcept'], 'each', 'rule' => ['string', 'max' => 255, 'skipOnEmpty' => false]],
+            [['runtimeIncludeCategories', 'runtimeExcludeCategories'], 'each', 'rule' => ['string', 'max' => 255, 'skipOnEmpty' => false]],
             [['showCpSection'], 'boolean'],
             [['showCpSection'], 'default', 'value' => true],
             [['forceEnableLogViewer'], 'boolean'],
@@ -314,8 +325,8 @@ class Settings extends Model
             'runtimeMaxMessageBytes' => Craft::t('logging-library', 'Maximum Message Bytes'),
             'runtimeMaxContextBytes' => Craft::t('logging-library', 'Maximum Context Bytes'),
             'runtimeLevels' => Craft::t('logging-library', 'Captured Levels'),
-            'runtimeCategories' => Craft::t('logging-library', 'Include Categories'),
-            'runtimeExcept' => Craft::t('logging-library', 'Exclude Categories'),
+            'runtimeIncludeCategories' => Craft::t('logging-library', 'Include Sources and Categories'),
+            'runtimeExcludeCategories' => Craft::t('logging-library', 'Exclude Sources and Categories'),
             'runtimeIncludeUserId' => Craft::t('logging-library', 'Include Request User ID'),
         ], $this->pluginNameSettingsLabel(), $this->itemsPerPageSettingsLabel(), $this->dateFormatSettingsLabels());
     }

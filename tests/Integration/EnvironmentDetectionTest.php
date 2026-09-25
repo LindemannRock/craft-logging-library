@@ -125,8 +125,8 @@ final class EnvironmentDetectionTest extends TestCase
                         $user = new \craft\web\User(['enableSession' => false, 'identityClass' => \craft\elements\User::class]);
                         self::assertSame([], \lindemannrock\base\helpers\CpNavHelper::buildSubnav($user, $settings, $sections));
                         $user->setIdentity(new \craft\elements\User(['admin' => true]));
-                        self::assertSame(['settings', 'setup'], array_keys(\lindemannrock\base\helpers\CpNavHelper::buildSubnav($user, $settings, $sections)));
-                        self::assertSame([LoggingLibrary::PERMISSION_MANAGE_SETTINGS], $sections['setup']['permissionsAll']);
+                        self::assertSame(['settings'], array_keys(\lindemannrock\base\helpers\CpNavHelper::buildSubnav($user, $settings, $sections)));
+                        self::assertArrayNotHasKey('setup', $sections);
                         self::assertSame([LoggingLibrary::PERMISSION_MANAGE_SETTINGS], $sections['settings']['permissionsAll']);
                     }
                 });

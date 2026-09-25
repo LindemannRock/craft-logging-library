@@ -20,6 +20,98 @@ use yii\helpers\Inflector;
 class RuntimeCategoryOptionsHelper
 {
     /**
+     * Source choices compiled to existing Yii category patterns, never display names.
+     * Does not read the log store: choices also work before a source has logged.
+     *
+     * @return array{options: array, values: array}
+     * @since 5.19.0
+     */
+    public static function capturePicker(array $selectedPatterns): array
+    {
+        $metadata = self::pluginMetadata();
+        $patterns = [];
+        foreach ($metadata as $plugin) {
+            $patterns[] = $plugin['handle'];
+            $patterns[] = $plugin['handle'] . ':*';
+            if ($plugin['namespace'] !== '') {
+                $patterns[] = $plugin['namespace'] . '\\*';
+            }
+        }
+        // Representative patterns use the viewer's category-to-source mapping.
+        // Method-specific viewer sources stay exact; grouped sources use prefixes.
+        $patterns = array_merge($patterns, [
+            'yii\\db\\Command::query', 'yii\\db\\Command::execute', 'yii\\db\\Connection::open',
+            'yii\\redis\\Connection::executeCommand', 'yii\\redis\\Connection::open',
+            'craft\\web\\UrlManager::*', 'yii\\web\\UrlRule::*',
+            'craft\\web\\Application::*', 'yii\\web\\Application::*', 'yii\\base\\Application::*',
+            'yii\\base\\Controller::*', 'yii\\base\\InlineAction::*',
+            'craft\\queue\\*', 'yii\\web\\Session::*', 'craft\\web\\View::*', 'yii\\base\\Module::*',
+            'nystudio107\\pluginvite\\*', 'nystudio107\\codeeditor\\*', 'integration-service',
+        ]);
+        $groups = [];
+        foreach (array_unique($patterns) as $pattern) {
+            $group = self::groupForCategory(str_replace('*', 'capture', $pattern), $metadata);
+            $id = $group['value'];
+            $groups[$id]['label'] = $group['label'];
+            $groups[$id]['patterns'][] = $pattern;
+        }
+        uasort($groups, static fn(array $a, array $b): int => strcasecmp($a['label'], $b['label']));
+
+        $options = [];
+        $values = [];
+        $remaining = array_values(array_filter($selectedPatterns, 'is_string'));
+        foreach ($groups as $group) {
+            // Selectize builds CSS selectors from values when removing options.
+            // Keep transport values selector-safe; only raw patterns are persisted.
+            $value = 'p_' . bin2hex(implode("\n", $group['patterns']));
+            $options[] = ['value' => $value, 'label' => $group['label'], 'data' => ['hint' => implode(', ', $group['patterns'])]];
+            if (array_diff($group['patterns'], $remaining) === []) {
+                $values[] = $value;
+                $remaining = array_values(array_diff($remaining, $group['patterns']));
+            }
+        }
+        foreach ($remaining as $pattern) {
+            if (!is_string($pattern)) {
+                continue;
+            }
+            $value = 'p_' . bin2hex($pattern);
+            $options[] = ['value' => $value, 'label' => Craft::t('logging-library', 'Category: {pattern}', ['pattern' => $pattern])];
+            $values[] = $value;
+        }
+        return ['options' => $options, 'values' => $values];
+    }
+
+    /**
+     * Expand source choices and custom patterns from the CP multiselect.
+     * Invalid values remain invalid for the existing settings validators.
+     *
+     * @since 5.19.0
+     */
+    public static function capturePatterns(mixed $values): mixed
+    {
+        if ($values === '') {
+            return [];
+        }
+        if (!is_array($values)) {
+            return $values;
+        }
+        $patterns = [];
+        foreach ($values as $value) {
+            if (!is_string($value) || preg_match('/\Ap_((?:[0-9a-f]{2})+)\z/', $value, $match) !== 1) {
+                $patterns[] = null;
+                continue;
+            }
+            foreach (preg_split('/\\R/', hex2bin($match[1])) ?: [] as $pattern) {
+                $pattern = trim($pattern);
+                if ($pattern !== '' && !in_array($pattern, $patterns, true)) {
+                    $patterns[] = $pattern;
+                }
+            }
+        }
+        return $patterns;
+    }
+
+    /**
      * Build grouped runtime category options from raw category counts.
      *
      * @param array<string, int> $categoryCounts

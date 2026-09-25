@@ -14,7 +14,6 @@ return [
     'Open Settings' => 'فتح الإعدادات',
 
     // Navigation
-    'Setup' => 'الإعداد',
     'File Logs' => 'سجلات الملفات',
     'All Logs' => 'جميع السجلات',
     'Runtime Logs' => 'سجلات وقت التشغيل',
@@ -27,9 +26,10 @@ return [
     'Interface' => 'الواجهة',
 
     // Permissions
-    'View all system logs' => 'عرض جميع سجلات النظام',
-    'Download all system logs' => 'تنزيل جميع سجلات النظام',
-    'Clear cache' => 'مسح Cache',
+    'View all file logs' => 'عرض جميع سجلات الملفات',
+    'Download all file logs' => 'تنزيل جميع سجلات الملفات',
+    'Clear file log cache' => 'مسح Cache سجلات الملفات',
+    'View runtime logs' => 'عرض سجلات وقت التشغيل',
     'Manage settings' => 'إدارة الإعدادات',
 
     // Common
@@ -64,7 +64,7 @@ return [
 
     // Settings: File Logs
     'Force Enable File Log Viewers' => 'فرض تفعيل عارضات سجلات الملفات',
-    'An edge or ephemeral environment is detected. File viewers are hidden unless forced on; Runtime Logs remain available when enabled. Only force file viewers on if persistent log files are available.' => 'تم اكتشاف بيئة edge أو بيئة مؤقتة. تُخفى عارضات الملفات ما لم يُفرض تفعيلها؛ وتظل سجلات وقت التشغيل متاحة عند تفعيلها. لا تفرض تفعيل عارضات الملفات إلا عند توفر ملفات سجلات دائمة.',
+    'An edge or ephemeral environment is detected. File viewers are hidden unless forced on; {runtimeLogs} remain available when enabled. Only force file viewers on if persistent log files are available.' => 'تم اكتشاف بيئة edge أو بيئة مؤقتة. تُخفى عارضات الملفات ما لم يُفرض تفعيلها؛ وتظل {runtimeLogs} متاحة عند تفعيلها. لا تفرض تفعيل عارضات الملفات إلا عند توفر ملفات سجلات دائمة.',
     'File viewers are available. Runtime Logs are optional and independent of file logging.' => 'عارضات الملفات متاحة. سجلات وقت التشغيل اختيارية ومستقلة عن التسجيل في الملفات.',
 
     // Settings: Runtime Logs
@@ -79,17 +79,18 @@ return [
     'Maximum Message Bytes' => 'الحد الأقصى لبايتات الرسالة',
     'Maximum Context Bytes' => 'الحد الأقصى لبايتات السياق',
     'Captured Levels' => 'المستويات المسجلة',
-    'Include Categories' => 'تضمين الفئات',
-    'Exclude Categories' => 'استبعاد الفئات',
+    'Include Sources and Categories' => 'تضمين المصادر والفئات',
+    'Exclude Sources and Categories' => 'استبعاد المصادر والفئات',
+    'Category: {pattern}' => 'الفئة: {pattern}',
     'Include Request User ID' => 'تضمين ID مستخدم الطلب',
     'Advanced' => 'متقدم',
     'Configured Storage' => 'التخزين المهيأ',
-    'Storage follows the Craft cache configuration. Redis database selection is configuration-only. This is not a connection test; confirm capture in Runtime Logs.' => 'يتبع التخزين إعدادات Cache في Craft. يتم اختيار قاعدة بيانات Redis من ملف الإعدادات فقط. هذا ليس اختبار اتصال؛ تحقق من التسجيل في سجلات وقت التشغيل.',
-    'On multiple servers, use shared cache storage. Local file cache does not combine logs from other instances.' => 'استخدم تخزين Cache مشتركاً عند وجود عدة خوادم. لا تجمع Cache الملفات المحلية سجلات النسخ الأخرى.',
-    'Capture changes apply to new requests. Restart long-running workers to load changed settings. Disabling capture does not clear stored logs.' => 'تسري تغييرات التسجيل على الطلبات الجديدة. أعد تشغيل عمليات المعالجة طويلة التشغيل لتحميل الإعدادات المعدلة. لا يؤدي تعطيل التسجيل إلى مسح السجلات المخزنة.',
+    'Capture new messages in Runtime Logs. Changes apply to new requests; restart long-running workers to apply them. Turning this off does not delete existing logs.' => 'تسجيل الرسائل الجديدة في سجلات وقت التشغيل. تسري التغييرات على الطلبات الجديدة؛ أعد تشغيل عمليات المعالجة طويلة التشغيل لتطبيقها. لا يؤدي تعطيل هذا الخيار إلى حذف السجلات الموجودة.',
+    'Limits the message text kept for each new Runtime Logs entry, in bytes rather than characters. Longer messages are shortened. File logs are unaffected.' => 'يحدّد مقدار نص الرسالة المحفوظ لكل إدخال جديد في سجلات وقت التشغيل بالبايت بدلاً من الأحرف. يتم اختصار الرسائل الأطول. لا تتأثر سجلات الملفات.',
+    'Limits the extra data kept for each new Runtime Logs entry, such as error details and stack traces, in bytes after JSON encoding. Larger context is shortened. File logs are unaffected.' => 'يحدّد مقدار البيانات الإضافية المحفوظة لكل إدخال جديد في سجلات وقت التشغيل، مثل تفاصيل الأخطاء وتتبع المكدس، بالبايت بعد ترميز JSON. يتم اختصار السياق الأكبر حجماً. لا تتأثر سجلات الملفات.',
     'How often Runtime Logs refreshes automatically. Set to 0 to disable. Current: {duration}' => 'معدل التحديث التلقائي لسجلات وقت التشغيل. اضبط القيمة على 0 لتعطيله. الحالي: {duration}',
-    'Choose which log categories to capture, not words in the message. Enter one category per line, such as {exact}, or use {prefix} to match categories starting with {start}. Leave empty to capture all categories.' => 'اختر فئات السجلات المراد تسجيلها، وليس كلمات في الرسالة. أدخل فئة واحدة لكل سطر، مثل {exact}، أو استخدم {prefix} لمطابقة الفئات التي تبدأ بـ {start}. اتركه فارغاً لتسجيل كل الفئات.',
-    'Skip these log categories even if included above. Enter one per line, such as {exact} or {prefix}. Leave empty to add no category exclusions.' => 'تخطَّ فئات السجلات هذه حتى إذا كانت مضمنة أعلاه. أدخل فئة واحدة لكل سطر، مثل {exact} أو {prefix}. اتركه فارغاً لعدم إضافة استبعادات للفئات.',
+    'Choose sources by name or type a category pattern such as {pattern} and press Enter. Leave empty to capture all sources. Changes affect new messages only.' => 'اختر المصادر بالاسم أو أدخل نمط فئة مثل {pattern} واضغط على مفتاح الإدخال. اترك الحقل فارغاً لتسجيل جميع المصادر. تنطبق التغييرات على الرسائل الجديدة فقط.',
+    'Choose sources to skip or type a category pattern and press Enter. Exclusions take precedence. Existing entries are not removed.' => 'اختر المصادر المراد تخطيها أو أدخل نمط فئة واضغط على مفتاح الإدخال. تكون الأولوية للاستبعادات. لا تُحذف الإدخالات الموجودة.',
     'When on, Runtime Logs skips command-line requests. Turn off only when diagnosing console commands; file and hosted logs are unaffected.' => 'عند التفعيل، تتخطى سجلات وقت التشغيل طلبات سطر الأوامر. عطّل هذا الخيار فقط لتشخيص أوامر وحدة التحكم؛ لا تتأثر سجلات الملفات وسجلات الاستضافة.',
     'When on, Runtime Logs skips detected queue execution. To capture console queue workers, turn off both skip switches and restart the workers. Workers can generate large volumes of logs.' => 'عند التفعيل، تتخطى سجلات وقت التشغيل تنفيذ قائمة الانتظار المكتشف. لتسجيل عمليات معالجة قائمة الانتظار في وحدة التحكم، عطّل خياري التخطي وأعد تشغيل عمليات المعالجة. قد تولد عمليات المعالجة كميات كبيرة من السجلات.',
     'Adds the authenticated request user ID. Messages and context may still contain personal data regardless of this setting.' => 'يضيف ID المستخدم المصادق عليه للطلب. قد تحتوي الرسائل والسياق على بيانات شخصية بغض النظر عن هذا الإعداد.',
@@ -107,10 +108,6 @@ return [
 
     // Settings: Interface
     'Interface Settings' => 'إعدادات الواجهة',
-
-    // Setup
-    'Choose the log views that suit this environment. Runtime capture is optional and remains off until enabled.' => 'اختر عروض السجلات المناسبة لهذه البيئة. تسجيل وقت التشغيل اختياري ويظل معطّلاً حتى يتم تفعيله.',
-    'Consider Runtime Logs for recent diagnostics on ephemeral hosting. Confirm shared storage before relying on logs from multiple instances.' => 'يمكن استخدام سجلات وقت التشغيل للتشخيصات الحديثة على الاستضافة المؤقتة. تحقق من التخزين المشترك قبل الاعتماد على سجلات عدة نسخ.',
 
     // Log levels
     'All Levels' => 'جميع المستويات',
@@ -176,7 +173,7 @@ return [
     'Current File' => 'الملف الحالي',
     'Log entries' => 'إدخالات السجل',
     'Refresh Cache' => 'تحديث Cache',
-    'Clear Runtime Logs' => 'مسح سجلات وقت التشغيل',
+    'Clear runtime logs' => 'مسح سجلات وقت التشغيل',
     'Clear recent runtime logs? This cannot be undone.' => 'مسح سجلات وقت التشغيل الأخيرة؟ لا يمكن التراجع عن هذا الإجراء.',
     'Loading' => 'جار التحميل',
     'Download File' => 'تنزيل الملف',

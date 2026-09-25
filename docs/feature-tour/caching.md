@@ -19,7 +19,7 @@ The cache key is derived from `md5(parser version + filepath + filesize + mtime)
 
 - **Automatic invalidation on file changes** — when the log file grows (new entries written), the filesize changes and the old cache key no longer matches, triggering a re-parse
 - **Automatic invalidation on plugin updates** — when an update improves the log parser, its internal version string changes, so every file is re-parsed with the current parser on next view — no manual cache clearing needed
-- **Manual invalidation** — clear all caches via **Utilities → Clear Caches → Logging Library caches** in the Control Panel
+- **Manual invalidation** — refresh the selected file from the standalone viewer, or clear all parsed-file caches via **Utilities → Clear Caches → Logging Library caches**. Both require **View all file logs** and **Clear file log cache**; Craft also controls access to its utility. Neither action clears Runtime Logs or deletes log files. Integrating plugins retain their own viewer permissions — see [Permissions](../developers/permissions.md).
 
 ## Cache statistics
 

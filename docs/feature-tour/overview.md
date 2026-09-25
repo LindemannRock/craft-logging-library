@@ -8,15 +8,15 @@ Give every Craft CMS plugin a consistent place to write, inspect, and troublesho
 - **Built-in Log Viewer** — web interface for viewing, filtering, searching, and downloading logs from within each plugin's CP section
 - **Standalone System Log Viewer** — browse all logs (plugin, Craft, PHP) from a single interface at **Logging Library → All Logs**
 - **Runtime Logs** — bounded Redis-list view of recent log activity, with a generic backend only for non-Redis Craft caches, at **Logging Library → Runtime Logs**
+- **Source-Aware Capture Filters** — choose named sources or custom category patterns in [Runtime Logs settings](settings.md#runtime-logs); exclusions take precedence
 - **Control Panel Section** — access the standalone viewer directly from the main Control Panel navigation when the CP section is enabled
 - **Control Panel Settings** — a [Settings area](settings.md) for runtime capture, file-viewer availability, the display name, menu visibility, page size, and timestamps, all overridable from `config/logging-library.php`
-- **Setup Summary** — review capture, file availability, and configured storage using the shared setup screen; capture remains optional
 - **LoggingTrait** — drop-in trait that adds `logInfo()`, `logWarning()`, `logError()`, and `logDebug()` to any class
 - **LoggingService** — static API for direct logging, log statistics, recent entries, and cleanup
 - **High Performance Caching** — indexed file-based cache for large log viewer pages, with ArrayQuery compatibility for API callers
 - **Multi-Format Parsing** — automatically detects and parses plugin logs, Craft logs, and PHP error logs
 - **Edge Detection** — hides file-based viewers when Craft reports ephemeral storage or `SERVD_PROJECT_SLUG` resolves to a non-empty Servd project slug
-- **Permission-Gated Access** — granular permissions for viewing and downloading logs
+- **Permission-Gated Access** — separate file-log and runtime-log viewing, explicit download and clearing permissions, and independent settings access
 
 Craft's ephemeral-host signal and the normalized Servd signal compose with OR behavior. Missing, blank, whitespace-only, null, or normalized false `SERVD_PROJECT_SLUG` values do not detect Servd; a genuine project slug does. On Craft-ephemeral hosts such as Craft Cloud, and on detected Servd projects, detection suppresses file-based viewer presentation only. Craft/Yii logging and dedicated Monolog targets continue unchanged, and the CP viewer does not import the host's centralized log feed. Use `forceEnableLogViewer` when persistent local log storage makes file viewing safe. For file-independent CP visibility, opt into [Runtime Logs](runtime-logs.md) in Settings or configuration — it remains disabled by default.
 

@@ -14,7 +14,6 @@ return [
     'Open Settings' => 'Abrir la configuración',
 
     // Navigation
-    'Setup' => 'Configuración',
     'File Logs' => 'Registros en archivos',
     'All Logs' => 'Todos los registros',
     'Runtime Logs' => 'Registros de tiempo de ejecución',
@@ -27,9 +26,10 @@ return [
     'Interface' => 'Interfaz',
 
     // Permissions
-    'View all system logs' => 'Ver todos los registros del sistema',
-    'Download all system logs' => 'Descargar todos los registros del sistema',
-    'Clear cache' => 'Vaciar caché',
+    'View all file logs' => 'Ver todos los registros en archivos',
+    'Download all file logs' => 'Descargar todos los registros en archivos',
+    'Clear file log cache' => 'Vaciar caché de registros en archivos',
+    'View runtime logs' => 'Ver registros de tiempo de ejecución',
     'Manage settings' => 'Gestionar configuración',
 
     // Common
@@ -64,7 +64,7 @@ return [
 
     // Settings: File Logs
     'Force Enable File Log Viewers' => 'Forzar visores de registros en archivos',
-    'An edge or ephemeral environment is detected. File viewers are hidden unless forced on; Runtime Logs remain available when enabled. Only force file viewers on if persistent log files are available.' => 'Se detecta un entorno edge o efímero. Los visores de archivos se ocultan salvo que se fuerce su activación; los registros de tiempo de ejecución siguen disponibles cuando están activados. Fuerce los visores solo si dispone de archivos de registro persistentes.',
+    'An edge or ephemeral environment is detected. File viewers are hidden unless forced on; {runtimeLogs} remain available when enabled. Only force file viewers on if persistent log files are available.' => 'Se detecta un entorno edge o efímero. Los visores de archivos se ocultan salvo que se fuerce su activación; los {runtimeLogs} siguen disponibles cuando están activados. Fuerce los visores solo si dispone de archivos de registro persistentes.',
     'File viewers are available. Runtime Logs are optional and independent of file logging.' => 'Los visores de archivos están disponibles. Los registros de tiempo de ejecución son opcionales e independientes del registro en archivos.',
 
     // Settings: Runtime Logs
@@ -79,17 +79,18 @@ return [
     'Maximum Message Bytes' => 'Máximo de bytes del mensaje',
     'Maximum Context Bytes' => 'Máximo de bytes del contexto',
     'Captured Levels' => 'Niveles capturados',
-    'Include Categories' => 'Incluir categorías',
-    'Exclude Categories' => 'Excluir categorías',
+    'Include Sources and Categories' => 'Incluir orígenes y categorías',
+    'Exclude Sources and Categories' => 'Excluir orígenes y categorías',
+    'Category: {pattern}' => 'Categoría: {pattern}',
     'Include Request User ID' => 'Incluir ID de usuario de la solicitud',
     'Advanced' => 'Avanzado',
     'Configured Storage' => 'Almacenamiento configurado',
-    'Storage follows the Craft cache configuration. Redis database selection is configuration-only. This is not a connection test; confirm capture in Runtime Logs.' => 'El almacenamiento sigue la configuración de caché de Craft. La base de datos Redis se selecciona solo mediante configuración. Esto no es una prueba de conexión; confirme la captura en los registros de tiempo de ejecución.',
-    'On multiple servers, use shared cache storage. Local file cache does not combine logs from other instances.' => 'En varios servidores, utilice almacenamiento de caché compartido. La caché de archivos local no combina registros de otras instancias.',
-    'Capture changes apply to new requests. Restart long-running workers to load changed settings. Disabling capture does not clear stored logs.' => 'Los cambios de captura se aplican a nuevas solicitudes. Reinicie los procesos de larga duración para cargar la configuración modificada. Desactivar la captura no borra los registros almacenados.',
+    'Capture new messages in Runtime Logs. Changes apply to new requests; restart long-running workers to apply them. Turning this off does not delete existing logs.' => 'Capture nuevos mensajes en los registros de tiempo de ejecución. Los cambios se aplican a nuevas solicitudes; reinicie los procesos de larga duración para aplicarlos. Desactivar esta opción no elimina los registros existentes.',
+    'Limits the message text kept for each new Runtime Logs entry, in bytes rather than characters. Longer messages are shortened. File logs are unaffected.' => 'Limita el texto del mensaje conservado para cada nueva entrada de los registros de tiempo de ejecución, en bytes en lugar de caracteres. Los mensajes más largos se acortan. Los registros en archivos no se ven afectados.',
+    'Limits the extra data kept for each new Runtime Logs entry, such as error details and stack traces, in bytes after JSON encoding. Larger context is shortened. File logs are unaffected.' => 'Limita los datos adicionales conservados para cada nueva entrada de los registros de tiempo de ejecución, como detalles de errores y trazas de pila, en bytes después de la codificación JSON. El contexto de mayor tamaño se acorta. Los registros en archivos no se ven afectados.',
     'How often Runtime Logs refreshes automatically. Set to 0 to disable. Current: {duration}' => 'Frecuencia de actualización automática de los registros de tiempo de ejecución. Establezca 0 para desactivarla. Actual: {duration}',
-    'Choose which log categories to capture, not words in the message. Enter one category per line, such as {exact}, or use {prefix} to match categories starting with {start}. Leave empty to capture all categories.' => 'Elija qué categorías de registros capturar, no palabras del mensaje. Introduzca una categoría por línea, como {exact}, o utilice {prefix} para las categorías que comiencen por {start}. Deje vacío para capturar todas las categorías.',
-    'Skip these log categories even if included above. Enter one per line, such as {exact} or {prefix}. Leave empty to add no category exclusions.' => 'Omita estas categorías de registros aunque estén incluidas arriba. Introduzca una por línea, como {exact} o {prefix}. Deje vacío para no añadir exclusiones de categorías.',
+    'Choose sources by name or type a category pattern such as {pattern} and press Enter. Leave empty to capture all sources. Changes affect new messages only.' => 'Elija los orígenes por nombre o introduzca un patrón de categoría como {pattern} y pulse Intro. Deje vacío para capturar todos los orígenes. Los cambios solo afectan a los mensajes nuevos.',
+    'Choose sources to skip or type a category pattern and press Enter. Exclusions take precedence. Existing entries are not removed.' => 'Elija los orígenes que desea omitir o introduzca un patrón de categoría y pulse Intro. Las exclusiones tienen prioridad. Las entradas existentes no se eliminan.',
     'When on, Runtime Logs skips command-line requests. Turn off only when diagnosing console commands; file and hosted logs are unaffected.' => 'Cuando esta opción está activada, los registros de ejecución omiten las solicitudes de línea de comandos. Desactívela solo para diagnosticar comandos de consola; los registros en archivos y del alojamiento no se ven afectados.',
     'When on, Runtime Logs skips detected queue execution. To capture console queue workers, turn off both skip switches and restart the workers. Workers can generate large volumes of logs.' => 'Cuando esta opción está activada, los registros de ejecución omiten la ejecución de cola detectada. Para capturar los procesos de cola de la consola, desactive ambas opciones de omisión y reinicie los procesos. Los procesos pueden generar grandes volúmenes de registros.',
     'Adds the authenticated request user ID. Messages and context may still contain personal data regardless of this setting.' => 'Añade el ID del usuario autenticado de la solicitud. Los mensajes y el contexto pueden contener datos personales independientemente de esta configuración.',
@@ -107,10 +108,6 @@ return [
 
     // Settings: Interface
     'Interface Settings' => 'Configuración de interfaz',
-
-    // Setup
-    'Choose the log views that suit this environment. Runtime capture is optional and remains off until enabled.' => 'Elija las vistas de registros adecuadas para este entorno. La captura de tiempo de ejecución es opcional y permanece desactivada hasta que se active.',
-    'Consider Runtime Logs for recent diagnostics on ephemeral hosting. Confirm shared storage before relying on logs from multiple instances.' => 'Considere los registros de tiempo de ejecución para diagnósticos recientes en alojamiento efímero. Confirme el almacenamiento compartido antes de confiar en registros de varias instancias.',
 
     // Log levels
     'All Levels' => 'Todos los niveles',
@@ -176,7 +173,7 @@ return [
     'Current File' => 'Archivo actual',
     'Log entries' => 'Entradas de registro',
     'Refresh Cache' => 'Actualizar caché',
-    'Clear Runtime Logs' => 'Borrar registros de tiempo de ejecución',
+    'Clear runtime logs' => 'Borrar registros de tiempo de ejecución',
     'Clear recent runtime logs? This cannot be undone.' => '¿Borrar los registros recientes de tiempo de ejecución? Esta acción no se puede deshacer.',
     'Loading' => 'Cargando',
     'Download File' => 'Descargar archivo',

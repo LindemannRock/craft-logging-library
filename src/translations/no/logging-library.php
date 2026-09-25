@@ -14,7 +14,6 @@ return [
     'Open Settings' => 'Åpne innstillinger',
 
     // Navigation
-    'Setup' => 'Oppsett',
     'File Logs' => 'Fillogger',
     'All Logs' => 'Alle logger',
     'Runtime Logs' => 'Runtime-logger',
@@ -27,9 +26,10 @@ return [
     'Interface' => 'Grensesnitt',
 
     // Permissions
-    'View all system logs' => 'Vis alle systemlogger',
-    'Download all system logs' => 'Last ned alle systemlogger',
-    'Clear cache' => 'Fjern cache',
+    'View all file logs' => 'Vis alle fillogger',
+    'Download all file logs' => 'Last ned alle fillogger',
+    'Clear file log cache' => 'Fjern filloggenes cache',
+    'View runtime logs' => 'Vis runtime-logger',
     'Manage settings' => 'Administrer innstillinger',
 
     // Common
@@ -64,7 +64,7 @@ return [
 
     // Settings: File Logs
     'Force Enable File Log Viewers' => 'Tving aktivering av filloggvisere',
-    'An edge or ephemeral environment is detected. File viewers are hidden unless forced on; Runtime Logs remain available when enabled. Only force file viewers on if persistent log files are available.' => 'Et edge- eller midlertidig miljø er oppdaget. Filvisere er skjult med mindre de tvinges på; runtime-logger er fortsatt tilgjengelige når de er aktivert. Tving bare filvisere på hvis vedvarende loggfiler er tilgjengelige.',
+    'An edge or ephemeral environment is detected. File viewers are hidden unless forced on; {runtimeLogs} remain available when enabled. Only force file viewers on if persistent log files are available.' => 'Et edge- eller midlertidig miljø er oppdaget. Filvisere er skjult med mindre de tvinges på; {runtimeLogs} er fortsatt tilgjengelige når de er aktivert. Tving bare filvisere på hvis vedvarende loggfiler er tilgjengelige.',
     'File viewers are available. Runtime Logs are optional and independent of file logging.' => 'Filvisere er tilgjengelige. Runtime-logger er valgfrie og uavhengige av fillogging.',
 
     // Settings: Runtime Logs
@@ -79,17 +79,18 @@ return [
     'Maximum Message Bytes' => 'Maksimalt antall byte per melding',
     'Maximum Context Bytes' => 'Maksimalt antall byte for kontekst',
     'Captured Levels' => 'Innsamlede nivåer',
-    'Include Categories' => 'Inkluder kategorier',
-    'Exclude Categories' => 'Ekskluder kategorier',
+    'Include Sources and Categories' => 'Inkluder kilder og kategorier',
+    'Exclude Sources and Categories' => 'Ekskluder kilder og kategorier',
+    'Category: {pattern}' => 'Kategori: {pattern}',
     'Include Request User ID' => 'Inkluder forespørselens bruker-ID',
     'Advanced' => 'Avansert',
     'Configured Storage' => 'Konfigurert lagring',
-    'Storage follows the Craft cache configuration. Redis database selection is configuration-only. This is not a connection test; confirm capture in Runtime Logs.' => 'Lagringen følger Crafts cachekonfigurasjon. Redis-databasen velges bare via konfigurasjon. Dette er ikke en tilkoblingstest; bekreft innsamling i runtime-logger.',
-    'On multiple servers, use shared cache storage. Local file cache does not combine logs from other instances.' => 'Bruk delt cachelagring på flere servere. Lokal filcache kombinerer ikke logger fra andre instanser.',
-    'Capture changes apply to new requests. Restart long-running workers to load changed settings. Disabling capture does not clear stored logs.' => 'Innsamlingsendringer gjelder nye forespørsler. Start langvarige arbeidsprosesser på nytt for å laste endrede innstillinger. Deaktivering av innsamling fjerner ikke lagrede logger.',
+    'Capture new messages in Runtime Logs. Changes apply to new requests; restart long-running workers to apply them. Turning this off does not delete existing logs.' => 'Samle inn nye meldinger i runtime-logger. Endringer gjelder nye forespørsler; start langvarige arbeidsprosesser på nytt for å ta dem i bruk. Deaktivering sletter ikke eksisterende logger.',
+    'Limits the message text kept for each new Runtime Logs entry, in bytes rather than characters. Longer messages are shortened. File logs are unaffected.' => 'Begrenser meldingsteksten som lagres for hver ny oppføring i runtime-logger, i byte i stedet for tegn. Lengre meldinger forkortes. Fillogger påvirkes ikke.',
+    'Limits the extra data kept for each new Runtime Logs entry, such as error details and stack traces, in bytes after JSON encoding. Larger context is shortened. File logs are unaffected.' => 'Begrenser ekstra data som lagres for hver ny oppføring i runtime-logger, som feildetaljer og stakksporinger, i byte etter JSON-koding. Større kontekst forkortes. Fillogger påvirkes ikke.',
     'How often Runtime Logs refreshes automatically. Set to 0 to disable. Current: {duration}' => 'Hvor ofte runtime-logger oppdateres automatisk. Angi 0 for å deaktivere. Gjeldende: {duration}',
-    'Choose which log categories to capture, not words in the message. Enter one category per line, such as {exact}, or use {prefix} to match categories starting with {start}. Leave empty to capture all categories.' => 'Velg hvilke loggkategorier som skal samles inn, ikke ord i meldingen. Angi én kategori per linje, for eksempel {exact}, eller bruk {prefix} for kategorier som begynner med {start}. La feltet stå tomt for å samle inn alle kategorier.',
-    'Skip these log categories even if included above. Enter one per line, such as {exact} or {prefix}. Leave empty to add no category exclusions.' => 'Hopp over disse loggkategoriene selv om de er inkludert ovenfor. Angi én per linje, for eksempel {exact} eller {prefix}. La feltet stå tomt for ikke å legge til kategoriekskluderinger.',
+    'Choose sources by name or type a category pattern such as {pattern} and press Enter. Leave empty to capture all sources. Changes affect new messages only.' => 'Velg kilder etter navn eller angi et kategorimønster som {pattern}, og trykk på Enter. La feltet stå tomt for å samle inn alle kilder. Endringer gjelder bare nye meldinger.',
+    'Choose sources to skip or type a category pattern and press Enter. Exclusions take precedence. Existing entries are not removed.' => 'Velg kilder som skal hoppes over, eller angi et kategorimønster og trykk på Enter. Ekskluderinger har forrang. Eksisterende oppføringer fjernes ikke.',
     'When on, Runtime Logs skips command-line requests. Turn off only when diagnosing console commands; file and hosted logs are unaffected.' => 'Når dette er aktivert, hopper runtime-logger over kommandolinjeforespørsler. Deaktiver bare ved diagnostikk av konsollkommandoer; fillogger og vertsleverandørens logger påvirkes ikke.',
     'When on, Runtime Logs skips detected queue execution. To capture console queue workers, turn off both skip switches and restart the workers. Workers can generate large volumes of logs.' => 'Når dette er aktivert, hopper runtime-logger over oppdaget køkjøring. For å samle inn logger fra konsollens køprosesser må du deaktivere begge hopp over-innstillingene og starte prosessene på nytt. Arbeidsprosesser kan generere store loggmengder.',
     'Adds the authenticated request user ID. Messages and context may still contain personal data regardless of this setting.' => 'Legger til ID for forespørselens autentiserte bruker. Meldinger og kontekst kan inneholde personopplysninger uavhengig av denne innstillingen.',
@@ -107,10 +108,6 @@ return [
 
     // Settings: Interface
     'Interface Settings' => 'Grensesnittinnstillinger',
-
-    // Setup
-    'Choose the log views that suit this environment. Runtime capture is optional and remains off until enabled.' => 'Velg loggvisningene som passer til dette miljøet. Runtime-innsamling er valgfri og forblir avslått til den aktiveres.',
-    'Consider Runtime Logs for recent diagnostics on ephemeral hosting. Confirm shared storage before relying on logs from multiple instances.' => 'Vurder runtime-logger for nyere diagnostikk på midlertidig hosting. Bekreft delt lagring før du stoler på logger fra flere instanser.',
 
     // Log levels
     'All Levels' => 'Alle nivåer',
@@ -176,7 +173,7 @@ return [
     'Current File' => 'Gjeldende fil',
     'Log entries' => 'Loggoppføringer',
     'Refresh Cache' => 'Oppdater cache',
-    'Clear Runtime Logs' => 'Tøm runtime-logger',
+    'Clear runtime logs' => 'Tøm runtime-logger',
     'Clear recent runtime logs? This cannot be undone.' => 'Tøm nylige runtime-logger? Dette kan ikke angres.',
     'Loading' => 'Laster',
     'Download File' => 'Last ned fil',

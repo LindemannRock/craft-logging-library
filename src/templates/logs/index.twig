@@ -292,7 +292,7 @@
     {% endif %}
 
     {# User #}
-    <td class="nowrap">
+    <td class="truncate" title="{{ (item.userLabel ?? '')|e }}">
         {{ ((item.userLabel ?? '') ?: 'System'|t('logging-library'))|e }}
     </td>
 
@@ -446,7 +446,7 @@
                         {{ actionInput('logging-library/logs/clear-runtime') }}
                         {{ redirectInput(craft.app.request.url) }}
                         <button type="submit" class="btn fullwidth">
-                            {{ "Clear Runtime Logs"|t('logging-library') }}
+                            {{ "Clear runtime logs"|t('logging-library') }}
                         </button>
                     </form>
                 </div>
@@ -474,61 +474,63 @@
                 <div class="value">{{ (logStoredTotal ?? 0)|number_format }}</div>
             </div>
 
-            <div class="log-config-item" style="grid-template-columns: 1fr; padding: 8px 0;">
-                <form method="post" accept-charset="UTF-8" id="refresh-log-cache-form">
-                    {{ csrfInput() }}
-                    {{ actionInput('logging-library/logs/refresh-cache') }}
-                    {{ redirectInput(craft.app.request.url) }}
-                    {{ hiddenInput('pluginHandle', pluginHandle) }}
-                    {% if isStandalone %}
-                        {{ hiddenInput('file', selectedStandaloneFile) }}
-                    {% else %}
-                        {{ hiddenInput('date', selectedPluginDate) }}
-                    {% endif %}
-                    <button type="submit" class="btn fullwidth" id="refresh-log-cache">
-                        <div class="inline-flex">
-                            <div class="label">{{ "Refresh Cache"|t('logging-library') }}</div>
-                        </div>
-                        <div class="spinner spinner-absolute">
-                            <span class="visually-hidden">{{ "Loading"|t('logging-library') }}</span>
-                        </div>
-                    </button>
-                </form>
-                <script>
-                document.addEventListener('DOMContentLoaded', function() {
-                    const refreshForm = document.getElementById('refresh-log-cache-form');
-                    const refreshButton = document.getElementById('refresh-log-cache');
-                    if (!refreshForm || !refreshButton || !window.jQuery) {
-                        return;
-                    }
-                    jQuery(refreshForm).on('submit', function(e) {
-                        e.preventDefault();
-                        const $button = jQuery(refreshButton);
-                        $button.addClass('loading').prop('disabled', true);
-                        jQuery.ajax({
-                            url: '{{ actionUrl('logging-library/logs/refresh-cache')|raw }}',
-                            type: 'POST',
-                            dataType: 'json',
-                            data: jQuery(refreshForm).serialize(),
-                            success: function(response) {
-                                if (response && response.success) {
-                                    Craft.cp.displayNotice(response.message || '{{ "Log cache refreshed."|t('logging-library')|e('js') }}');
-                                    setTimeout(function() { window.location.reload(); }, 300);
-                                } else {
+            {% if canRefreshCache ?? false %}
+                <div class="log-config-item" style="grid-template-columns: 1fr; padding: 8px 0;">
+                    <form method="post" accept-charset="UTF-8" id="refresh-log-cache-form">
+                        {{ csrfInput() }}
+                        {{ actionInput('logging-library/logs/refresh-cache') }}
+                        {{ redirectInput(craft.app.request.url) }}
+                        {{ hiddenInput('pluginHandle', pluginHandle) }}
+                        {% if isStandalone %}
+                            {{ hiddenInput('file', selectedStandaloneFile) }}
+                        {% else %}
+                            {{ hiddenInput('date', selectedPluginDate) }}
+                        {% endif %}
+                        <button type="submit" class="btn fullwidth" id="refresh-log-cache">
+                            <div class="inline-flex">
+                                <div class="label">{{ "Refresh Cache"|t('logging-library') }}</div>
+                            </div>
+                            <div class="spinner spinner-absolute">
+                                <span class="visually-hidden">{{ "Loading"|t('logging-library') }}</span>
+                            </div>
+                        </button>
+                    </form>
+                    <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const refreshForm = document.getElementById('refresh-log-cache-form');
+                        const refreshButton = document.getElementById('refresh-log-cache');
+                        if (!refreshForm || !refreshButton || !window.jQuery) {
+                            return;
+                        }
+                        jQuery(refreshForm).on('submit', function(e) {
+                            e.preventDefault();
+                            const $button = jQuery(refreshButton);
+                            $button.addClass('loading').prop('disabled', true);
+                            jQuery.ajax({
+                                url: '{{ actionUrl('logging-library/logs/refresh-cache')|raw }}',
+                                type: 'POST',
+                                dataType: 'json',
+                                data: jQuery(refreshForm).serialize(),
+                                success: function(response) {
+                                    if (response && response.success) {
+                                        Craft.cp.displayNotice(response.message || '{{ "Log cache refreshed."|t('logging-library')|e('js') }}');
+                                        setTimeout(function() { window.location.reload(); }, 300);
+                                    } else {
+                                        Craft.cp.displayError('{{ "Failed to refresh log cache."|t('logging-library')|e('js') }}');
+                                    }
+                                },
+                                error: function() {
                                     Craft.cp.displayError('{{ "Failed to refresh log cache."|t('logging-library')|e('js') }}');
+                                },
+                                complete: function() {
+                                    $button.removeClass('loading').prop('disabled', false);
                                 }
-                            },
-                            error: function() {
-                                Craft.cp.displayError('{{ "Failed to refresh log cache."|t('logging-library')|e('js') }}');
-                            },
-                            complete: function() {
-                                $button.removeClass('loading').prop('disabled', false);
-                            }
+                            });
                         });
                     });
-                });
-                </script>
-            </div>
+                    </script>
+                </div>
+            {% endif %}
 
             {% if canDownload %}
                 <div class="log-config-item" style="grid-template-columns: 1fr; padding: 8px 0;">

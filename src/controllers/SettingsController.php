@@ -10,9 +10,8 @@ namespace lindemannrock\logginglibrary\controllers;
 
 use Craft;
 use craft\web\Controller;
-use lindemannrock\base\helpers\PluginHelper;
-use lindemannrock\base\helpers\PluginThemeStyleHelper;
 use lindemannrock\base\helpers\SettingsPostHelper;
+use lindemannrock\logginglibrary\helpers\RuntimeCategoryOptionsHelper;
 use lindemannrock\logginglibrary\LoggingLibrary;
 use lindemannrock\logginglibrary\models\Settings;
 use yii\web\Response;
@@ -24,25 +23,6 @@ use yii\web\Response;
  */
 class SettingsController extends Controller
 {
-    /**
-     * Shared setup page with optional runtime capture and deployment information.
-     *
-     * @since 5.19.0
-     */
-    public function actionSetup(): Response
-    {
-        $this->requirePermission(LoggingLibrary::PERMISSION_MANAGE_SETTINGS);
-        $plugin = LoggingLibrary::getInstance();
-        $iconSvg = PluginHelper::getIconSvg($plugin);
-        return $this->renderTemplate('logging-library/setup', [
-            'settings' => $plugin->getSettings(),
-            'pluginVersion' => PluginHelper::getPluginVersion($plugin),
-            'pluginIconSvg' => $iconSvg,
-            'pluginHeroStyle' => PluginThemeStyleHelper::heroCssVarsFromSvg($iconSvg),
-            'logoPaths' => PluginHelper::lrLogoPaths(),
-        ]);
-    }
-
     /**
      * Settings index
      */
@@ -120,8 +100,8 @@ class SettingsController extends Controller
             shouldSkipAttribute: fn(string $attribute): bool => $settings->isOverriddenByConfig($attribute),
             adapters: [
                 'runtimeLevels' => static fn(mixed $value): mixed => $value === '' ? [] : $value,
-                'runtimeCategories' => static fn(mixed $value): mixed => is_string($value) ? preg_split('/\\R/', trim($value), -1, PREG_SPLIT_NO_EMPTY) : $value,
-                'runtimeExcept' => static fn(mixed $value): mixed => is_string($value) ? preg_split('/\\R/', trim($value), -1, PREG_SPLIT_NO_EMPTY) : $value,
+                'runtimeIncludeCategories' => RuntimeCategoryOptionsHelper::capturePatterns(...),
+                'runtimeExcludeCategories' => RuntimeCategoryOptionsHelper::capturePatterns(...),
             ],
         );
 

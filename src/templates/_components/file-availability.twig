@@ -2,7 +2,9 @@
 	include 'lindemannrock-base/_components/info-box' with {
 	    type: settings.edgeEnvironmentDetected ? 'warning' : 'info',
 	    message: settings.edgeEnvironmentDetected
-	        ? 'An edge or ephemeral environment is detected. File viewers are hidden unless forced on; Runtime Logs remain available when enabled. Only force file viewers on if persistent log files are available.'|t('logging-library')
+	        ? 'An edge or ephemeral environment is detected. File viewers are hidden unless forced on; {runtimeLogs} remain available when enabled. Only force file viewers on if persistent log files are available.'|t('logging-library', {
+	            runtimeLogs: tag('a', {href: url('logging-library/settings/runtime'), text: 'Runtime Logs'|t('logging-library')}),
+	        })
 	        : 'File viewers are available. Runtime Logs are optional and independent of file logging.'|t('logging-library'),
 	    margin: 'bottom',
 	} only

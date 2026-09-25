@@ -22,7 +22,7 @@ ddev composer require lindemannrock/craft-logging-library && ddev craft plugin/i
 
 ## Post-install setup
 
-Open **Logging Library → Setup** to review runtime capture, file-viewer availability, and configured storage. No mandatory setup step is required: runtime capture stays off unless you enable it under **Settings → Runtime Logs** or in configuration. Existing configuration overrides remain authoritative. Continue to the quickstart to connect a plugin and confirm your first log entry.
+The installation welcome button opens **Logging Library → Settings**, starting on **General**. Use **Runtime Logs** for capture and configured storage, or **File Logs** for file-viewer availability. No mandatory setup step is required: runtime capture stays off unless you enable it under **Settings → Runtime Logs** or in configuration. Existing configuration overrides remain authoritative. Continue to the quickstart to connect a plugin and confirm your first log entry.
 
 ## Quick start
 

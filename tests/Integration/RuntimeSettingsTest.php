@@ -11,8 +11,10 @@ namespace lindemannrock\logginglibrary\tests\Integration;
 use Craft;
 use craft\db\Connection;
 use lindemannrock\base\helpers\SettingsPostHelper;
+use lindemannrock\logginglibrary\helpers\RuntimeCategoryOptionsHelper;
 use lindemannrock\logginglibrary\migrations\Install;
 use lindemannrock\logginglibrary\migrations\m260925_000000_add_runtime_log_settings;
+use lindemannrock\logginglibrary\migrations\m260925_000001_rename_runtime_category_filters;
 use lindemannrock\logginglibrary\models\Settings;
 use lindemannrock\logginglibrary\services\RuntimeLogStoreService;
 use lindemannrock\logginglibrary\tests\Support\RuntimePreferencesConfig;
@@ -104,7 +106,7 @@ final class RuntimeSettingsTest extends TestCase
         yield 'unsupported level' => ['runtimeLevels', ['notice']];
         yield 'malformed boolean' => ['runtimeEnabled', 'maybe'];
         yield 'fractional retention' => ['runtimeTtl', '1.5'];
-        yield 'non-string category' => ['runtimeCategories', [[]]];
+        yield 'non-string category' => ['runtimeIncludeCategories', [[]]];
     }
 
     public function testRetentionLimitAppliesToControlPanelWithoutClampingConfiguration(): void
@@ -157,6 +159,10 @@ final class RuntimeSettingsTest extends TestCase
             }
             $fresh = Settings::loadFromDatabase();
             self::assertSame((new Settings())->getStoredRuntimeConfig(), $fresh->getStoredRuntimeConfig());
+            self::assertFalse($db->columnExists($table, 'runtimeCategories'));
+            self::assertFalse($db->columnExists($table, 'runtimeExcept'));
+            $rename = new m260925_000001_rename_runtime_category_filters(['db' => $db, 'compact' => true]);
+            self::assertTrue($rename->safeUp(), 'Fresh installs already have the final names.');
 
             // Reconstruct the supported previous schema on our exact owned table.
             foreach (array_keys(Settings::RUNTIME_FIELDS) as $column) {
@@ -174,21 +180,58 @@ final class RuntimeSettingsTest extends TestCase
             }
             $after = $db->createCommand('SELECT * FROM ' . $table)->queryOne();
             self::assertSame($before, array_intersect_key($after, $before));
+            $db->createCommand()->update($table, [
+                'runtimeCategories' => json_encode(['yii\\db\\*', 'custom:*']),
+                'runtimeExcept' => json_encode(['yii\\db\\Connection::open']),
+            ], ['id' => 1])->execute();
+            $beforeRename = $db->createCommand('SELECT * FROM ' . $table)->queryOne();
+            ob_start();
+            try {
+                self::assertTrue($rename->safeUp());
+                self::assertTrue($rename->safeUp(), 'Reentry does not alter filter data.');
+                $renamed = $db->createCommand('SELECT * FROM ' . $table)->queryOne();
+                $expected = $beforeRename;
+                $expected['runtimeIncludeCategories'] = $expected['runtimeCategories'];
+                $expected['runtimeExcludeCategories'] = $expected['runtimeExcept'];
+                unset($expected['runtimeCategories'], $expected['runtimeExcept']);
+                self::assertEquals($expected, $renamed, 'Every value must survive the column rename.');
+                self::assertTrue($rename->safeDown());
+                self::assertSame($beforeRename, $db->createCommand('SELECT * FROM ' . $table)->queryOne());
+                self::assertTrue($rename->safeUp());
+            } finally {
+                ob_end_clean();
+            }
             $db->getSchema()->refresh();
             $this->withConfig(['runtimeLogStore' => ['maxEntries' => 8000]], function() use ($db, $table): void {
                 $settings = Settings::loadFromDatabase();
                 $settings->runtimeEnabled = true;
                 $settings->runtimeMaxEntries = 77;
-                $settings->runtimeCategories = ['my-plugin', 'yii\\db\\*'];
+                $settings->runtimeIncludeCategories = ['my-plugin', 'yii\\db\\*'];
                 self::assertTrue($settings->saveToDatabase(array_keys(Settings::RUNTIME_FIELDS)));
                 $saved = Settings::loadFromDatabase();
                 self::assertTrue($saved->runtimeEnabled);
                 self::assertSame(1000, $saved->runtimeMaxEntries);
                 self::assertSame(8000, $saved->getRuntimeConfig()['maxEntries']);
-                self::assertSame(['my-plugin', 'yii\\db\\*'], $saved->runtimeCategories);
+                self::assertSame(['my-plugin', 'yii\\db\\*'], $saved->runtimeIncludeCategories);
                 self::assertSame('Existing name', $saved->pluginName);
                 self::assertFalse($saved->showCpSection);
                 self::assertSame(1, (int)$db->createCommand('SELECT COUNT(*) FROM ' . $table)->queryScalar());
+
+                // The CP posts encoded choices; partial removal and clearing must
+                // replace both lists, persist raw patterns, and survive a reload.
+                $attributes = ['runtimeIncludeCategories', 'runtimeExcludeCategories'];
+                foreach ([['yii\\db\\Connection::open', 'custom:*'], ['custom:*'], []] as $patterns) {
+                    $values = RuntimeCategoryOptionsHelper::capturePicker($patterns)['values'];
+                    $posted = array_fill_keys($attributes, $values === [] ? '' : $values);
+                    $model = Settings::loadFromDatabase();
+                    $result = SettingsPostHelper::apply($model, $posted, $attributes, adapters: array_fill_keys($attributes, RuntimeCategoryOptionsHelper::capturePatterns(...)));
+                    self::assertFalse($result->hasErrors);
+                    self::assertTrue($model->saveToDatabase($result->attributesToValidate));
+                    $reloaded = Settings::loadFromDatabase();
+                    self::assertSame($patterns, $reloaded->runtimeIncludeCategories);
+                    self::assertSame($patterns, $reloaded->runtimeExcludeCategories);
+                    self::assertSame('Existing name', $reloaded->pluginName);
+                }
             });
         } finally {
             Craft::$app->set('db', $originalDb);

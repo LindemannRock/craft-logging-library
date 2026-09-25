@@ -39,8 +39,27 @@ return [
             'maxMessageBytes' => 8000,
             'maxContextBytes' => 8000,
             'levels' => ['error', 'warning', 'info'],
-            'categories' => [],
-            'except' => [],
+            // Raw category names or trailing-* prefix patterns, not source display names.
+            // Empty includes allow all categories. Empty exclusions add no exclusions.
+            // Exclusions win. Omit either key to manage that list in the CP picker.
+            'includeCategories' => [],
+            'excludeCategories' => [],
+
+            // Example: capture only database queries and commands.
+            // 'includeCategories' => [
+            //     'yii\\db\\Command::query',   // DB Queries
+            //     'yii\\db\\Command::execute', // DB Commands
+            // ],
+
+            // Example: omit these sources while keeping everything else.
+            // Leave includeCategories empty when using this example.
+            // 'excludeCategories' => [
+            //     'yii\\db\\Connection::open',    // DB Connection (not queries/commands)
+            //     'nystudio107\\vite\\*',          // Vite plugin
+            //     'nystudio107\\pluginvite\\*',    // Vite shared package
+            //     'nystudio107\\codeeditor\\*',    // Code Editor
+            //     'nystudio107\\minify\\*',        // Minify
+            // ],
             'redis' => [
                 // Omit to inherit Craft cache's Redis database.
                 // Use null to disable SELECT for compatible cluster-style endpoints.

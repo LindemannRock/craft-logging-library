@@ -456,10 +456,10 @@ class RuntimeLogStoreTest extends TestCase
         self::assertSame('cli', $out[2]['userLabel']);
     }
 
-    public function testClearRuntimeRejectsUserWithoutClearCachePermission(): void
+    public function testClearRuntimeRejectsUserWithoutClearRuntimePermission(): void
     {
         $user = $this->createTestUser('__logginglibrary_test_');
-        $this->grantPermissions($user, [LoggingLibrary::PERMISSION_VIEW_ALL_LOGS]);
+        $this->grantPermissions($user, [LoggingLibrary::PERMISSION_VIEW_RUNTIME_LOGS]);
         $this->actingAs($user);
 
         $originalRequest = Craft::$app->getRequest();
@@ -477,7 +477,7 @@ class RuntimeLogStoreTest extends TestCase
     public function testRuntimeDataPayloadReportsStoredTotalAlongsideFilteredCount(): void
     {
         $user = $this->createTestUser('__logginglibrary_test_');
-        $this->grantPermissions($user, [LoggingLibrary::PERMISSION_VIEW_ALL_LOGS]);
+        $this->grantPermissions($user, [LoggingLibrary::PERMISSION_VIEW_RUNTIME_LOGS]);
         $this->actingAs($user);
 
         $this->store->appendMessages([
@@ -516,7 +516,7 @@ class RuntimeLogStoreTest extends TestCase
     public function testInitialAndAjaxStatusReportUnavailableRedisAuthoritatively(): void
     {
         $user = $this->createTestUser('__logginglibrary_test_');
-        $this->grantPermissions($user, [LoggingLibrary::PERMISSION_VIEW_ALL_LOGS]);
+        $this->grantPermissions($user, [LoggingLibrary::PERMISSION_VIEW_RUNTIME_LOGS]);
         $this->actingAs($user);
         $this->swapPluginComponent(
             'logging-library',

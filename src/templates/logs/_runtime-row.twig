@@ -23,7 +23,7 @@
     {% set sourceDisplay = sourceLabel == 'unknown' ? 'Unknown'|t('logging-library') : sourceLabel %}
     <td class="truncate" data-column="category" title="{{ sourceTitle|e }}">{{ sourceDisplay|e }}</td>
 
-    <td class="nowrap" data-column="user">
+    <td class="truncate" data-column="user" title="{{ (item.userLabel ?? '')|e }}">
         {{ ((item.userLabel ?? '') ?: 'System'|t('logging-library'))|e }}
     </td>
 

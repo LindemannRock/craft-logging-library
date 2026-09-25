@@ -1,77 +1,60 @@
 # Permissions
 
-Logging Library registers four permissions — two for its own log views (the standalone All Logs viewer and Runtime Logs), one for clearing its caches, and one for managing its settings. Individual plugins register their own log-viewing permissions separately.
+Give a support user access to recent runtime activity without exposing every log file, or let an administrator manage capture settings without reading logs. Logging Library separates file logs, runtime logs, and settings permissions.
 
-All four appear in the Control Panel under **Settings → Users → (group/user) → Permissions → Logging Library**. Admins always have full access regardless of permission settings.
+Assign them under **Settings → Users → (group/user) → Permissions → Logging Library**. Administrators have full permission access; disabled viewers and hosting restrictions still apply.
 
-## Permission structure
+## Choose the access needed
 
-### Standalone viewer
+| CP permission | Handle | What it allows |
+|---------------|--------|----------------|
+| **View all file logs** | `loggingLibrary:viewAllLogs` | Open the standalone **All Logs** viewer |
+| └─ Download all file logs | `loggingLibrary:downloadAllLogs` | Download raw files; also requires file viewing |
+| └─ Clear file log cache | `loggingLibrary:clearCache` | Refresh a file's parsed cache and expose the Logging Library option in **Utilities → Clear Caches**; also requires file viewing |
+| **View runtime logs** | `loggingLibrary:viewRuntimeLogs` | Open **Runtime Logs** and receive automatic updates |
+| └─ Clear runtime logs | `loggingLibrary:clearRuntimeLogs` | Empty the runtime diagnostic window; also requires runtime viewing |
+| **Manage settings** | `loggingLibrary:manageSettings` | Manage General, File Logs, Runtime Logs, and Interface settings |
 
-| Permission | Description |
-|------------|-------------|
-| **`loggingLibrary:viewAllLogs`** | Parent — access the standalone "All Logs" viewer and the **Runtime Logs** view |
-| └─ `loggingLibrary:downloadAllLogs` | Download log files from the standalone viewer |
+For read-only runtime access, grant **View runtime logs** only. Add **Clear runtime logs** only if that role should discard the shared diagnostic window. Neither grants access to files or settings.
 
-These control access to the centralized viewer at **Logging Library → All Logs** when the CP section is enabled. The same `viewAllLogs` permission also gates the [Runtime Logs](../feature-tour/runtime-logs.md) view when the runtime log store is enabled.
+For read-only file access, grant **View all file logs** only. Downloads and manual cache refresh are separate choices. Refreshing the file cache does not delete log files or clear runtime entries. Automatic rebuilding during ordinary viewing is unchanged.
 
-### Caches & settings
+Craft's nested checkboxes do not automatically grant child permissions. The controller requires viewing as well as the download or clearing permission; hiding a button is not the security boundary. Craft separately governs access to its Clear Caches utility.
 
-| Permission | Description |
-|------------|-------------|
-| **`loggingLibrary:clearCache`** | Show the **Logging Library caches** option under **Utilities → Clear Caches** and allow clearing it; also shows the **Clear Runtime Logs** button in the [Runtime Logs](../feature-tour/runtime-logs.md) view |
-| **`loggingLibrary:manageSettings`** | Access the Logging Library settings pages (**General**, **Runtime Logs**, **File Logs**, **Interface**) and **Setup**, with their navigation items |
+## Upgrading to 5.19.0
 
-These two are top-level permissions — they are not nested under `viewAllLogs`. A user can manage settings without being able to read logs, and vice versa.
+Run Craft's normal plugin migrations when deploying the update. Existing file-view and cache-clear handles are retained. The migration adds corresponding runtime grants:
 
-### Per-plugin permissions
+- Existing **View all system logs** grants gain **View runtime logs**.
+- Existing **Clear cache** grants gain **Clear runtime logs**. Clearing still requires runtime viewing, so a clear-only grant does not give someone access to logs.
+- Direct user grants remain direct; group grants stay on the same groups. Group changes use Craft's project config, so deploy the resulting group configuration through your usual project-config workflow.
 
-Each plugin that integrates Logging Library registers its own permissions. These are not defined by the library — they are passed to `LoggingLibrary::configure()` as `viewSystemLogsPermissions` and `downloadSystemLogsPermissions`.
+This preserves runtime access when viewing and clearing came from different groups or a mix of direct and group grants. It does not copy group permissions onto individual users. New installations and roles receive only permissions you assign. Log entries and plugin settings are untouched.
 
-A typical plugin registers:
+The migration is not automatically reversible: revoking grants later could remove permissions an administrator deliberately assigned after upgrading. Review permissions manually if downgrading.
 
-| Permission | Description |
-|------------|-------------|
-| **`yourPlugin:viewLogs`** | Parent — view the plugin's log viewer |
-| └─ `yourPlugin:downloadLogs` | Download log files from the plugin's viewer |
+## Navigation and direct routes
 
-## Checking permissions
+**All Logs** requires file viewing; **Runtime Logs** requires runtime viewing and enabled capture; **Settings** requires settings management. An inaccessible initial viewer page may redirect to another available section. Runtime data and clearing endpoints enforce their permissions independently.
 
-In Twig:
+**Show Main Menu** controls navigation visibility, not access rights. Hiding it does not revoke direct-route access or disable capture. Edge detection can suppress file viewers without affecting runtime access — see [Edge Detection](../feature-tour/edge-detection.md).
+
+## Per-plugin viewers
+
+An integrating plugin still owns its log-viewing and download permissions, passed to `LoggingLibrary::configure()` as `viewSystemLogsPermissions` and `downloadSystemLogsPermissions`. This split does not change those contracts: plugin-specific cache refresh continues to require that plugin's viewing permission, not Logging Library's centralized file-cache permission.
+
+A typical integration registers `yourPlugin:viewLogs` with a nested `yourPlugin:downloadLogs`. Configured arrays use **any-of** checks. An empty array imposes no extra permission requirement for that operation on an authenticated user, so configure them deliberately. See the [integration guide](../feature-tour/integration-guide.md).
+
+## Checking access in code
 
 ```twig
-{% if currentUser.can('loggingLibrary:viewAllLogs') %}
-    {# User can access standalone viewer #}
+{% if currentUser.can('loggingLibrary:viewRuntimeLogs') %}
+    {# Offer a Runtime Logs link when capture is enabled. #}
 {% endif %}
 ```
 
-In PHP:
-
 ```php
-if (Craft::$app->getUser()->checkPermission('loggingLibrary:viewAllLogs')) {
-    // User can access standalone viewer
-}
-
-// In a controller
-$this->requirePermission('loggingLibrary:viewAllLogs');
+// A mutating action requires both permissions, not either one.
+$this->requirePermission('loggingLibrary:viewRuntimeLogs');
+$this->requirePermission('loggingLibrary:clearRuntimeLogs');
 ```
-
-## Nested permission pattern
-
-Craft's nested permissions are a UI convenience — the parent permission does not automatically grant child permissions.
-
-- **"View" permissions** control read access and CP subnav visibility
-- **"Download" permissions** control whether the download button appears
-
-To give a user read-only access, grant `loggingLibrary:viewAllLogs` only. For full access including downloads, also grant `loggingLibrary:downloadAllLogs`.
-
-## How permissions are checked
-
-The library checks permissions in several places:
-
-1. **Navigation** — the **All Logs** and **Runtime Logs** subnav items are hidden unless the user is admin or has `loggingLibrary:viewAllLogs`; the **Settings** and **Setup** subnav items require `loggingLibrary:manageSettings`
-2. **Log controller** — `LogsController` checks `viewSystemLogsPermissions` before rendering and `downloadSystemLogsPermissions` before allowing file downloads
-3. **Settings controller** — `SettingsController` requires `loggingLibrary:manageSettings` for every action
-4. **Utilities** — the **Logging Library caches** entry only registers under **Utilities → Clear Caches** when the user has `loggingLibrary:clearCache`
-
-When a per-plugin permissions array is empty (no permissions specified), any logged-in user can access that plugin's viewer.

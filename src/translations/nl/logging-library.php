@@ -14,7 +14,6 @@ return [
     'Open Settings' => 'Instellingen openen',
 
     // Navigation
-    'Setup' => 'Setup',
     'File Logs' => 'Bestandslogboeken',
     'All Logs' => 'Alle logboeken',
     'Runtime Logs' => 'Runtime-logboeken',
@@ -27,9 +26,10 @@ return [
     'Interface' => 'Interface',
 
     // Permissions
-    'View all system logs' => 'Alle systeemlogboeken bekijken',
-    'Download all system logs' => 'Alle systeemlogboeken downloaden',
-    'Clear cache' => 'Cache wissen',
+    'View all file logs' => 'Alle bestandslogboeken bekijken',
+    'Download all file logs' => 'Alle bestandslogboeken downloaden',
+    'Clear file log cache' => 'Cache van bestandslogboeken wissen',
+    'View runtime logs' => 'Runtime-logboeken bekijken',
     'Manage settings' => 'Instellingen beheren',
 
     // Common
@@ -64,7 +64,7 @@ return [
 
     // Settings: File Logs
     'Force Enable File Log Viewers' => 'Bestandslogviewers geforceerd inschakelen',
-    'An edge or ephemeral environment is detected. File viewers are hidden unless forced on; Runtime Logs remain available when enabled. Only force file viewers on if persistent log files are available.' => 'Er is een edge- of tijdelijke omgeving gedetecteerd. Bestandsviewers zijn verborgen tenzij geforceerd ingeschakeld; runtime-logboeken blijven beschikbaar wanneer ingeschakeld. Forceer bestandsviewers alleen als permanente logbestanden beschikbaar zijn.',
+    'An edge or ephemeral environment is detected. File viewers are hidden unless forced on; {runtimeLogs} remain available when enabled. Only force file viewers on if persistent log files are available.' => 'Er is een edge- of tijdelijke omgeving gedetecteerd. Bestandsviewers zijn verborgen tenzij geforceerd ingeschakeld; {runtimeLogs} blijven beschikbaar wanneer ingeschakeld. Forceer bestandsviewers alleen als permanente logbestanden beschikbaar zijn.',
     'File viewers are available. Runtime Logs are optional and independent of file logging.' => 'Bestandsviewers zijn beschikbaar. Runtime-logboeken zijn optioneel en onafhankelijk van bestandsregistratie.',
 
     // Settings: Runtime Logs
@@ -79,17 +79,18 @@ return [
     'Maximum Message Bytes' => 'Maximale berichtbytes',
     'Maximum Context Bytes' => 'Maximale contextbytes',
     'Captured Levels' => 'Vastgelegde niveaus',
-    'Include Categories' => 'Categorieën opnemen',
-    'Exclude Categories' => 'Categorieën uitsluiten',
+    'Include Sources and Categories' => 'Bronnen en categorieën opnemen',
+    'Exclude Sources and Categories' => 'Bronnen en categorieën uitsluiten',
+    'Category: {pattern}' => 'Categorie: {pattern}',
     'Include Request User ID' => 'Gebruikers-ID van verzoek opnemen',
     'Advanced' => 'Geavanceerd',
     'Configured Storage' => 'Geconfigureerde opslag',
-    'Storage follows the Craft cache configuration. Redis database selection is configuration-only. This is not a connection test; confirm capture in Runtime Logs.' => 'De opslag volgt de Craft-cacheconfiguratie. De Redis-database wordt alleen via configuratie gekozen. Dit is geen verbindingstest; controleer de vastlegging in Runtime-logboeken.',
-    'On multiple servers, use shared cache storage. Local file cache does not combine logs from other instances.' => 'Gebruik gedeelde cacheopslag bij meerdere servers. Lokale bestandscache combineert geen logboeken van andere instanties.',
-    'Capture changes apply to new requests. Restart long-running workers to load changed settings. Disabling capture does not clear stored logs.' => 'Wijzigingen in de vastlegging gelden voor nieuwe verzoeken. Herstart langdurige werkprocessen om gewijzigde instellingen te laden. Uitschakelen van de vastlegging wist geen opgeslagen logboeken.',
+    'Capture new messages in Runtime Logs. Changes apply to new requests; restart long-running workers to apply them. Turning this off does not delete existing logs.' => 'Leg nieuwe berichten vast in de runtime-logboeken. Wijzigingen gelden voor nieuwe verzoeken; herstart langdurige werkprocessen om ze toe te passen. Uitschakelen verwijdert geen bestaande logboeken.',
+    'Limits the message text kept for each new Runtime Logs entry, in bytes rather than characters. Longer messages are shortened. File logs are unaffected.' => 'Beperkt de berichttekst die voor elke nieuwe vermelding in de runtime-logboeken wordt bewaard, in bytes in plaats van tekens. Langere berichten worden ingekort. Bestandslogboeken blijven ongewijzigd.',
+    'Limits the extra data kept for each new Runtime Logs entry, such as error details and stack traces, in bytes after JSON encoding. Larger context is shortened. File logs are unaffected.' => 'Beperkt de extra gegevens die voor elke nieuwe vermelding in de runtime-logboeken worden bewaard, zoals foutdetails en stacktraces, in bytes na JSON-codering. Grotere context wordt ingekort. Bestandslogboeken blijven ongewijzigd.',
     'How often Runtime Logs refreshes automatically. Set to 0 to disable. Current: {duration}' => 'Hoe vaak de runtime-logboeken automatisch worden vernieuwd. Stel in op 0 om dit uit te schakelen. Huidig: {duration}',
-    'Choose which log categories to capture, not words in the message. Enter one category per line, such as {exact}, or use {prefix} to match categories starting with {start}. Leave empty to capture all categories.' => 'Kies welke logboekcategorieën u wilt vastleggen, niet woorden in het bericht. Voer één categorie per regel in, zoals {exact}, of gebruik {prefix} voor categorieën die beginnen met {start}. Laat leeg om alle categorieën vast te leggen.',
-    'Skip these log categories even if included above. Enter one per line, such as {exact} or {prefix}. Leave empty to add no category exclusions.' => 'Sla deze logboekcategorieën over, ook als ze hierboven zijn opgenomen. Voer er één per regel in, zoals {exact} of {prefix}. Laat leeg om geen categorie-uitsluitingen toe te voegen.',
+    'Choose sources by name or type a category pattern such as {pattern} and press Enter. Leave empty to capture all sources. Changes affect new messages only.' => 'Kies bronnen op naam of voer een categoriepatroon in, zoals {pattern}, en druk op Enter. Laat leeg om alle bronnen vast te leggen. Wijzigingen gelden alleen voor nieuwe berichten.',
+    'Choose sources to skip or type a category pattern and press Enter. Exclusions take precedence. Existing entries are not removed.' => 'Kies bronnen om over te slaan of voer een categoriepatroon in en druk op Enter. Uitsluitingen hebben voorrang. Bestaande vermeldingen worden niet verwijderd.',
     'When on, Runtime Logs skips command-line requests. Turn off only when diagnosing console commands; file and hosted logs are unaffected.' => 'Wanneer ingeschakeld, slaan runtimelogboeken opdrachtregelaanvragen over. Schakel dit alleen uit om consoleopdrachten te onderzoeken; bestandslogboeken en gehoste logboeken blijven ongewijzigd.',
     'When on, Runtime Logs skips detected queue execution. To capture console queue workers, turn off both skip switches and restart the workers. Workers can generate large volumes of logs.' => 'Wanneer ingeschakeld, slaan runtimelogboeken gedetecteerde wachtrijuitvoering over. Schakel beide overslaanschakelaars uit en herstart de werkprocessen om consolewerkprocessen voor de wachtrij vast te leggen. Werkprocessen kunnen grote hoeveelheden logboeken genereren.',
     'Adds the authenticated request user ID. Messages and context may still contain personal data regardless of this setting.' => 'Voegt de ID van de aangemelde verzoekgebruiker toe. Berichten en context kunnen ongeacht deze instelling persoonsgegevens bevatten.',
@@ -107,10 +108,6 @@ return [
 
     // Settings: Interface
     'Interface Settings' => 'Interface-instellingen',
-
-    // Setup
-    'Choose the log views that suit this environment. Runtime capture is optional and remains off until enabled.' => 'Kies de logboekweergaven die bij deze omgeving passen. Runtime-vastlegging is optioneel en blijft uitgeschakeld totdat u deze inschakelt.',
-    'Consider Runtime Logs for recent diagnostics on ephemeral hosting. Confirm shared storage before relying on logs from multiple instances.' => 'Overweeg Runtime-logboeken voor recente diagnoses op tijdelijke hosting. Controleer gedeelde opslag voordat u vertrouwt op logboeken van meerdere instanties.',
 
     // Log levels
     'All Levels' => 'Alle niveaus',
@@ -176,7 +173,7 @@ return [
     'Current File' => 'Huidig bestand',
     'Log entries' => 'Logvermeldingen',
     'Refresh Cache' => 'Cache vernieuwen',
-    'Clear Runtime Logs' => 'Runtime-logboeken wissen',
+    'Clear runtime logs' => 'Runtime-logboeken wissen',
     'Clear recent runtime logs? This cannot be undone.' => 'Recente runtime-logboeken wissen? Dit kan niet ongedaan worden gemaakt.',
     'Loading' => 'Laden',
     'Download File' => 'Bestand downloaden',

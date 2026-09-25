@@ -14,7 +14,6 @@ return [
     'Open Settings' => 'Einstellungen öffnen',
 
     // Navigation
-    'Setup' => 'Einrichtung',
     'File Logs' => 'Dateiprotokolle',
     'All Logs' => 'Alle Protokolle',
     'Runtime Logs' => 'Laufzeitprotokolle',
@@ -27,9 +26,10 @@ return [
     'Interface' => 'Oberfläche',
 
     // Permissions
-    'View all system logs' => 'Alle Systemprotokolle anzeigen',
-    'Download all system logs' => 'Alle Systemprotokolle herunterladen',
-    'Clear cache' => 'Cache leeren',
+    'View all file logs' => 'Alle Dateiprotokolle anzeigen',
+    'Download all file logs' => 'Alle Dateiprotokolle herunterladen',
+    'Clear file log cache' => 'Dateiprotokoll-Cache löschen',
+    'View runtime logs' => 'Laufzeitprotokolle anzeigen',
     'Manage settings' => 'Einstellungen verwalten',
 
     // Common
@@ -64,7 +64,7 @@ return [
 
     // Settings: File Logs
     'Force Enable File Log Viewers' => 'Dateibasierte Protokoll-Viewer erzwingen',
-    'An edge or ephemeral environment is detected. File viewers are hidden unless forced on; Runtime Logs remain available when enabled. Only force file viewers on if persistent log files are available.' => 'Eine Edge- oder kurzlebige Umgebung wurde erkannt. Datei-Viewer sind ausgeblendet, sofern sie nicht erzwungen werden; aktivierte Laufzeitprotokolle bleiben verfügbar. Erzwingen Sie Datei-Viewer nur, wenn persistente Protokolldateien verfügbar sind.',
+    'An edge or ephemeral environment is detected. File viewers are hidden unless forced on; {runtimeLogs} remain available when enabled. Only force file viewers on if persistent log files are available.' => 'Eine Edge- oder kurzlebige Umgebung wurde erkannt. Datei-Viewer sind ausgeblendet, sofern sie nicht erzwungen werden; aktivierte {runtimeLogs} bleiben verfügbar. Erzwingen Sie Datei-Viewer nur, wenn persistente Protokolldateien verfügbar sind.',
     'File viewers are available. Runtime Logs are optional and independent of file logging.' => 'Datei-Viewer sind verfügbar. Laufzeitprotokolle sind optional und unabhängig von der Dateiprotokollierung.',
 
     // Settings: Runtime Logs
@@ -79,17 +79,18 @@ return [
     'Maximum Message Bytes' => 'Maximale Nachrichtenbytes',
     'Maximum Context Bytes' => 'Maximale Kontextbytes',
     'Captured Levels' => 'Erfasste Protokollstufen',
-    'Include Categories' => 'Kategorien einschließen',
-    'Exclude Categories' => 'Kategorien ausschließen',
+    'Include Sources and Categories' => 'Quellen und Kategorien einschließen',
+    'Exclude Sources and Categories' => 'Quellen und Kategorien ausschließen',
+    'Category: {pattern}' => 'Kategorie: {pattern}',
     'Include Request User ID' => 'Benutzer-ID der Anfrage einschließen',
     'Advanced' => 'Erweitert',
     'Configured Storage' => 'Konfigurierter Speicher',
-    'Storage follows the Craft cache configuration. Redis database selection is configuration-only. This is not a connection test; confirm capture in Runtime Logs.' => 'Der Speicher folgt der Craft Cache-Konfiguration. Die Redis-Datenbank wird ausschließlich über die Konfiguration ausgewählt. Dies ist kein Verbindungstest; prüfen Sie die Erfassung unter Laufzeitprotokolle.',
-    'On multiple servers, use shared cache storage. Local file cache does not combine logs from other instances.' => 'Verwenden Sie bei mehreren Servern gemeinsamen Cache-Speicher. Ein lokaler Datei-Cache führt keine Protokolle anderer Instanzen zusammen.',
-    'Capture changes apply to new requests. Restart long-running workers to load changed settings. Disabling capture does not clear stored logs.' => 'Änderungen an der Erfassung gelten für neue Anfragen. Starten Sie langlebige Worker neu, um geänderte Einstellungen zu laden. Das Deaktivieren der Erfassung löscht keine gespeicherten Protokolle.',
+    'Capture new messages in Runtime Logs. Changes apply to new requests; restart long-running workers to apply them. Turning this off does not delete existing logs.' => 'Neue Nachrichten in den Laufzeitprotokollen erfassen. Änderungen gelten für neue Anfragen; starten Sie langlebige Worker neu, um sie anzuwenden. Das Deaktivieren löscht keine vorhandenen Protokolle.',
+    'Limits the message text kept for each new Runtime Logs entry, in bytes rather than characters. Longer messages are shortened. File logs are unaffected.' => 'Begrenzt den Nachrichtentext für jeden neuen Eintrag in den Laufzeitprotokollen, gemessen in Bytes statt Zeichen. Längere Nachrichten werden gekürzt. Dateiprotokolle bleiben unverändert.',
+    'Limits the extra data kept for each new Runtime Logs entry, such as error details and stack traces, in bytes after JSON encoding. Larger context is shortened. File logs are unaffected.' => 'Begrenzt die Zusatzdaten für jeden neuen Eintrag in den Laufzeitprotokollen, etwa Fehlerdetails und Stacktraces, gemessen in Bytes nach der JSON-Kodierung. Größere Kontextdaten werden gekürzt. Dateiprotokolle bleiben unverändert.',
     'How often Runtime Logs refreshes automatically. Set to 0 to disable. Current: {duration}' => 'Wie oft die Laufzeitprotokolle automatisch aktualisiert werden. Zum Deaktivieren auf 0 setzen. Aktuell: {duration}',
-    'Choose which log categories to capture, not words in the message. Enter one category per line, such as {exact}, or use {prefix} to match categories starting with {start}. Leave empty to capture all categories.' => 'Wählen Sie die zu erfassenden Protokollkategorien, nicht Wörter in der Meldung. Geben Sie eine Kategorie pro Zeile ein, etwa {exact}, oder verwenden Sie {prefix} für Kategorien, die mit {start} beginnen. Lassen Sie das Feld leer, um alle Kategorien zu erfassen.',
-    'Skip these log categories even if included above. Enter one per line, such as {exact} or {prefix}. Leave empty to add no category exclusions.' => 'Überspringen Sie diese Protokollkategorien, auch wenn sie oben eingeschlossen sind. Geben Sie eine pro Zeile ein, etwa {exact} oder {prefix}. Lassen Sie das Feld leer, um keine Kategorieausschlüsse hinzuzufügen.',
+    'Choose sources by name or type a category pattern such as {pattern} and press Enter. Leave empty to capture all sources. Changes affect new messages only.' => 'Wählen Sie Quellen nach Namen oder geben Sie ein Kategoriemuster wie {pattern} ein und drücken Sie die Eingabetaste. Lassen Sie das Feld leer, um alle Quellen zu erfassen. Änderungen gelten nur für neue Meldungen.',
+    'Choose sources to skip or type a category pattern and press Enter. Exclusions take precedence. Existing entries are not removed.' => 'Wählen Sie die zu überspringenden Quellen oder geben Sie ein Kategoriemuster ein und drücken Sie die Eingabetaste. Ausschlüsse haben Vorrang. Vorhandene Einträge werden nicht entfernt.',
     'When on, Runtime Logs skips command-line requests. Turn off only when diagnosing console commands; file and hosted logs are unaffected.' => 'Wenn aktiviert, überspringen Laufzeitprotokolle Befehlszeilenanfragen. Deaktivieren Sie diese Option nur zur Diagnose von Konsolenbefehlen; Datei- und Hosting-Protokolle bleiben unverändert.',
     'When on, Runtime Logs skips detected queue execution. To capture console queue workers, turn off both skip switches and restart the workers. Workers can generate large volumes of logs.' => 'Wenn aktiviert, überspringen Laufzeitprotokolle erkannte Warteschlangenausführungen. Um Konsolen-Worker der Warteschlange zu erfassen, deaktivieren Sie beide Überspringen-Schalter und starten Sie die Worker neu. Worker können große Protokollmengen erzeugen.',
     'Adds the authenticated request user ID. Messages and context may still contain personal data regardless of this setting.' => 'Fügt die ID des authentifizierten Anfragebenutzers hinzu. Nachrichten und Kontext können unabhängig von dieser Einstellung personenbezogene Daten enthalten.',
@@ -107,10 +108,6 @@ return [
 
     // Settings: Interface
     'Interface Settings' => 'Oberflächen-Einstellungen',
-
-    // Setup
-    'Choose the log views that suit this environment. Runtime capture is optional and remains off until enabled.' => 'Wählen Sie die für diese Umgebung geeigneten Protokollansichten. Die Laufzeiterfassung ist optional und bleibt bis zur Aktivierung ausgeschaltet.',
-    'Consider Runtime Logs for recent diagnostics on ephemeral hosting. Confirm shared storage before relying on logs from multiple instances.' => 'Erwägen Sie Laufzeitprotokolle für aktuelle Diagnosen auf kurzlebigem Hosting. Prüfen Sie den gemeinsamen Speicher, bevor Sie sich auf Protokolle mehrerer Instanzen verlassen.',
 
     // Log levels
     'All Levels' => 'Alle Stufen',
@@ -176,7 +173,7 @@ return [
     'Current File' => 'Aktuelle Datei',
     'Log entries' => 'Protokolleinträge',
     'Refresh Cache' => 'Cache aktualisieren',
-    'Clear Runtime Logs' => 'Laufzeitprotokolle löschen',
+    'Clear runtime logs' => 'Laufzeitprotokolle löschen',
     'Clear recent runtime logs? This cannot be undone.' => 'Aktuelle Laufzeitprotokolle löschen? Dies kann nicht rückgängig gemacht werden.',
     'Loading' => 'Wird geladen',
     'Download File' => 'Datei herunterladen',

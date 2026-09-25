@@ -7,7 +7,7 @@ Logging Library is built on `lindemannrock/base`, the shared foundation used acr
 In its `init()`, Logging Library calls `PluginHelper::bootstrap()`. This single call wires up the pieces the base plugin provides:
 
 - **Twig globals** — registers the `loggingLibraryHelper` variable for templates (see [Twig Globals](twig-globals.md))
-- **Install experience** — the welcome screen shown on first install, with a call-to-action that opens **Setup** to review capture, file availability, and configured storage
+- **Install experience** — the welcome screen shown on first install, with a call-to-action that opens **Settings** on the General tab
 - **Plugin-name resolution** — applies the display name from `config/logging-library.php` if one is set
 
 Unlike a consumer plugin, Logging Library passes empty log-permission arrays to `bootstrap()` — it *provides* the logging infrastructure rather than consuming it, so it registers its own viewer routes and permissions directly.

@@ -11,6 +11,8 @@ namespace lindemannrock\logginglibrary\tests\Integration;
 use Craft;
 use craft\console\Request;
 use craft\console\User;
+use craft\events\RegisterUrlRulesEvent;
+use craft\web\UrlManager;
 use craft\web\View;
 use lindemannrock\logginglibrary\controllers\SettingsController;
 use lindemannrock\logginglibrary\LoggingLibrary;
@@ -55,7 +57,26 @@ final class SettingsPagesTest extends TestCase
         yield 'runtime' => ['actionRuntime', 'logging-library/settings/runtime'];
         yield 'files' => ['actionFiles', 'logging-library/settings/files'];
         yield 'interface' => ['actionInterface', 'logging-library/settings/interface'];
-        yield 'setup' => ['actionSetup', 'logging-library/setup'];
+        yield 'general' => ['actionGeneral', 'logging-library/settings/general'];
+    }
+
+    public function testWelcomeDestinationOpensGeneralSettingsWithoutSetupRoutes(): void
+    {
+        $source = file_get_contents(dirname(__DIR__, 2) . '/src/LoggingLibrary.php');
+        self::assertIsString($source);
+        self::assertStringContainsString("'ctaLabel' => Craft::t('logging-library', 'Settings')", $source);
+        self::assertStringContainsString("'ctaUrl' => 'logging-library/settings'", $source);
+        self::assertStringContainsString("'redirectUri' => 'logging-library/settings'", $source);
+
+        $event = new RegisterUrlRulesEvent();
+        $manager = new UrlManager();
+        $manager->trigger(UrlManager::EVENT_REGISTER_CP_URL_RULES, $event);
+        self::assertSame('logging-library/settings/index', $event->rules['logging-library/settings']);
+        self::assertArrayNotHasKey('logging-library/setup', $event->rules);
+        $controller = new SettingsPageController('settings', LoggingLibrary::getInstance());
+        self::assertNull($controller->createAction('setup'));
+        self::assertInstanceOf(Response::class, $controller->actionIndex());
+        self::assertSame('logging-library/settings/general', $controller->redirectedUrl);
     }
 
     public function testRuntimeFormRendersPerOptionConfigLocksAndEditableStoredValues(): void
@@ -116,8 +137,8 @@ final class SettingsPagesTest extends TestCase
             self::assertStringContainsString('Min: 0 (Disabled), Max: 3600 (1 hour)', $xpath->evaluate('string(//*[@id="runtimeRefreshInterval-field"])'));
             self::assertStringContainsString('Current: <strong id="runtimeRefreshInterval-human"></strong>', $html);
             self::assertStringContainsString('<code>yii\\db\\*</code>', $html);
-            self::assertStringContainsString('<code>yii\\db\\</code>', $html);
-            self::assertStringContainsString('not words in the message', $html);
+            self::assertStringContainsString('Choose sources by name', $html);
+            self::assertSame(2.0, $xpath->evaluate('count(//select[@multiple])'));
             self::assertLessThan(strpos($html, 'Advanced'), strpos($html, 'id="runtimeSkipConsoleRequests"'));
             self::assertLessThan(strpos($html, 'Advanced'), strpos($html, 'id="runtimeSkipQueueRequests"'));
             self::assertLessThan(strpos($html, 'Advanced'), strpos($html, 'id="runtimeIncludeUserId"'));
@@ -128,7 +149,7 @@ final class SettingsPagesTest extends TestCase
                 ));
                 $settings = new Settings([
                     'runtimeEnabled' => $stored,
-                    'runtimeCategories' => ['my-plugin', 'yii\\db\\*'],
+                    'runtimeIncludeCategories' => ['my-plugin', 'yii\\db\\*'],
                 ]);
                 $html = $template->renderBlock('content', [
                     'settings' => $settings,
@@ -139,16 +160,22 @@ final class SettingsPagesTest extends TestCase
                 $document->loadHTML($html, LIBXML_NOERROR | LIBXML_NOWARNING);
                 $xpath = new \DOMXPath($document);
                 self::assertSame($visible ? '' : 'hidden', $xpath->evaluate('string(//*[@id="runtime-settings"]/@class)'));
-                self::assertSame("my-plugin\nyii\\db\\*", $xpath->evaluate('string(//*[@id="runtime-settings"]//textarea[@id="runtimeCategories"])'));
+                self::assertSame('p_' . bin2hex('my-plugin'), $xpath->evaluate('string(//select[@id="runtimeIncludeCategories"]/option[@selected][1]/@value)'));
+                self::assertSame('p_' . bin2hex('yii\\db\\*'), $xpath->evaluate('string(//select[@id="runtimeIncludeCategories"]/option[@selected][2]/@value)'));
                 self::assertSame(1.0, $xpath->evaluate('count(//*[@id="runtime-storage-status"])'));
                 self::assertSame(0.0, $xpath->evaluate('count(//*[@id="runtime-settings"]//*[@id="runtime-storage-status"])'));
                 self::assertSame(1.0, $xpath->evaluate('count(//*[@id="runtimeEnabled"]/preceding::*[@id="runtime-storage-status"])'));
-                self::assertStringContainsString('Capture changes apply to new requests.', $xpath->evaluate('string(//*[@id="runtime-settings"])'));
+                self::assertStringContainsString('Capture new messages in Runtime Logs.', $xpath->evaluate('string(//*[@id="runtimeEnabled-instructions"])'));
+                self::assertStringContainsString('Turning this off does not delete existing logs.', $xpath->evaluate('string(//*[@id="runtimeEnabled-instructions"])'));
+                self::assertSame(0.0, $xpath->evaluate('count(//*[@id="runtime-settings"]//*[@id="runtimeEnabled-instructions"])'));
+                self::assertStringNotContainsString('Capture new messages in Runtime Logs.', $xpath->evaluate('string(//*[@id="runtime-settings"])'));
+                self::assertStringContainsString('in bytes rather than characters. Longer messages are shortened. File logs are unaffected.', $xpath->evaluate('string(//*[@id="runtimeMaxMessageBytes-instructions"])'));
+                self::assertStringContainsString('such as error details and stack traces, in bytes after JSON encoding. Larger context is shortened. File logs are unaffected.', $xpath->evaluate('string(//*[@id="runtimeMaxContextBytes-instructions"])'));
                 self::assertStringContainsString('Uses the application cache configuration.', $xpath->evaluate('string(//*[@id="runtime-storage-status"])'));
                 self::assertStringContainsString('To verify capture, trigger a log message and check Runtime Logs.', $xpath->evaluate('string(//*[@id="runtime-storage-status"])'));
                 self::assertStringNotContainsString('On multiple servers', $html);
             }
-            foreach (['setup', 'settings/general', 'settings/files', 'settings/interface', 'settings/runtime'] as $template) {
+            foreach (['settings/general', 'settings/files', 'settings/interface', 'settings/runtime'] as $template) {
                 self::assertNotNull($view->getTwig()->load('logging-library/' . $template));
             }
         } finally {
@@ -156,6 +183,54 @@ final class SettingsPagesTest extends TestCase
                 $view->getTwig()->setCache($twigCache);
             }
             Craft::$app->set('config', $config);
+            Craft::$app->set('request', $request);
+            $view->setTemplateMode($mode);
+        }
+    }
+
+    public function testSettingsOrderAndEdgeNoticeLinkRenderInEveryLocale(): void
+    {
+        $view = Craft::$app->getView();
+        $mode = $view->getTemplateMode();
+        $request = Craft::$app->getRequest();
+        $language = Craft::$app->language;
+        $twigCache = null;
+        try {
+            $view->setTemplateMode(View::TEMPLATE_MODE_CP);
+            $twigCache = $view->getTwig()->getCache();
+            $view->getTwig()->setCache($this->createTrackedTempDirectory('ll-settings-twig-'));
+            Craft::$app->set('request', new SettingsFormRequest());
+            foreach (['en', 'de', 'fr', 'nl', 'es', 'ar', 'it', 'pt', 'ja', 'sv', 'da', 'no'] as $locale) {
+                Craft::$app->language = $locale;
+                $html = $view->getTwig()->load('logging-library/_layouts/settings')->renderBlock('sidebar', [
+                    'selectedSettingsItem' => 'files',
+                ]);
+                $document = new \DOMDocument();
+                $document->loadHTML('<?xml encoding="UTF-8">' . $html, LIBXML_NOERROR | LIBXML_NOWARNING);
+                $xpath = new \DOMXPath($document);
+                foreach (['general', 'files', 'runtime', 'interface'] as $index => $section) {
+                    self::assertStringEndsWith('/logging-library/settings/' . $section, $xpath->evaluate('string((//nav//a)[' . ($index + 1) . ']/@href)'));
+                }
+                self::assertStringEndsWith('/logging-library/settings/files', $xpath->evaluate('string(//nav//a[@class="sel"]/@href)'));
+                foreach ([true, false] as $edge) {
+                    $html = $view->renderTemplate('logging-library/_components/file-availability', [
+                        'settings' => ['edgeEnvironmentDetected' => $edge],
+                    ], View::TEMPLATE_MODE_CP);
+                    $document->loadHTML('<?xml encoding="UTF-8">' . $html, LIBXML_NOERROR | LIBXML_NOWARNING);
+                    $xpath = new \DOMXPath($document);
+                    self::assertSame($edge ? 1.0 : 0.0, $xpath->evaluate('count(//a)'));
+                    self::assertStringNotContainsString('{runtimeLogs}', $html);
+                    if ($edge) {
+                        self::assertStringEndsWith('/logging-library/settings/runtime', $xpath->evaluate('string(//a/@href)'));
+                        self::assertSame(Craft::t('logging-library', 'Runtime Logs'), $xpath->evaluate('string(//a)'));
+                    }
+                }
+            }
+        } finally {
+            Craft::$app->language = $language;
+            if ($twigCache !== null) {
+                $view->getTwig()->setCache($twigCache);
+            }
             Craft::$app->set('request', $request);
             $view->setTemplateMode($mode);
         }
@@ -183,6 +258,13 @@ final class SettingsPermissionUser extends User
 final class SettingsPageController extends SettingsController
 {
     public ?string $renderedTemplate = null;
+    public array|string|null $redirectedUrl = null;
+
+    public function redirect($url, $statusCode = 302): Response
+    {
+        $this->redirectedUrl = $url;
+        return new Response();
+    }
 
     public function renderTemplate(string $template, array $variables = [], ?string $templateMode = null): Response
     {

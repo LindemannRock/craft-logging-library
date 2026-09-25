@@ -39,9 +39,9 @@ Use these checks when a log destination, viewer, or Runtime Logs result does not
 
 1. Confirm **Show Main Menu** is on
 2. Check whether file viewers are suppressed because Craft reports an ephemeral host or its normalized `SERVD_PROJECT_SLUG` value resolves to a non-empty project slug. Missing, blank, whitespace-only, null, and normalized false Servd values do not detect Servd
-3. Check permissions: settings managers can access Settings and Setup; viewer-only users need an available viewer
+3. Check permissions: settings managers can access Settings; viewer-only users need an available viewer
 
-**Fix:** If persistent shared storage backs `storage/logs/`, use **Force Enable File Log Viewers** to restore automatic file-viewer availability. Otherwise, enable [Runtime Logs](../feature-tour/runtime-logs.md) under **Settings → Runtime Logs** or in configuration. With both viewers off, a settings manager still sees Settings and Setup, but a viewer-only user has no available section.
+**Fix:** If persistent shared storage backs `storage/logs/`, use **Force Enable File Log Viewers** to restore automatic file-viewer availability. Otherwise, enable [Runtime Logs](../feature-tour/runtime-logs.md) under **Settings → Runtime Logs** or in configuration. With both viewers off, a settings manager still sees Settings, but a viewer-only user has no available section.
 
 ## Servd shows an empty Select File dropdown
 
@@ -52,11 +52,26 @@ On Servd, Logging Library can only show files that exist in the current Craft `s
 ## Runtime Logs is missing or empty
 
 1. Confirm **Enable Runtime Logs** is on under **Settings → Runtime Logs**, or overridden to `true` by `runtimeLogStore.enabled` in configuration
-2. Check the user has `loggingLibrary:viewAllLogs` and that **Show Main Menu** is on in Logging Library settings
+2. Check the user has `loggingLibrary:viewRuntimeLogs` and that **Show Main Menu** is on in Logging Library settings
 3. If the view is empty, trigger something that logs at a captured level (`error`, `warning`, or `info` by default) and let the page auto-refresh
 4. Check effective capture levels and include/exclude categories in Settings — an entry has to match all three to be captured
 
 **Why:** Runtime entries only exist in their selected diagnostic store. They expire with the configured `ttl`, roll off past `maxEntries`, and disappear when that store is cleared or evicts them. On load-balanced hosting without a shared cache backend (such as Redis), each instance keeps its own fallback store, so the CP may show only entries captured by the instance serving your request. The Runtime Logs sidebar reports the effective backend and Redis database. See [Runtime Logs](../feature-tour/runtime-logs.md).
+
+## An excluded source still appears in Runtime Logs
+
+1. Open **Settings → Runtime Logs → Advanced → Exclude Sources and Categories**
+2. Search for the source and select the named result, such as **Vite**, **DB Connection**, **Code Editor**, or an installed plugin such as **Minify**
+3. If you previously typed a display name as a raw category, remove the **Category: Vite** item and select **Vite** instead
+4. Save, then trigger a new request and check its timestamp; restart long-running workers if they capture logs
+
+**Why:** The viewer groups raw categories under readable source names. The picker translates a named selection into matching category patterns, but custom categories and configuration arrays match raw strings, case-sensitively. **DB Connection** matches `yii\db\Connection::open`; it does not exclude the separate **DB Queries** or **DB Commands** sources. Existing entries are not removed when a capture filter changes; let them expire or clear them only if you no longer need them.
+
+## Removed capture filters return after saving
+
+Reload the Runtime Logs settings page after updating, remove the unwanted source or category selections, and save again. Both Include and Exclude support removing individual items or clearing the whole list. A configuration override locks the corresponding field; remove `runtimeLogStore.includeCategories` or `runtimeLogStore.excludeCategories` from configuration if you want to manage that list in the CP.
+
+**Why:** A picker bug allowed removed chips to leave stale values in the submitted form, so saving restored the earlier selections. Picker values are now encoded for safe removal and decoded back into ordinary category patterns before saving. This does not clear existing runtime logs.
 
 ## Runtime Logs shows Redis unavailable
 
@@ -76,7 +91,7 @@ An explicit `'database' => null` sends no `SELECT` and is intended only for comp
 
 Older Logging Library versions exported a `samdark\log\PsrMessage` object as PHP reconstruction text, which could make the message begin with content resembling `unserialize(...)` and bury its structured context inside that text.
 
-**Fix:** Update to Logging Library 5.18.1 or later, then reproduce the event. New entries show `PsrMessage::getMessage()` as the message and `getContext()` in the separate context field. Existing cached Runtime entries are not rewritten; let them expire under the configured `ttl`, roll off the bounded store, or use **Clear Runtime Logs** if you have the `loggingLibrary:clearCache` permission and no longer need the current diagnostic window.
+**Fix:** Update to Logging Library 5.18.1 or later, then reproduce the event. New entries show `PsrMessage::getMessage()` as the message and `getContext()` in the separate context field. Existing cached Runtime entries are not rewritten; let them expire under the configured `ttl`, roll off the bounded store, or use **Clear runtime logs** if you have both `loggingLibrary:viewRuntimeLogs` and `loggingLibrary:clearRuntimeLogs` and no longer need the current diagnostic window.
 
 **Why:** Runtime Logs stores bounded diagnostic snapshots. Updating normalization changes newly captured records only; it does not migrate, evaluate, or deserialize records already in Redis or Craft cache.
 
@@ -106,6 +121,10 @@ With a local or otherwise non-shared cache, each application instance has a sepa
 
 Restart long-running queue workers after changing these options. A running worker keeps the Runtime Logs target configuration captured when its application started.
 
+## Long user names appear shortened
+
+Hover the User or Request User value to see the full name or email address. The table uses an ellipsis when it cannot fit the value, preventing it from overlapping the message. This is display-only: stored logs and user values are unchanged, including after Runtime Logs refreshes.
+
 ## Permission denied when viewing logs
 
 1. Ensure the user has the required permission (e.g., `yourPlugin:viewLogs`)
@@ -113,6 +132,10 @@ Restart long-running queue workers after changing these options. A running worke
 3. Grant the permission via **Settings → Users → User Groups → [Group] → [Plugin Name]**
 
 **Why:** When `viewSystemLogsPermissions` is set, the controller requires the user to have at least one of the listed permissions. Admins are always allowed.
+
+## A clearing action or Runtime Logs is unavailable after upgrading
+
+Before changing permissions, check which operation is missing: **View runtime logs** is independent of file viewing, and **Clear runtime logs** requires runtime viewing as well. For the standalone file viewer, **Refresh Cache** requires both **View all file logs** and **Clear file log cache**. If access changed after upgrading to 5.19.0, confirm the plugin migrations and resulting group project config have been applied; see [Permissions](../developers/permissions.md#upgrading-to-5190).
 
 ## Settings save shows a validation error
 
@@ -124,7 +147,7 @@ When a setting is overridden in `config/logging-library.php`, the Control Panel 
 
 Each explicit nested option in `config/logging-library.php` locks only its matching field. Copying the full sample pins all listed options. Remove the specific override to manage that value in the CP; the saved preference or default becomes effective again. Redis database selection remains configuration-only.
 
-Changes affect new requests. Restart long-running workers after saving capture settings. **Configured Storage** on Settings and Setup does not test connectivity: trigger a matching log message and check the Runtime Logs viewer. Turning capture off does not clear existing entries, and disabling user IDs does not redact personal data already present in messages or context.
+Changes affect new requests. Restart long-running workers after saving capture settings. **Configured Storage** on Settings does not test connectivity: trigger a matching log message and check the Runtime Logs viewer. Turning capture off does not clear existing entries, and disabling user IDs does not redact personal data already present in messages or context.
 
 ## Cache not updating after new log entries
 

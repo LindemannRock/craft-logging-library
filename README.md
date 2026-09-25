@@ -15,16 +15,16 @@ A reusable logging library for Craft CMS plugins that provides consistent loggin
 - **Built-in Log Viewer** — web interface for viewing, filtering, searching, and downloading logs
 - **Standalone System Log Viewer** — browse all Craft, plugin, and PHP logs from one interface
 - **Runtime Logs** — bounded Redis/Craft-cache view of recent log activity for edge/ephemeral hosting where log files don't persist
+- **Source-Aware Capture Filters** — select readable source names or enter custom category patterns to include or exclude runtime messages
 - **Control Panel Section** — access the standalone viewer from **Logging Library → All Logs** when the CP section is enabled
 - **Control Panel Settings** — runtime capture, file-viewer availability, display name, menu visibility, page size, and timestamps, with per-option config overrides
-- **Setup Summary** — review runtime capture, file availability, and configured storage through the shared setup screen; capture remains optional
 - **LoggingTrait** — drop-in trait with `logInfo()`, `logWarning()`, `logError()`, `logDebug()`
 - **LoggingService API** — direct logging, log statistics, recent entries, and cleanup
 - **High Performance Caching** — indexed file-based cache for large log viewer pages, with ArrayQuery compatibility for API callers
 - **Multi-Format Parsing** — automatically detects plugin, Craft CMS, and PHP error log formats
 - **Edge Detection** — auto-hides file-based viewers when Craft reports ephemeral storage or Servd identifies the project
 - **Monolog Integration** — uses Craft 5's Monolog system with proper PSR-3 standards
-- **Configurable** — customizable log levels, retention, permissions, and sidebar menus
+- **Configurable** — customizable log levels, retention, and sidebar menus, with separate file-log, runtime-log, and settings permissions
 
 On ephemeral hosts such as Craft Cloud, and on Servd, automatic suppression affects file-based viewers only. Craft/Yii logging and Logging Library's dedicated Monolog targets continue unchanged. Logging Library does not import a hosting provider's centralized log feed into Craft; the file-based CP viewer reads local `storage/logs/` files only.
 

@@ -14,7 +14,6 @@ return [
     'Open Settings' => 'Abrir as definições',
 
     // Navigation
-    'Setup' => 'Configuração',
     'File Logs' => 'Registos em ficheiros',
     'All Logs' => 'Todos os registos',
     'Runtime Logs' => 'Registos de runtime',
@@ -27,9 +26,10 @@ return [
     'Interface' => 'Interface',
 
     // Permissions
-    'View all system logs' => 'Ver todos os registos do sistema',
-    'Download all system logs' => 'Descarregar todos os registos do sistema',
-    'Clear cache' => 'Limpar cache',
+    'View all file logs' => 'Ver todos os registos em ficheiros',
+    'Download all file logs' => 'Descarregar todos os registos em ficheiros',
+    'Clear file log cache' => 'Limpar cache dos registos em ficheiros',
+    'View runtime logs' => 'Ver registos de runtime',
     'Manage settings' => 'Gerir definições',
 
     // Common
@@ -64,7 +64,7 @@ return [
 
     // Settings: File Logs
     'Force Enable File Log Viewers' => 'Forçar ativação dos visualizadores de registos em ficheiros',
-    'An edge or ephemeral environment is detected. File viewers are hidden unless forced on; Runtime Logs remain available when enabled. Only force file viewers on if persistent log files are available.' => 'Foi detetado um ambiente edge ou efémero. Os visualizadores de ficheiros ficam ocultos salvo ativação forçada; os registos de runtime continuam disponíveis quando ativados. Force os visualizadores apenas se existirem ficheiros de registos persistentes.',
+    'An edge or ephemeral environment is detected. File viewers are hidden unless forced on; {runtimeLogs} remain available when enabled. Only force file viewers on if persistent log files are available.' => 'Foi detetado um ambiente edge ou efémero. Os visualizadores de ficheiros ficam ocultos salvo ativação forçada; os {runtimeLogs} continuam disponíveis quando ativados. Force os visualizadores apenas se existirem ficheiros de registos persistentes.',
     'File viewers are available. Runtime Logs are optional and independent of file logging.' => 'Os visualizadores de ficheiros estão disponíveis. Os registos de runtime são opcionais e independentes do registo em ficheiros.',
 
     // Settings: Runtime Logs
@@ -79,17 +79,18 @@ return [
     'Maximum Message Bytes' => 'Máximo de bytes da mensagem',
     'Maximum Context Bytes' => 'Máximo de bytes do contexto',
     'Captured Levels' => 'Níveis capturados',
-    'Include Categories' => 'Incluir categorias',
-    'Exclude Categories' => 'Excluir categorias',
+    'Include Sources and Categories' => 'Incluir origens e categorias',
+    'Exclude Sources and Categories' => 'Excluir origens e categorias',
+    'Category: {pattern}' => 'Categoria: {pattern}',
     'Include Request User ID' => 'Incluir ID do utilizador do pedido',
     'Advanced' => 'Avançado',
     'Configured Storage' => 'Armazenamento configurado',
-    'Storage follows the Craft cache configuration. Redis database selection is configuration-only. This is not a connection test; confirm capture in Runtime Logs.' => 'O armazenamento segue a configuração da cache do Craft. A base de dados Redis é selecionada apenas por configuração. Isto não é um teste de ligação; confirme a captura nos registos de runtime.',
-    'On multiple servers, use shared cache storage. Local file cache does not combine logs from other instances.' => 'Em ambientes multi-servidor, use armazenamento de cache partilhado. A cache de ficheiros local não combina registos de outras instâncias.',
-    'Capture changes apply to new requests. Restart long-running workers to load changed settings. Disabling capture does not clear stored logs.' => 'As alterações à captura aplicam-se a novos pedidos. Reinicie os processos de longa duração para carregar as definições alteradas. Desativar a captura não limpa os registos armazenados.',
+    'Capture new messages in Runtime Logs. Changes apply to new requests; restart long-running workers to apply them. Turning this off does not delete existing logs.' => 'Capture novas mensagens nos registos de runtime. As alterações aplicam-se a novos pedidos; reinicie os processos de longa duração para as aplicar. Desativar esta opção não elimina os registos existentes.',
+    'Limits the message text kept for each new Runtime Logs entry, in bytes rather than characters. Longer messages are shortened. File logs are unaffected.' => 'Limita o texto da mensagem guardado para cada nova entrada dos registos de runtime, em bytes e não em caracteres. As mensagens mais longas são encurtadas. Os registos em ficheiros não são afetados.',
+    'Limits the extra data kept for each new Runtime Logs entry, such as error details and stack traces, in bytes after JSON encoding. Larger context is shortened. File logs are unaffected.' => 'Limita os dados adicionais guardados para cada nova entrada dos registos de runtime, como detalhes de erros e rastreios da pilha, em bytes após a codificação JSON. O contexto de maior dimensão é encurtado. Os registos em ficheiros não são afetados.',
     'How often Runtime Logs refreshes automatically. Set to 0 to disable. Current: {duration}' => 'Frequência de atualização automática dos registos de runtime. Defina 0 para desativar. Atual: {duration}',
-    'Choose which log categories to capture, not words in the message. Enter one category per line, such as {exact}, or use {prefix} to match categories starting with {start}. Leave empty to capture all categories.' => 'Escolha as categorias de registos a capturar, não palavras da mensagem. Introduza uma categoria por linha, como {exact}, ou use {prefix} para categorias que comecem por {start}. Deixe vazio para capturar todas as categorias.',
-    'Skip these log categories even if included above. Enter one per line, such as {exact} or {prefix}. Leave empty to add no category exclusions.' => 'Ignore estas categorias de registos mesmo que estejam incluídas acima. Introduza uma por linha, como {exact} ou {prefix}. Deixe vazio para não adicionar exclusões de categorias.',
+    'Choose sources by name or type a category pattern such as {pattern} and press Enter. Leave empty to capture all sources. Changes affect new messages only.' => 'Escolha as origens pelo nome ou introduza um padrão de categoria como {pattern} e prima Enter. Deixe vazio para capturar todas as origens. As alterações afetam apenas as mensagens novas.',
+    'Choose sources to skip or type a category pattern and press Enter. Exclusions take precedence. Existing entries are not removed.' => 'Escolha as origens a ignorar ou introduza um padrão de categoria e prima Enter. As exclusões têm prioridade. As entradas existentes não são removidas.',
     'When on, Runtime Logs skips command-line requests. Turn off only when diagnosing console commands; file and hosted logs are unaffected.' => 'Quando esta opção está ativada, os registos de runtime ignoram os pedidos da linha de comandos. Desative-a apenas para diagnosticar comandos da consola; os registos em ficheiros e do alojamento não são afetados.',
     'When on, Runtime Logs skips detected queue execution. To capture console queue workers, turn off both skip switches and restart the workers. Workers can generate large volumes of logs.' => 'Quando esta opção está ativada, os registos de runtime ignoram a execução da fila detetada. Para capturar os processos da fila da consola, desative ambas as opções de exclusão e reinicie os processos. Os processos podem gerar grandes volumes de registos.',
     'Adds the authenticated request user ID. Messages and context may still contain personal data regardless of this setting.' => 'Adiciona o ID do utilizador autenticado do pedido. As mensagens e o contexto podem conter dados pessoais independentemente desta definição.',
@@ -107,10 +108,6 @@ return [
 
     // Settings: Interface
     'Interface Settings' => 'Definições de interface',
-
-    // Setup
-    'Choose the log views that suit this environment. Runtime capture is optional and remains off until enabled.' => 'Escolha as vistas de registos adequadas a este ambiente. A captura de runtime é opcional e permanece desativada até ser ativada.',
-    'Consider Runtime Logs for recent diagnostics on ephemeral hosting. Confirm shared storage before relying on logs from multiple instances.' => 'Considere os registos de runtime para diagnósticos recentes em alojamento efémero. Confirme o armazenamento partilhado antes de confiar nos registos de várias instâncias.',
 
     // Log levels
     'All Levels' => 'Todos os níveis',
@@ -176,7 +173,7 @@ return [
     'Current File' => 'Ficheiro atual',
     'Log entries' => 'Entradas de registo',
     'Refresh Cache' => 'Atualizar cache',
-    'Clear Runtime Logs' => 'Limpar registos de runtime',
+    'Clear runtime logs' => 'Limpar registos de runtime',
     'Clear recent runtime logs? This cannot be undone.' => 'Limpar os registos de runtime recentes? Esta ação não pode ser anulada.',
     'Loading' => 'A carregar',
     'Download File' => 'Transferir ficheiro',

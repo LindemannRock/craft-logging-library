@@ -14,7 +14,6 @@ return [
     'Open Settings' => '設定を開く',
 
     // Navigation
-    'Setup' => 'セットアップ',
     'File Logs' => 'ファイルログ',
     'All Logs' => 'すべてのログ',
     'Runtime Logs' => 'ランタイムログ',
@@ -27,9 +26,10 @@ return [
     'Interface' => 'インターフェース',
 
     // Permissions
-    'View all system logs' => 'すべてのシステムログを表示する',
-    'Download all system logs' => 'すべてのシステムログをダウンロードする',
-    'Clear cache' => 'キャッシュを削除する',
+    'View all file logs' => 'すべてのファイルログを表示する',
+    'Download all file logs' => 'すべてのファイルログをダウンロードする',
+    'Clear file log cache' => 'ファイルログのキャッシュを削除する',
+    'View runtime logs' => 'ランタイムログを表示する',
     'Manage settings' => '設定を管理する',
 
     // Common
@@ -64,7 +64,7 @@ return [
 
     // Settings: File Logs
     'Force Enable File Log Viewers' => 'ファイルログビューアーを強制的に有効にする',
-    'An edge or ephemeral environment is detected. File viewers are hidden unless forced on; Runtime Logs remain available when enabled. Only force file viewers on if persistent log files are available.' => 'エッジ環境または一時的な環境が検出されました。ファイルビューアーは強制的に有効にしない限り非表示になります。有効なランタイムログは引き続き利用できます。永続的なログファイルが利用できる場合のみ、ファイルビューアーを強制的に有効にしてください。',
+    'An edge or ephemeral environment is detected. File viewers are hidden unless forced on; {runtimeLogs} remain available when enabled. Only force file viewers on if persistent log files are available.' => 'エッジ環境または一時的な環境が検出されました。ファイルビューアーは強制的に有効にしない限り非表示になります。有効な{runtimeLogs}は引き続き利用できます。永続的なログファイルが利用できる場合のみ、ファイルビューアーを強制的に有効にしてください。',
     'File viewers are available. Runtime Logs are optional and independent of file logging.' => 'ファイルビューアーが利用できます。ランタイムログは任意であり、ファイルへのログ記録とは独立しています。',
 
     // Settings: Runtime Logs
@@ -79,17 +79,18 @@ return [
     'Maximum Message Bytes' => 'メッセージの最大バイト数',
     'Maximum Context Bytes' => 'コンテキストの最大バイト数',
     'Captured Levels' => 'キャプチャするレベル',
-    'Include Categories' => '含めるカテゴリ',
-    'Exclude Categories' => '除外するカテゴリ',
+    'Include Sources and Categories' => 'ソースとカテゴリを含める',
+    'Exclude Sources and Categories' => 'ソースとカテゴリを除外',
+    'Category: {pattern}' => 'カテゴリ: {pattern}',
     'Include Request User ID' => 'リクエストユーザー ID を含める',
     'Advanced' => '詳細設定',
     'Configured Storage' => '設定されたストレージ',
-    'Storage follows the Craft cache configuration. Redis database selection is configuration-only. This is not a connection test; confirm capture in Runtime Logs.' => 'ストレージは Craft のキャッシュ設定に従います。Redis データベースは設定ファイルでのみ選択できます。これは接続テストではありません。ランタイムログでキャプチャを確認してください。',
-    'On multiple servers, use shared cache storage. Local file cache does not combine logs from other instances.' => '複数のサーバーでは共有キャッシュストレージを使用してください。ローカルファイルキャッシュは他のインスタンスのログを統合しません。',
-    'Capture changes apply to new requests. Restart long-running workers to load changed settings. Disabling capture does not clear stored logs.' => 'キャプチャの変更は新しいリクエストに適用されます。変更した設定を読み込むには、長時間実行されるワーカーを再起動してください。キャプチャを無効にしても保存済みのログは削除されません。',
+    'Capture new messages in Runtime Logs. Changes apply to new requests; restart long-running workers to apply them. Turning this off does not delete existing logs.' => '新しいメッセージをランタイムログに記録します。変更は新しいリクエストに適用されます。長時間実行されるワーカーには、再起動して変更を適用してください。無効にしても既存のログは削除されません。',
+    'Limits the message text kept for each new Runtime Logs entry, in bytes rather than characters. Longer messages are shortened. File logs are unaffected.' => 'ランタイムログの新しいエントリーごとに保存するメッセージ本文を、文字数ではなくバイト数で制限します。長いメッセージは短縮されます。ファイルログには影響しません。',
+    'Limits the extra data kept for each new Runtime Logs entry, such as error details and stack traces, in bytes after JSON encoding. Larger context is shortened. File logs are unaffected.' => 'ランタイムログの新しいエントリーごとに保存するエラーの詳細やスタックトレースなどの追加データを、JSON エンコード後のバイト数で制限します。大きなコンテキストは短縮されます。ファイルログには影響しません。',
     'How often Runtime Logs refreshes automatically. Set to 0 to disable. Current: {duration}' => 'ランタイムログが自動更新される頻度です。無効にするには 0 に設定してください。現在: {duration}',
-    'Choose which log categories to capture, not words in the message. Enter one category per line, such as {exact}, or use {prefix} to match categories starting with {start}. Leave empty to capture all categories.' => 'メッセージ内の単語ではなく、キャプチャするログカテゴリを選択してください。{exact} のように 1 行に 1 つのカテゴリを入力するか、{prefix} を使用して {start} で始まるカテゴリに一致させます。すべてのカテゴリをキャプチャするには空欄にしてください。',
-    'Skip these log categories even if included above. Enter one per line, such as {exact} or {prefix}. Leave empty to add no category exclusions.' => '上記で含めた場合でも、これらのログカテゴリを除外します。{exact} や {prefix} のように 1 行に 1 つ入力してください。カテゴリの除外を追加しない場合は空欄にしてください。',
+    'Choose sources by name or type a category pattern such as {pattern} and press Enter. Leave empty to capture all sources. Changes affect new messages only.' => '名前でソースを選択するか、{pattern} などのカテゴリパターンを入力して Enter キーを押してください。すべてのソースをキャプチャするには空欄にしてください。変更は新しいメッセージにのみ適用されます。',
+    'Choose sources to skip or type a category pattern and press Enter. Exclusions take precedence. Existing entries are not removed.' => '除外するソースを選択するか、カテゴリパターンを入力して Enter キーを押してください。除外が優先されます。既存のエントリは削除されません。',
     'When on, Runtime Logs skips command-line requests. Turn off only when diagnosing console commands; file and hosted logs are unaffected.' => '有効にすると、ランタイムログはコマンドラインのリクエストを除外します。コンソールコマンドの診断時のみ無効にしてください。ファイルログとホスティングのログには影響しません。',
     'When on, Runtime Logs skips detected queue execution. To capture console queue workers, turn off both skip switches and restart the workers. Workers can generate large volumes of logs.' => '有効にすると、ランタイムログは検出されたキュー実行を除外します。コンソールのキューワーカーをキャプチャするには、両方の除外スイッチを無効にしてワーカーを再起動してください。ワーカーは大量のログを生成する場合があります。',
     'Adds the authenticated request user ID. Messages and context may still contain personal data regardless of this setting.' => 'リクエストの認証済みユーザー ID を追加します。この設定に関係なく、メッセージとコンテキストには個人データが含まれる場合があります。',
@@ -107,10 +108,6 @@ return [
 
     // Settings: Interface
     'Interface Settings' => 'インターフェース設定',
-
-    // Setup
-    'Choose the log views that suit this environment. Runtime capture is optional and remains off until enabled.' => 'この環境に適したログ表示を選択してください。ランタイムキャプチャは任意であり、有効にするまで無効のままです。',
-    'Consider Runtime Logs for recent diagnostics on ephemeral hosting. Confirm shared storage before relying on logs from multiple instances.' => '一時的なホスティングでの最近の診断にはランタイムログをご検討ください。複数のインスタンスのログを利用する前に、共有ストレージを確認してください。',
 
     // Log levels
     'All Levels' => 'すべてのレベル',
@@ -176,7 +173,7 @@ return [
     'Current File' => '現在のファイル',
     'Log entries' => 'ログエントリ',
     'Refresh Cache' => 'キャッシュを更新',
-    'Clear Runtime Logs' => 'ランタイムログを削除する',
+    'Clear runtime logs' => 'ランタイムログを削除する',
     'Clear recent runtime logs? This cannot be undone.' => '最近のランタイムログを削除しますか？この操作は取り消せません。',
     'Loading' => 'ロードしています',
     'Download File' => 'ファイルをダウンロード',

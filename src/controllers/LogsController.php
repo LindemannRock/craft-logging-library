@@ -83,6 +83,7 @@ class LogsController extends Controller
             // Check if user can download (only if downloadSystemLogsPermissions is configured)
             $downloadPermissions = $config['downloadSystemLogsPermissions'] ?? [];
             $canDownload = !empty($downloadPermissions) && $this->_hasPermission($downloadPermissions);
+            $canRefreshCache = true;
 
             $limit = $config['itemsPerPage'] ?? 50;
             $pluginName = $config['pluginName'];
@@ -118,6 +119,7 @@ class LogsController extends Controller
             $limit = $settings instanceof Settings ? $settings->itemsPerPage : 50;
             $pluginName = $settings instanceof Settings ? $settings->getFullName() : LoggingLibrary::getInstance()->name;
             $canDownload = $this->_hasPermission([LoggingLibrary::PERMISSION_DOWNLOAD_ALL_LOGS]);
+            $canRefreshCache = $this->_hasPermission([LoggingLibrary::PERMISSION_CLEAR_CACHE]);
             $logMenuItems = null;
             $logMenuLabel = null;
         }
@@ -229,6 +231,7 @@ class LogsController extends Controller
             'categoryOptions' => $categoryOptions,
             'logEntries' => $logEntries,
             'canDownload' => $canDownload,
+            'canRefreshCache' => $canRefreshCache,
             'filters' => [
                 'level' => $level,
                 'category' => $category,
@@ -261,7 +264,7 @@ class LogsController extends Controller
         $user = Craft::$app->getUser();
         $settings = LoggingLibrary::getInstance()->getSettings();
 
-        if (!$user->checkPermission(LoggingLibrary::PERMISSION_VIEW_ALL_LOGS)) {
+        if (!$user->checkPermission(LoggingLibrary::PERMISSION_VIEW_RUNTIME_LOGS)) {
             if ($settings instanceof Settings) {
                 $sections = LoggingLibrary::getInstance()->getCpSections($settings);
                 $route = CpNavHelper::firstAccessibleRoute($user, $settings, $sections);
@@ -270,10 +273,10 @@ class LogsController extends Controller
                 }
             }
 
-            $this->requirePermission(LoggingLibrary::PERMISSION_VIEW_ALL_LOGS);
+            $this->requirePermission(LoggingLibrary::PERMISSION_VIEW_RUNTIME_LOGS);
         }
 
-        $this->_checkPermissions([LoggingLibrary::PERMISSION_VIEW_ALL_LOGS]);
+        $this->_checkPermissions([LoggingLibrary::PERMISSION_VIEW_RUNTIME_LOGS]);
 
         if (!LoggingLibrary::isRuntimeLogStoreEnabled()) {
             throw new NotFoundHttpException(Craft::t('logging-library', 'Recent runtime logs are disabled'));
@@ -324,7 +327,7 @@ class LogsController extends Controller
             'runtimeStoreLabel' => $this->_runtimeStoreLabel($context['runtimeStorage']),
             'runtimeLocationLabel' => $this->_runtimeLocationLabel($context['runtimeStorage']),
             'runtimeLocationTitle' => $this->_runtimeLocationTitle($context['runtimeStorage']),
-            'canClearRuntimeLogs' => $user->checkPermission(LoggingLibrary::PERMISSION_CLEAR_CACHE),
+            'canClearRuntimeLogs' => $user->checkPermission(LoggingLibrary::PERMISSION_CLEAR_RUNTIME_LOGS),
             'logConfig' => null,
         ]);
     }
@@ -338,7 +341,7 @@ class LogsController extends Controller
     public function actionRuntimeData(): Response
     {
         $this->requireAcceptsJson();
-        $this->_checkPermissions([LoggingLibrary::PERMISSION_VIEW_ALL_LOGS]);
+        $this->_checkPermissions([LoggingLibrary::PERMISSION_VIEW_RUNTIME_LOGS]);
 
         if (!LoggingLibrary::isRuntimeLogStoreEnabled()) {
             throw new NotFoundHttpException(Craft::t('logging-library', 'Recent runtime logs are disabled'));
@@ -398,8 +401,8 @@ class LogsController extends Controller
     public function actionClearRuntime(): Response
     {
         $this->requirePostRequest();
-        $this->_checkPermissions([LoggingLibrary::PERMISSION_VIEW_ALL_LOGS]);
-        $this->_checkPermissions([LoggingLibrary::PERMISSION_CLEAR_CACHE]);
+        $this->_checkPermissions([LoggingLibrary::PERMISSION_VIEW_RUNTIME_LOGS]);
+        $this->_checkPermissions([LoggingLibrary::PERMISSION_CLEAR_RUNTIME_LOGS]);
 
         if (!LoggingLibrary::isRuntimeLogStoreEnabled()) {
             throw new NotFoundHttpException(Craft::t('logging-library', 'Recent runtime logs are disabled'));
@@ -527,6 +530,7 @@ class LogsController extends Controller
             }
 
             $this->_checkPermissions([LoggingLibrary::PERMISSION_VIEW_ALL_LOGS]);
+            $this->_checkPermissions([LoggingLibrary::PERMISSION_CLEAR_CACHE]);
 
             $filename = trim($request->getRequiredParam('file'));
             if (!preg_match('/^[a-zA-Z0-9_\-\.]+$/', $filename) || !preg_match('/\.log(\.\d+)?$/i', $filename)) {

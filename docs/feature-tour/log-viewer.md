@@ -23,6 +23,8 @@ When a plugin calls `LoggingLibrary::configure()`, the log viewer becomes availa
 
 Full dates shown for undated/current files use the shared date settings from `config/lindemannrock-base.php`; Logging Library's own settings only expose time format and seconds controls.
 
+Long user names or email addresses shorten with an ellipsis to stay inside the User column. Hover the value to read it in full; the underlying log data is unchanged. This also applies to the standalone viewer and Runtime Logs, including automatic refreshes.
+
 ## Enabling the viewer
 
 Two things are required for the log viewer to work:

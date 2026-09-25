@@ -13,7 +13,7 @@ Where the [file-based viewers](standalone-viewer.md) read what's on disk, Runtim
 
 ## Turn it on
 
-Runtime Logs is **off by default**. Open **Logging Library → Settings → Runtime Logs**, turn on **Enable Runtime Logs**, choose the levels and limits you need, and save. Setup summarizes the environment and storage without enabling capture for you.
+Runtime Logs is **off by default**. Open **Logging Library → Settings → Runtime Logs**, turn on **Enable Runtime Logs**, choose the levels and limits you need, and save.
 
 If a field is disabled, it is pinned in `config/logging-library.php`. Remove only the matching option to manage that field in the CP, or keep configuration as the authority. For example:
 
@@ -30,13 +30,13 @@ return [
 ];
 ```
 
-On the next request, Logging Library registers a target that captures matching messages. Trigger a normal web request that logs at an enabled level, then open **Runtime Logs** to verify capture. **Show Main Menu** must be on for navigation to appear. Viewing requires `loggingLibrary:viewAllLogs`; changing preferences requires `loggingLibrary:manageSettings` — see [Permissions](../developers/permissions.md).
+On the next request, Logging Library registers a target that captures matching messages. Trigger a normal web request that logs at an enabled level, then open **Runtime Logs** to verify capture. **Show Main Menu** must be on for navigation to appear. Viewing requires `loggingLibrary:viewRuntimeLogs`; changing preferences requires `loggingLibrary:manageSettings` — see [Permissions](../developers/permissions.md), including the upgrade mapping for existing users.
 
 > [!IMPORTANT]
 > Restart long-running queue workers after changing `runtimeLogStore` configuration. A target keeps the configuration snapshot from the application startup that created it.
 
 > [!NOTE]
-> Runtime Logs works independently of file viewers on edge platforms. Settings managers can reach Setup and Settings even with both viewers off, provided **Show Main Menu** is on.
+> Runtime Logs works independently of file viewers on edge platforms. Settings managers can reach Settings even with both viewers off, provided **Show Main Menu** is on.
 
 ## Browse runtime logs
 
@@ -56,11 +56,13 @@ The page **auto-refreshes** every few seconds (5 by default) and pauses while yo
 
 The store text, location text, and Redis key tooltip all refresh with the table, so a Redis failure or recovery isn't hidden behind the status from the initial page load.
 
-**Clear Runtime Logs** in the sidebar empties the store after a confirmation. The button only appears with the `loggingLibrary:clearCache` permission. Redis clearing issues an exact delete for Logging Library's application-namespaced Runtime Logs key; it never flushes a Redis database or scans/deletes wildcard keys. Log files, unrelated Redis data, and the [file viewer cache](caching.md) are untouched.
+**Clear runtime logs** in the sidebar empties the store after a confirmation. It requires both `loggingLibrary:viewRuntimeLogs` and `loggingLibrary:clearRuntimeLogs`. File-cache permissions do not authorize it. Redis clearing issues an exact delete for Logging Library's application-namespaced Runtime Logs key; it never flushes a Redis database or scans/deletes wildcard keys. Log files, unrelated Redis data, and the [file viewer cache](caching.md) are untouched.
 
 Entries per page follows the standalone viewer's **Items Per Page** setting — see [Settings](settings.md).
 
 ## Configuration reference
+
+In **Settings → Runtime Logs → Advanced**, the Include/Exclude pickers accept both named sources and custom category patterns. Choose the same source name you see in the viewer, or type a pattern and press Enter. Named choices save their underlying raw patterns; `includeCategories` and `excludeCategories` in configuration accept raw Yii category patterns, not display names. See [Settings](settings.md#runtime-logs) for examples and existing-filter behavior. Exclusions win, and changes affect newly captured messages only.
 
 Capture options are editable in **Settings → Runtime Logs**. Console/queue safeguards and request user IDs sit directly below **Enable Runtime Logs**. Category lists and payload limits are under **Advanced**. Only `redis.database` stays configuration-only.
 
@@ -77,8 +79,8 @@ Use nested `runtimeLogStore` options to override individual preferences. Each ex
     'maxMessageBytes' => 8000,
     'maxContextBytes' => 8000,
     'levels' => ['error', 'warning', 'info'],
-    'categories' => [],
-    'except' => [],
+    'includeCategories' => [],
+    'excludeCategories' => [],
     'redis' => [
         // Omit to inherit Craft cache's Redis database.
         // Use null to disable SELECT for compatible cluster-style endpoints.
@@ -101,16 +103,45 @@ Use nested `runtimeLogStore` options to override individual preferences. Each ex
 | `maxMessageBytes` | Longer messages are truncated with `...` (capped at 65,536 bytes). | `8000` |
 | `maxContextBytes` | Same truncation for the context payload. | `8000` |
 | `levels` | Which levels to capture: any of `error`, `warning`, `info`, `trace` (`debug` is accepted as an alias for `trace`). The CP's Debug filter only appears when Craft's `devMode` is on. | `['error', 'warning', 'info']` |
-| `categories` | Capture only these log categories (Yii wildcard patterns, e.g. `my-plugin*`). Empty means all. | `[]` |
-| `except` | Never capture these categories. Translation-lookup noise (`yii\i18n\PhpMessageSource:*`) is always excluded. | `[]` |
+| `includeCategories` | Capture only these log categories (exact names or trailing-`*` prefix patterns, e.g. `yii\db\*`). Empty means all. | `[]` |
+| `excludeCategories` | Never capture these categories, even if included above. Empty adds no exclusions of your own. Translation-lookup noise (`yii\i18n\PhpMessageSource:*`) is always excluded. | `[]` |
 | `redis.database` | Optional Runtime Logs Redis database. Omit it to inherit Craft's Redis database, use a non-negative integer, use an environment reference such as `'$LOGGING_LIBRARY_RUNTIME_REDIS_DB'`, or set it explicitly to `null` to avoid `SELECT`. | Omitted |
 | `privacy.includeUserId` | Record which logged-in user triggered each entry. Off by default so no user IDs are written to cache; when off, the Request User column shows **System**. | `false` |
 
-The CP rejects out-of-range values: retention is 1–2,592,000 seconds (30 days); entries 1–10,000; refresh 0–3,600 seconds (1 hour); message/context limits 1–65,536 bytes. Choose at least one supported level. Category fields take one pattern per line (up to 255 characters each), with a trailing `*` for prefix matching. Configuration-file values retain their existing normalization and bounded-limit clamping. Redis database values use the stricter fail-closed rules below.
+The CP rejects out-of-range values: retention is 1–2,592,000 seconds (30 days); entries 1–10,000; refresh 0–3,600 seconds (1 hour); message/context limits 1–65,536 bytes. Choose at least one supported level. Category pickers accept named sources and custom patterns (up to 255 characters per pattern), with a trailing `*` for prefix matching. Configuration-file values retain their existing normalization and bounded-limit clamping. Redis database values use the stricter fail-closed rules below.
 
-Saving settings does not clear entries or move them between backends. Disabling capture hides the viewer and stops capture in new requests without deleting the buffer. **Configured Storage** in Settings and Setup describes the selected backend without probing connectivity; confirm real capture in the viewer.
+Saving settings does not clear entries or move them between backends. Disabling capture hides the viewer and stops capture in new requests without deleting the buffer. **Configured Storage** in Settings describes the selected backend without probing connectivity; confirm real capture in the viewer.
 
 **Include Request User ID** is off by default. Turning it off omits that metadata from new entries; messages and context can still contain personal or sensitive data. It is not a redaction setting, and existing entries are not rewritten.
+
+### Real category examples
+
+To capture only **DB Queries** and **DB Commands**, use:
+
+```php
+'includeCategories' => [
+    'yii\\db\\Command::query',
+    'yii\\db\\Command::execute',
+],
+```
+
+To capture all sources except **DB Connection**, **Vite**, **Code Editor**, and **Minify**, use:
+
+```php
+'includeCategories' => [],
+'excludeCategories' => [
+    'yii\\db\\Connection::open', // DB Connection; queries and commands remain
+    'nystudio107\\vite\\*',       // Vite plugin
+    'nystudio107\\pluginvite\\*', // Vite shared package
+    'nystudio107\\codeeditor\\*', // Code Editor
+    'nystudio107\\minify\\*',     // Minify
+],
+```
+
+Place either example inside `runtimeLogStore`. The backslashes are doubled because these are PHP strings; in the CP, choose the source names or type raw patterns with single backslashes. Both Vite namespaces are included because the plugin and its shared package emit categories separately. Exclusions affect Runtime Logs only, not file logging or hosted log feeds.
+
+> [!IMPORTANT]
+> In 5.19.0, rename any existing `runtimeLogStore.categories` configuration to `runtimeLogStore.includeCategories` and `runtimeLogStore.except` to `runtimeLogStore.excludeCategories`. The old keys are not aliases and no longer control capture. Saved CP filter lists are preserved by the database migration.
 
 ## Storage backends
 

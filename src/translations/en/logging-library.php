@@ -14,7 +14,6 @@ return [
     'Open Settings' => 'Open Settings',
 
     // Navigation
-    'Setup' => 'Setup',
     'File Logs' => 'File Logs',
     'All Logs' => 'All Logs',
     'Runtime Logs' => 'Runtime Logs',
@@ -27,9 +26,10 @@ return [
     'Interface' => 'Interface',
 
     // Permissions
-    'View all system logs' => 'View all system logs',
-    'Download all system logs' => 'Download all system logs',
-    'Clear cache' => 'Clear cache',
+    'View all file logs' => 'View all file logs',
+    'Download all file logs' => 'Download all file logs',
+    'Clear file log cache' => 'Clear file log cache',
+    'View runtime logs' => 'View runtime logs',
     'Manage settings' => 'Manage settings',
 
     // Common
@@ -64,7 +64,7 @@ return [
 
     // Settings: File Logs
     'Force Enable File Log Viewers' => 'Force Enable File Log Viewers',
-    'An edge or ephemeral environment is detected. File viewers are hidden unless forced on; Runtime Logs remain available when enabled. Only force file viewers on if persistent log files are available.' => 'An edge or ephemeral environment is detected. File viewers are hidden unless forced on; Runtime Logs remain available when enabled. Only force file viewers on if persistent log files are available.',
+    'An edge or ephemeral environment is detected. File viewers are hidden unless forced on; {runtimeLogs} remain available when enabled. Only force file viewers on if persistent log files are available.' => 'An edge or ephemeral environment is detected. File viewers are hidden unless forced on; {runtimeLogs} remain available when enabled. Only force file viewers on if persistent log files are available.',
     'File viewers are available. Runtime Logs are optional and independent of file logging.' => 'File viewers are available. Runtime Logs are optional and independent of file logging.',
 
     // Settings: Runtime Logs
@@ -79,17 +79,18 @@ return [
     'Maximum Message Bytes' => 'Maximum Message Bytes',
     'Maximum Context Bytes' => 'Maximum Context Bytes',
     'Captured Levels' => 'Captured Levels',
-    'Include Categories' => 'Include Categories',
-    'Exclude Categories' => 'Exclude Categories',
+    'Include Sources and Categories' => 'Include Sources and Categories',
+    'Exclude Sources and Categories' => 'Exclude Sources and Categories',
+    'Category: {pattern}' => 'Category: {pattern}',
     'Include Request User ID' => 'Include Request User ID',
     'Advanced' => 'Advanced',
     'Configured Storage' => 'Configured Storage',
-    'Storage follows the Craft cache configuration. Redis database selection is configuration-only. This is not a connection test; confirm capture in Runtime Logs.' => 'Storage follows the Craft cache configuration. Redis database selection is configuration-only. This is not a connection test; confirm capture in Runtime Logs.',
-    'On multiple servers, use shared cache storage. Local file cache does not combine logs from other instances.' => 'On multiple servers, use shared cache storage. Local file cache does not combine logs from other instances.',
-    'Capture changes apply to new requests. Restart long-running workers to load changed settings. Disabling capture does not clear stored logs.' => 'Capture changes apply to new requests. Restart long-running workers to load changed settings. Disabling capture does not clear stored logs.',
+    'Capture new messages in Runtime Logs. Changes apply to new requests; restart long-running workers to apply them. Turning this off does not delete existing logs.' => 'Capture new messages in Runtime Logs. Changes apply to new requests; restart long-running workers to apply them. Turning this off does not delete existing logs.',
+    'Limits the message text kept for each new Runtime Logs entry, in bytes rather than characters. Longer messages are shortened. File logs are unaffected.' => 'Limits the message text kept for each new Runtime Logs entry, in bytes rather than characters. Longer messages are shortened. File logs are unaffected.',
+    'Limits the extra data kept for each new Runtime Logs entry, such as error details and stack traces, in bytes after JSON encoding. Larger context is shortened. File logs are unaffected.' => 'Limits the extra data kept for each new Runtime Logs entry, such as error details and stack traces, in bytes after JSON encoding. Larger context is shortened. File logs are unaffected.',
     'How often Runtime Logs refreshes automatically. Set to 0 to disable. Current: {duration}' => 'How often Runtime Logs refreshes automatically. Set to 0 to disable. Current: {duration}',
-    'Choose which log categories to capture, not words in the message. Enter one category per line, such as {exact}, or use {prefix} to match categories starting with {start}. Leave empty to capture all categories.' => 'Choose which log categories to capture, not words in the message. Enter one category per line, such as {exact}, or use {prefix} to match categories starting with {start}. Leave empty to capture all categories.',
-    'Skip these log categories even if included above. Enter one per line, such as {exact} or {prefix}. Leave empty to add no category exclusions.' => 'Skip these log categories even if included above. Enter one per line, such as {exact} or {prefix}. Leave empty to add no category exclusions.',
+    'Choose sources by name or type a category pattern such as {pattern} and press Enter. Leave empty to capture all sources. Changes affect new messages only.' => 'Choose sources by name or type a category pattern such as {pattern} and press Enter. Leave empty to capture all sources. Changes affect new messages only.',
+    'Choose sources to skip or type a category pattern and press Enter. Exclusions take precedence. Existing entries are not removed.' => 'Choose sources to skip or type a category pattern and press Enter. Exclusions take precedence. Existing entries are not removed.',
     'When on, Runtime Logs skips command-line requests. Turn off only when diagnosing console commands; file and hosted logs are unaffected.' => 'When on, Runtime Logs skips command-line requests. Turn off only when diagnosing console commands; file and hosted logs are unaffected.',
     'When on, Runtime Logs skips detected queue execution. To capture console queue workers, turn off both skip switches and restart the workers. Workers can generate large volumes of logs.' => 'When on, Runtime Logs skips detected queue execution. To capture console queue workers, turn off both skip switches and restart the workers. Workers can generate large volumes of logs.',
     'Adds the authenticated request user ID. Messages and context may still contain personal data regardless of this setting.' => 'Adds the authenticated request user ID. Messages and context may still contain personal data regardless of this setting.',
@@ -107,10 +108,6 @@ return [
 
     // Settings: Interface
     'Interface Settings' => 'Interface Settings',
-
-    // Setup
-    'Choose the log views that suit this environment. Runtime capture is optional and remains off until enabled.' => 'Choose the log views that suit this environment. Runtime capture is optional and remains off until enabled.',
-    'Consider Runtime Logs for recent diagnostics on ephemeral hosting. Confirm shared storage before relying on logs from multiple instances.' => 'Consider Runtime Logs for recent diagnostics on ephemeral hosting. Confirm shared storage before relying on logs from multiple instances.',
 
     // Log levels
     'All Levels' => 'All Levels',
@@ -176,7 +173,7 @@ return [
     'Current File' => 'Current File',
     'Log entries' => 'Log entries',
     'Refresh Cache' => 'Refresh Cache',
-    'Clear Runtime Logs' => 'Clear Runtime Logs',
+    'Clear runtime logs' => 'Clear runtime logs',
     'Clear recent runtime logs? This cannot be undone.' => 'Clear recent runtime logs? This cannot be undone.',
     'Loading' => 'Loading',
     'Download File' => 'Download File',

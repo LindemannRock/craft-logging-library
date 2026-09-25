@@ -14,7 +14,6 @@ return [
     'Open Settings' => 'Apri le impostazioni',
 
     // Navigation
-    'Setup' => 'Configurazione',
     'File Logs' => 'Log su file',
     'All Logs' => 'Tutti i log',
     'Runtime Logs' => 'Log runtime',
@@ -27,9 +26,10 @@ return [
     'Interface' => 'Interfaccia',
 
     // Permissions
-    'View all system logs' => 'Visualizza tutti i log di sistema',
-    'Download all system logs' => 'Scarica tutti i log di sistema',
-    'Clear cache' => 'Svuota cache',
+    'View all file logs' => 'Visualizza tutti i log su file',
+    'Download all file logs' => 'Scarica tutti i log su file',
+    'Clear file log cache' => 'Svuota cache dei log su file',
+    'View runtime logs' => 'Visualizza log runtime',
     'Manage settings' => 'Gestisci impostazioni',
 
     // Common
@@ -64,7 +64,7 @@ return [
 
     // Settings: File Logs
     'Force Enable File Log Viewers' => 'Forza attivazione visualizzatori di log su file',
-    'An edge or ephemeral environment is detected. File viewers are hidden unless forced on; Runtime Logs remain available when enabled. Only force file viewers on if persistent log files are available.' => 'È stato rilevato un ambiente edge o temporaneo. I visualizzatori di file sono nascosti salvo attivazione forzata; i log runtime restano disponibili quando attivati. Forzare i visualizzatori solo se sono disponibili file di log persistenti.',
+    'An edge or ephemeral environment is detected. File viewers are hidden unless forced on; {runtimeLogs} remain available when enabled. Only force file viewers on if persistent log files are available.' => 'È stato rilevato un ambiente edge o temporaneo. I visualizzatori di file sono nascosti salvo attivazione forzata; i {runtimeLogs} restano disponibili quando attivati. Forzare i visualizzatori solo se sono disponibili file di log persistenti.',
     'File viewers are available. Runtime Logs are optional and independent of file logging.' => 'I visualizzatori di file sono disponibili. I log runtime sono facoltativi e indipendenti dalla registrazione su file.',
 
     // Settings: Runtime Logs
@@ -79,17 +79,18 @@ return [
     'Maximum Message Bytes' => 'Byte massimi del messaggio',
     'Maximum Context Bytes' => 'Byte massimi del contesto',
     'Captured Levels' => 'Livelli acquisiti',
-    'Include Categories' => 'Includi categorie',
-    'Exclude Categories' => 'Escludi categorie',
+    'Include Sources and Categories' => 'Includi sorgenti e categorie',
+    'Exclude Sources and Categories' => 'Escludi sorgenti e categorie',
+    'Category: {pattern}' => 'Categoria: {pattern}',
     'Include Request User ID' => 'Includi ID utente della richiesta',
     'Advanced' => 'Avanzate',
     'Configured Storage' => 'Archiviazione configurata',
-    'Storage follows the Craft cache configuration. Redis database selection is configuration-only. This is not a connection test; confirm capture in Runtime Logs.' => 'L\'archiviazione segue la configurazione della cache Craft. Il database Redis si seleziona solo tramite configurazione. Questo non è un test di connessione; verificare l\'acquisizione nei log runtime.',
-    'On multiple servers, use shared cache storage. Local file cache does not combine logs from other instances.' => 'Su più server, usare una cache condivisa. La cache di file locale non combina i log di altre istanze.',
-    'Capture changes apply to new requests. Restart long-running workers to load changed settings. Disabling capture does not clear stored logs.' => 'Le modifiche all\'acquisizione si applicano alle nuove richieste. Riavviare i processi di lunga durata per caricare le impostazioni modificate. Disattivare l\'acquisizione non elimina i log archiviati.',
+    'Capture new messages in Runtime Logs. Changes apply to new requests; restart long-running workers to apply them. Turning this off does not delete existing logs.' => 'Acquisire nuovi messaggi nei log runtime. Le modifiche si applicano alle nuove richieste; riavviare i processi di lunga durata per applicarle. Disattivare questa opzione non elimina i log esistenti.',
+    'Limits the message text kept for each new Runtime Logs entry, in bytes rather than characters. Longer messages are shortened. File logs are unaffected.' => 'Limita il testo del messaggio conservato per ogni nuova voce nei log runtime, in byte anziché in caratteri. I messaggi più lunghi vengono abbreviati. I log su file non vengono modificati.',
+    'Limits the extra data kept for each new Runtime Logs entry, such as error details and stack traces, in bytes after JSON encoding. Larger context is shortened. File logs are unaffected.' => 'Limita i dati aggiuntivi conservati per ogni nuova voce nei log runtime, come i dettagli degli errori e le tracce dello stack, in byte dopo la codifica JSON. Il contesto più grande viene abbreviato. I log su file non vengono modificati.',
     'How often Runtime Logs refreshes automatically. Set to 0 to disable. Current: {duration}' => 'Frequenza di aggiornamento automatico dei log runtime. Impostare 0 per disattivarlo. Attuale: {duration}',
-    'Choose which log categories to capture, not words in the message. Enter one category per line, such as {exact}, or use {prefix} to match categories starting with {start}. Leave empty to capture all categories.' => 'Scegliere le categorie di log da acquisire, non parole del messaggio. Inserire una categoria per riga, come {exact}, oppure usare {prefix} per le categorie che iniziano con {start}. Lasciare vuoto per acquisire tutte le categorie.',
-    'Skip these log categories even if included above. Enter one per line, such as {exact} or {prefix}. Leave empty to add no category exclusions.' => 'Ignorare queste categorie di log anche se incluse sopra. Inserirne una per riga, come {exact} o {prefix}. Lasciare vuoto per non aggiungere esclusioni di categorie.',
+    'Choose sources by name or type a category pattern such as {pattern} and press Enter. Leave empty to capture all sources. Changes affect new messages only.' => 'Scegliere le sorgenti per nome oppure inserire un modello di categoria come {pattern} e premere Invio. Lasciare vuoto per acquisire tutte le sorgenti. Le modifiche riguardano solo i nuovi messaggi.',
+    'Choose sources to skip or type a category pattern and press Enter. Exclusions take precedence. Existing entries are not removed.' => 'Scegliere le sorgenti da ignorare oppure inserire un modello di categoria e premere Invio. Le esclusioni hanno la precedenza. Le voci esistenti non vengono rimosse.',
     'When on, Runtime Logs skips command-line requests. Turn off only when diagnosing console commands; file and hosted logs are unaffected.' => 'Quando l’opzione è attiva, i log di runtime ignorano le richieste da riga di comando. Disattivarla solo per diagnosticare i comandi della console; i log su file e dell’hosting restano invariati.',
     'When on, Runtime Logs skips detected queue execution. To capture console queue workers, turn off both skip switches and restart the workers. Workers can generate large volumes of logs.' => 'Quando l’opzione è attiva, i log di runtime ignorano l’esecuzione della coda rilevata. Per acquisire i processi della coda della console, disattivare entrambe le opzioni di esclusione e riavviare i processi. I processi possono generare grandi volumi di log.',
     'Adds the authenticated request user ID. Messages and context may still contain personal data regardless of this setting.' => 'Aggiunge l\'ID dell\'utente autenticato della richiesta. Messaggi e contesto possono contenere dati personali indipendentemente da questa impostazione.',
@@ -107,10 +108,6 @@ return [
 
     // Settings: Interface
     'Interface Settings' => 'Impostazioni interfaccia',
-
-    // Setup
-    'Choose the log views that suit this environment. Runtime capture is optional and remains off until enabled.' => 'Scegliere le viste dei log adatte a questo ambiente. L\'acquisizione runtime è facoltativa e resta disattivata fino all\'attivazione.',
-    'Consider Runtime Logs for recent diagnostics on ephemeral hosting. Confirm shared storage before relying on logs from multiple instances.' => 'Valutare i log runtime per la diagnostica recente su hosting temporaneo. Verificare l\'archiviazione condivisa prima di affidarsi ai log di più istanze.',
 
     // Log levels
     'All Levels' => 'Tutti i livelli',
@@ -176,7 +173,7 @@ return [
     'Current File' => 'File attuale',
     'Log entries' => 'Voci di log',
     'Refresh Cache' => 'Aggiorna cache',
-    'Clear Runtime Logs' => 'Cancella log runtime',
+    'Clear runtime logs' => 'Cancella log runtime',
     'Clear recent runtime logs? This cannot be undone.' => 'Cancellare i log runtime recenti? Questa azione non può essere annullata.',
     'Loading' => 'Caricamento',
     'Download File' => 'Scarica file',

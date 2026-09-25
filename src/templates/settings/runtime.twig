@@ -39,7 +39,19 @@
 		}))
 	}}
 {% elseif type == 'list' %}
-	{{ forms.textareaField(field|merge({value: value|join('\n'), rows: 4})) }}
+	{% set picker = settings.getRuntimeCategoryPicker(value) %}
+	{{
+		forms.selectizeField(field|merge({
+		values: picker.values,
+		options: picker.options,
+		multi: true,
+		selectizeOptions: {create: true, createOnBlur: true, persist: false, delimiter: '\n'},
+		}))
+	}}
+	{% js %}
+	(() => { const field = $({{ ('#' ~ attribute|namespaceInputId)|json_encode|raw }}).data('selectize'); field.settings.formatValueToKey = value => 'p_' + Array.from(new TextEncoder().encode(value),
+	byte => byte.toString(16).padStart(2, '0')).join(''); })();
+	{% endjs %}
 {% else %}
 	{{ forms.textField(field|merge({value: value, type: 'number', step: 1})) }}
 {% endif %}
@@ -51,18 +63,16 @@
 	{{ hiddenInput('section', 'runtime') }}
 	<h2 class='first'>{{ title }}</h2>
 	<p>{{ 'Recent runtime logs use a bounded diagnostic store and are not complete log history.'|t('logging-library') }}</p>
-	{% include 'logging-library/_components/runtime-storage' with {settings: settings, compact: true} only %}
+	{% include 'logging-library/_components/runtime-storage' with {settings: settings} only %}
 
-	{{ _self.runtimeField(settings, runtime, 'runtimeEnabled', 'enabled', 'boolean', {toggle: 'runtime-settings'}) }}
+	{{
+		_self.runtimeField(settings, runtime, 'runtimeEnabled', 'enabled', 'boolean', {
+		toggle: 'runtime-settings',
+		instructions: 'Capture new messages in Runtime Logs. Changes apply to new requests; restart long-running workers to apply them. Turning this off does not delete existing logs.'|t('logging-library'),
+		})
+	}}
 	{% set enabled = not settings.isOverriddenByConfig('runtimeEnabled') and settings.hasErrors() ? settings.runtimeEnabled : runtime.enabled %}
 	<div id='runtime-settings' class='{{ not enabled ? 'hidden' }}'>
-		{%
-			include 'lindemannrock-base/_components/info-box' with {
-			    message: 'Capture changes apply to new requests. Restart long-running workers to load changed settings. Disabling capture does not clear stored logs.'|t('logging-library'),
-			    type: 'info',
-			    margin: 'bottom',
-			} only
-		%}
 		{{
 			_self.runtimeField(settings, runtime, 'runtimeSkipConsoleRequests', 'skipConsoleRequests', 'boolean', {
 			instructions: 'When on, Runtime Logs skips command-line requests. Turn off only when diagnosing console commands; file and hosted logs are unaffected.'|t('logging-library'),
@@ -108,17 +118,27 @@
 		<hr>
 		<h2>{{ 'Advanced'|t('logging-library') }}</h2>
 		{{
-			_self.runtimeField(settings, runtime, 'runtimeCategories', 'categories', 'list', {
-			instructions: 'Choose which log categories to capture, not words in the message. Enter one category per line, such as {exact}, or use {prefix} to match categories starting with {start}. Leave empty to capture all categories.'|t('logging-library', {exact: '`my-plugin`', prefix: '`yii\\db\\*`', start: '`yii\\db\\`'}),
+			_self.runtimeField(settings, runtime, 'runtimeIncludeCategories', 'includeCategories', 'list', {
+			instructions: 'Choose sources by name or type a category pattern such as {pattern} and press Enter. Leave empty to capture all sources. Changes affect new messages only.'|t('logging-library', {pattern: '`yii\\db\\*`'}),
 			})
 		}}
 		{{
-			_self.runtimeField(settings, runtime, 'runtimeExcept', 'except', 'list', {
-			instructions: 'Skip these log categories even if included above. Enter one per line, such as {exact} or {prefix}. Leave empty to add no category exclusions.'|t('logging-library', {exact: '`my-plugin`', prefix: '`yii\\db\\*`'}),
+			_self.runtimeField(settings, runtime, 'runtimeExcludeCategories', 'excludeCategories', 'list', {
+			instructions: 'Choose sources to skip or type a category pattern and press Enter. Exclusions take precedence. Existing entries are not removed.'|t('logging-library'),
 			})
 		}}
-		{{ _self.runtimeField(settings, runtime, 'runtimeMaxMessageBytes', 'maxMessageBytes', 'number', {min: 1, max: 65536}) }}
-		{{ _self.runtimeField(settings, runtime, 'runtimeMaxContextBytes', 'maxContextBytes', 'number', {min: 1, max: 65536}) }}
+		{{
+			_self.runtimeField(settings, runtime, 'runtimeMaxMessageBytes', 'maxMessageBytes', 'number', {
+			min: 1, max: 65536,
+			instructions: 'Limits the message text kept for each new Runtime Logs entry, in bytes rather than characters. Longer messages are shortened. File logs are unaffected.'|t('logging-library'),
+			})
+		}}
+		{{
+			_self.runtimeField(settings, runtime, 'runtimeMaxContextBytes', 'maxContextBytes', 'number', {
+			min: 1, max: 65536,
+			instructions: 'Limits the extra data kept for each new Runtime Logs entry, such as error details and stack traces, in bytes after JSON encoding. Larger context is shortened. File logs are unaffected.'|t('logging-library'),
+			})
+		}}
 	</div>
 	{% include 'lindemannrock-base/_components/plugin-credit' %}
 {% endblock %}
