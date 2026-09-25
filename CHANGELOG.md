@@ -1,5 +1,18 @@
 # Changelog
 
+## [5.19.0](https://github.com/LindemannRock/craft-logging-library/compare/v5.18.2...v5.19.0) - 2026-09-25
+
+
+### Added
+
+* **cp:** add source filters and separate runtime log permissions ([16b3cc4](https://github.com/LindemannRock/craft-logging-library/commit/16b3cc40089a9a42774f4e92ce489734e753d2f4))
+* **settings:** add runtime log settings and setup ([569acc0](https://github.com/LindemannRock/craft-logging-library/commit/569acc0b12d311fb9210c8487eaa471368473729))
+
+
+### Fixed
+
+* **settings:** preserve Unicode runtime filters ([1a0e415](https://github.com/LindemannRock/craft-logging-library/commit/1a0e4154e5b0bbc4e6931410317cd457964e6c18))
+
 ## [5.18.2](https://github.com/LindemannRock/craft-logging-library/compare/v5.18.1...v5.18.2) - 2026-08-31
 
 
