@@ -23,7 +23,7 @@ $baseBootstrap = $projectRoot . '/vendor/lindemannrock/craft-plugin-base/src/tes
 
 if (!file_exists($baseBootstrap)) {
     fwrite(STDERR, "Base plugin testing bootstrap not found at {$baseBootstrap}\n");
-    fwrite(STDERR, "Run `composer install` and ensure lindemannrock/craft-plugin-base ^5.x is present.\n");
+    fwrite(STDERR, "Run `composer install` and ensure lindemannrock/craft-plugin-base ^5.39.0 is present.\n");
     exit(1);
 }
 

@@ -3,7 +3,7 @@
 # Logging Library for Craft CMS
 
 [![Latest Version](https://img.shields.io/packagist/v/lindemannrock/craft-logging-library.svg)](https://packagist.org/packages/lindemannrock/craft-logging-library)
-[![Craft CMS](https://img.shields.io/badge/Craft%20CMS-5.10%2B-orange.svg)](https://craftcms.com/)
+[![Craft CMS](https://img.shields.io/badge/Craft%20CMS-5.11%2B-orange.svg)](https://craftcms.com/)
 [![PHP](https://img.shields.io/badge/PHP-8.2%2B-blue.svg)](https://php.net/)
 [![License](https://img.shields.io/packagist/l/lindemannrock/craft-logging-library.svg)](LICENSE.md)
 
@@ -32,9 +32,9 @@ For recent-activity visibility in the CP on those platforms, enable the bounded 
 
 ## Requirements
 
-- Craft CMS 5.10+
+- Craft CMS 5.11+
 - PHP 8.2+
-- [LindemannRock Plugin Base](https://github.com/LindemannRock/craft-plugin-base) 5.38.2+ (required by Composer)
+- [LindemannRock Plugin Base](https://github.com/LindemannRock/craft-plugin-base) 5.39.0+ (required by Composer)
 
 ## Installation
 
