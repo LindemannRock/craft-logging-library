@@ -53,6 +53,9 @@ final class QualityGateOrchestrationTest extends TestCase
             'Composer\\Config::disableProcessTimeout',
             'bash scripts/quality-gate',
         ], $composer['scripts']['quality-gate']);
+        self::assertSame('php tests/Fixtures/Project/run.php --no-progress', $composer['scripts']['test']);
+        self::assertSame('phpunit --colors=always', $composer['scripts']['test:direct']);
+        self::assertSame(['@ci', '@test'], $composer['scripts']['ci:full']);
     }
 
     public function testComposerRequiresPublishedDependencyAndToolFloors(): void
@@ -86,6 +89,21 @@ final class QualityGateOrchestrationTest extends TestCase
         self::assertFalse(Semver::satisfies('1.12.32', $phpstanConstraint));
         self::assertTrue(Semver::satisfies('1.12.33', $phpstanConstraint));
         self::assertFalse(Semver::satisfies('2.0.0', $phpstanConstraint));
+    }
+
+    public function testWorkspaceRunnerPreparesTheDisposableFixtureBeforeComposerTest(): void
+    {
+        $runner = (string)file_get_contents($this->packageRoot() . '/scripts/run-tests');
+        $fixture = (string)file_get_contents(
+            $this->packageRoot() . '/tests/Support/DisposableCraftProject.php',
+        );
+
+        self::assertStringContainsString('LOGGING_LIBRARY_FIXTURE_SOURCE_VENDOR_ROOT', $runner);
+        self::assertLessThan(
+            strpos($runner, 'exec composer test'),
+            strpos($runner, 'export LOGGING_LIBRARY_FIXTURE_SOURCE_VENDOR_ROOT='),
+        );
+        self::assertStringContainsString("'web/cpresources'", $fixture);
     }
 
     public function testSuccessfulProbeRunsEveryConstituentInOrder(): void

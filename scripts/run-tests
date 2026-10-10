@@ -8,6 +8,7 @@ cd "$PACKAGE_ROOT"
 if [ "$PACKAGE_ROOT" = "$WORKSPACE_ROOT/plugins/logging-library" ] \
     && [ -f "$WORKSPACE_ROOT/bootstrap.php" ] \
     && [ -f "$WORKSPACE_ROOT/vendor/autoload.php" ]; then
+    export LOGGING_LIBRARY_FIXTURE_SOURCE_VENDOR_ROOT="$WORKSPACE_ROOT/vendor"
     exec composer test
 fi
 
