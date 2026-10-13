@@ -53,7 +53,7 @@ final class QualityGateOrchestrationTest extends TestCase
             'Composer\\Config::disableProcessTimeout',
             'bash scripts/quality-gate',
         ], $composer['scripts']['quality-gate']);
-        self::assertSame('php tests/Fixtures/Project/run.php --no-progress', $composer['scripts']['test']);
+        self::assertSame('bash scripts/run-tests --no-progress', $composer['scripts']['test']);
         self::assertSame('phpunit --colors=always', $composer['scripts']['test:direct']);
         self::assertSame(['@ci', '@test'], $composer['scripts']['ci:full']);
     }
@@ -91,7 +91,7 @@ final class QualityGateOrchestrationTest extends TestCase
         self::assertFalse(Semver::satisfies('2.0.0', $phpstanConstraint));
     }
 
-    public function testWorkspaceRunnerPreparesTheDisposableFixtureBeforeComposerTest(): void
+    public function testWorkspaceRunnerPreparesTheDisposableFixtureWithoutComposerRecursion(): void
     {
         $runner = (string)file_get_contents($this->packageRoot() . '/scripts/run-tests');
         $fixture = (string)file_get_contents(
@@ -99,11 +99,51 @@ final class QualityGateOrchestrationTest extends TestCase
         );
 
         self::assertStringContainsString('LOGGING_LIBRARY_FIXTURE_SOURCE_VENDOR_ROOT', $runner);
-        self::assertLessThan(
-            strpos($runner, 'exec composer test'),
-            strpos($runner, 'export LOGGING_LIBRARY_FIXTURE_SOURCE_VENDOR_ROOT='),
-        );
+        self::assertStringContainsString('tests/Fixtures/Project/run.php "$@"', $runner);
+        self::assertStringNotContainsString('composer test', $runner);
         self::assertStringContainsString("'web/cpresources'", $fixture);
+    }
+
+    public function testPublicTestRunnerInitializesWorkspaceVendorWithoutComposerRecursion(): void
+    {
+        $root = $this->createTrackedTempDirectory('logging-library-test-runner');
+        $bin = $root . '/bin';
+        $phpLog = $root . '/php.log';
+        $composerLog = $root . '/composer.log';
+        mkdir($bin);
+        file_put_contents($phpLog, '');
+        file_put_contents($composerLog, '');
+        file_put_contents($bin . '/php', <<<'SH'
+#!/bin/sh
+printf '%s|%s\n' "$LOGGING_LIBRARY_FIXTURE_SOURCE_VENDOR_ROOT" "$*" >> "$LOGGING_LIBRARY_RUNNER_PHP_LOG"
+exit 0
+SH);
+        chmod($bin . '/php', 0700);
+        file_put_contents($bin . '/composer', <<<'SH'
+#!/bin/sh
+printf '%s\n' "$*" >> "$LOGGING_LIBRARY_RUNNER_COMPOSER_LOG"
+exit 86
+SH);
+        chmod($bin . '/composer', 0700);
+
+        $process = new Process(
+            ['/bin/bash', 'scripts/run-tests', '--no-progress'],
+            $this->packageRoot(),
+            [
+                'PATH' => $bin . ':/usr/bin:/bin',
+                'LOGGING_LIBRARY_RUNNER_PHP_LOG' => $phpLog,
+                'LOGGING_LIBRARY_RUNNER_COMPOSER_LOG' => $composerLog,
+            ],
+        );
+        $process->run();
+
+        $vendorRoot = (string)realpath(dirname($this->packageRoot(), 2) . '/vendor');
+        self::assertSame(0, $process->getExitCode(), $process->getErrorOutput());
+        self::assertSame(
+            [$vendorRoot . '|tests/Fixtures/Project/run.php --no-progress'],
+            array_values(array_filter(explode("\n", trim((string)file_get_contents($phpLog))))),
+        );
+        self::assertSame('', (string)file_get_contents($composerLog));
     }
 
     public function testSuccessfulProbeRunsEveryConstituentInOrder(): void
