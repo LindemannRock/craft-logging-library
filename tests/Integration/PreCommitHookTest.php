@@ -123,6 +123,7 @@ final class PreCommitHookTest extends TestCase
             ['/bin/bash', $fixture['packageRoot'] . '/.githooks/pre-commit'],
             $fixture['packageRoot'],
             [
+                'BASH_ENV' => false,
                 'PATH' => $fixture['bin'] . ':/usr/bin:/bin',
                 'LOGGING_LIBRARY_HOOK_TEST_LOG' => $fixture['log'],
             ],
