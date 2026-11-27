@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.21.0](https://github.com/LindemannRock/craft-logging-library/compare/v5.20.0...v5.21.0) - 2026-11-27
+
+
+### Fixed
+
+* **deps:** require Base 5.40 and Craft 5.12.3 ([9553f42](https://github.com/LindemannRock/craft-logging-library/commit/9553f42c96226784066a53d41233e49982992c0b))
+
 ## [5.20.0](https://github.com/LindemannRock/craft-logging-library/compare/v5.19.0...v5.20.0) - 2026-10-13
 
 
